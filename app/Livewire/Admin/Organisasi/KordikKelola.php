@@ -22,6 +22,18 @@ class KordikKelola extends Component
     public string $mode = 'tabel';
     public string $cari = '';
     public string $filterPeriode = '';
+    public string $filterKecamatan = 'semua';
+    public string $statusFilter = 'Semua';
+
+    // Sorting & Pagination
+    public string $sortField = 'dibuat_pada';
+    public string $sortDirection = 'desc';
+    public int $perPage = 10;
+    public string $tampilanMode = 'tabel'; // 'tabel' atau 'grid'
+
+    // Bulk selection
+    public array $selectedKordik = [];
+    public bool $pilihSemua = false;
 
     // Form fields
     public ?string $editId = null;
@@ -53,7 +65,7 @@ class KordikKelola extends Component
 
     public function mount(): void
     {
-        $periodeAktif = PeriodeKepengurusan::aktif()->first();
+        $periodeAktif = PeriodeKepengurusan::aktif()->first() ?? PeriodeKepengurusan::orderByDesc('tahun_mulai')->first();
         if ($periodeAktif) {
             $this->periode_id = $periodeAktif->id;
             $this->filterPeriode = $periodeAktif->id;
@@ -66,6 +78,8 @@ class KordikKelola extends Component
 
     public function updatedCari(): void { $this->resetPage(); }
     public function updatedFilterPeriode(): void { $this->resetPage(); }
+    public function updatedFilterKecamatan(): void { $this->resetPage(); }
+    public function updatedStatusFilter(): void { $this->resetPage(); }
 
     public function kembaliKeTabel(): void
     {
@@ -76,7 +90,7 @@ class KordikKelola extends Component
     public function bukaFormTambah(): void
     {
         $this->resetInput();
-        $periodeAktif = PeriodeKepengurusan::aktif()->first();
+        $periodeAktif = PeriodeKepengurusan::aktif()->first() ?? PeriodeKepengurusan::orderByDesc('tahun_mulai')->first();
         if ($periodeAktif) $this->periode_id = $periodeAktif->id;
         $firstKec = Kecamatan::first();
         if ($firstKec) $this->kecamatan_id = $firstKec->id;
@@ -96,7 +110,7 @@ class KordikKelola extends Component
         $this->nomor_telepon = $item->nomor_telepon ?? '';
         $this->nomor_sk = $item->nomor_sk ?? '';
         $this->foto_ketua_url = $item->foto_ketua_url ?? '';
-        $this->status_aktif = $item->status_aktif;
+        $this->status_aktif = (bool) $item->status_aktif;
         $this->uploadFoto = null;
         $this->mode = 'form';
         $this->resetErrorBag();
@@ -119,17 +133,17 @@ class KordikKelola extends Component
             'kecamatan_id' => $this->kecamatan_id,
             'periode_id' => $this->periode_id,
             'nama_ketua' => trim($this->nama_ketua),
-            'nama_sekretaris' => $this->nama_sekretaris ?: null,
-            'nama_bendahara' => $this->nama_bendahara ?: null,
-            'nomor_telepon' => $this->nomor_telepon ?: null,
-            'nomor_sk' => $this->nomor_sk ?: null,
+            'nama_sekretaris' => $this->nama_sekretaris ? trim($this->nama_sekretaris) : null,
+            'nama_bendahara' => $this->nama_bendahara ? trim($this->nama_bendahara) : null,
+            'nomor_telepon' => $this->nomor_telepon ? trim($this->nomor_telepon) : null,
+            'nomor_sk' => $this->nomor_sk ? trim($this->nomor_sk) : null,
             'foto_ketua_url' => $pathFoto,
             'status_aktif' => $this->status_aktif,
         ];
 
         if ($this->editId) {
             KordikPengurus::findOrFail($this->editId)->update($data);
-            session()->flash('pesan', 'Data koordinator kecamatan berhasil diperbarui!');
+            session()->flash('pesan', 'Data koordinator kecamatan ' . ($item->kecamatan->nama_kecamatan ?? '') . ' berhasil diperbarui!');
         } else {
             $data['id'] = (string) Str::uuid();
             KordikPengurus::create($data);
@@ -142,9 +156,92 @@ class KordikKelola extends Component
     public function hapus(string $id): void
     {
         $item = KordikPengurus::findOrFail($id);
-        app(StorageService::class)->hapusFile($item->foto_ketua_url);
+        if ($item->foto_ketua_url) {
+            app(StorageService::class)->hapusFile($item->foto_ketua_url);
+        }
+        $nama = $item->nama_ketua;
         $item->delete();
-        session()->flash('pesan', 'Data koordinator kecamatan berhasil dihapus.');
+        session()->flash('pesan', 'Data koordinator kecamatan (' . $nama . ') berhasil dihapus.');
+    }
+
+    public function sortBy(string $field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function updatedPilihSemua(bool $value): void
+    {
+        if ($value) {
+            $query = KordikPengurus::query()
+                ->when($this->filterPeriode, fn($q) => $q->where('periode_id', $this->filterPeriode));
+            $this->selectedKordik = $query->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selectedKordik = [];
+        }
+    }
+
+    public function resetSelection(): void
+    {
+        $this->selectedKordik = [];
+        $this->pilihSemua = false;
+    }
+
+    public function setFilterPeriode(string $periodeId): void
+    {
+        $this->filterPeriode = $periodeId;
+        $this->resetPage();
+    }
+
+    public function setFilterStatus(string $status): void
+    {
+        $this->statusFilter = $status;
+        $this->resetPage();
+    }
+
+    public function resetSemuaFilter(): void
+    {
+        $this->cari = '';
+        $this->filterKecamatan = 'semua';
+        $this->statusFilter = 'Semua';
+        $this->resetPage();
+    }
+
+    public function toggleStatus(string $id): void
+    {
+        $item = KordikPengurus::findOrFail($id);
+        $item->status_aktif = !$item->status_aktif;
+        $item->save();
+        session()->flash('pesan', 'Status keaktifan Kordik Kecamatan ' . ($item->kecamatan?->nama_kecamatan ?? '') . ' berhasil diperbarui!');
+    }
+
+    public function bulkSetStatus(bool $status): void
+    {
+        if (empty($this->selectedKordik)) return;
+        KordikPengurus::whereIn('id', $this->selectedKordik)->update(['status_aktif' => $status]);
+        $text = $status ? 'diaktifkan' : 'dinonaktifkan';
+        session()->flash('pesan', count($this->selectedKordik) . ' data koordinator kecamatan berhasil ' . $text . '.');
+        $this->resetSelection();
+    }
+
+    public function bulkDelete(): void
+    {
+        if (empty($this->selectedKordik)) return;
+        $items = KordikPengurus::whereIn('id', $this->selectedKordik)->get();
+        $storage = app(StorageService::class);
+        foreach ($items as $item) {
+            if ($item->foto_ketua_url) {
+                $storage->hapusFile($item->foto_ketua_url);
+            }
+            $item->delete();
+        }
+        session()->flash('pesan', count($this->selectedKordik) . ' data koordinator kecamatan berhasil dihapus.');
+        $this->resetSelection();
     }
 
     public function resetInput(): void
@@ -164,18 +261,46 @@ class KordikKelola extends Component
     {
         $periodeList = PeriodeKepengurusan::orderByDesc('tahun_mulai')->get();
         $kecamatanList = Kecamatan::orderBy('nama_kecamatan')->get();
+        $totalKecamatan = Kecamatan::count();
 
         $query = KordikPengurus::with(['kecamatan', 'periode'])
             ->when($this->filterPeriode, fn($q) => $q->where('periode_id', $this->filterPeriode))
-            ->when($this->cari, fn($q) => $q->where('nama_ketua', 'like', "%{$this->cari}%"))
-            ->orderBy('dibuat_pada', 'desc');
+            ->when($this->filterKecamatan !== 'semua', fn($q) => $q->where('kecamatan_id', $this->filterKecamatan))
+            ->when($this->statusFilter !== 'Semua', function ($q) {
+                if ($this->statusFilter === 'Aktif') {
+                    $q->where('status_aktif', true);
+                } elseif ($this->statusFilter === 'Non-Aktif') {
+                    $q->where('status_aktif', false);
+                }
+            })
+            ->when($this->cari, fn($q) => $q->where(function($sub) {
+                $sub->where('nama_ketua', 'like', "%{$this->cari}%")
+                    ->orWhere('nama_sekretaris', 'like', "%{$this->cari}%")
+                    ->orWhere('nama_bendahara', 'like', "%{$this->cari}%")
+                    ->orWhere('nomor_sk', 'like', "%{$this->cari}%")
+                    ->orWhereHas('kecamatan', fn($k) => $k->where('nama_kecamatan', 'like', "%{$this->cari}%"));
+            }));
+
+        if (in_array($this->sortField, ['nama_ketua', 'status_aktif', 'dibuat_pada', 'created_at'])) {
+            $query->orderBy($this->sortField, $this->sortDirection);
+        } else {
+            $query->orderBy('dibuat_pada', 'desc');
+        }
+
+        $baseCountQuery = KordikPengurus::query()
+            ->when($this->filterPeriode, fn($q) => $q->where('periode_id', $this->filterPeriode));
 
         return view('livewire.admin.organisasi.kordik-kelola', [
             'periodeList' => $periodeList,
             'kecamatanList' => $kecamatanList,
-            'kordikList' => $query->paginate(15),
+            'kordikList' => $query->paginate($this->perPage),
             'totalKordik' => KordikPengurus::count(),
-            'totalKecamatanTerisi' => KordikPengurus::distinct('kecamatan_id')->count('kecamatan_id'),
+            'totalKordikPeriode' => (clone $baseCountQuery)->count(),
+            'totalAktif' => (clone $baseCountQuery)->where('status_aktif', true)->count(),
+            'totalNonAktif' => (clone $baseCountQuery)->where('status_aktif', false)->count(),
+            'totalKecamatanTerisi' => (clone $baseCountQuery)->distinct('kecamatan_id')->count('kecamatan_id'),
+            'totalKecamatan' => $totalKecamatan,
+            'namaPeriodeAktif' => PeriodeKepengurusan::find($this->filterPeriode)?->nama_periode ?? 'Semua Periode',
         ]);
     }
 }

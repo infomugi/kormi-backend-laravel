@@ -19,8 +19,18 @@ class SaprasKelola extends Component
     use WithPagination, WithFileUploads;
 
     public string $mode = 'tabel'; // 'tabel' atau 'form'
+    public string $tampilanMode = 'tabel'; // 'tabel' atau 'grid'
     public string $cari = '';
     public string $kategoriDipilih = 'Semua';
+    public string $statusKondisiFilter = 'Semua'; // 'Semua', 'Baik', 'Perlu Renovasi', 'Dalam Pembangunan'
+    public string $kecamatanFilter = 'Semua';
+    public string $sortField = 'nama_fasilitas';
+    public string $sortDirection = 'asc';
+    public int $perPage = 10;
+
+    // Bulk selection
+    public array $selectedSapras = [];
+    public bool $pilihSemua = false;
 
     // Backward compatibility for automated tests
     public bool $tampilkanModal = false;
@@ -71,11 +81,118 @@ class SaprasKelola extends Component
     public function updatedCari(): void
     {
         $this->resetPage();
+        $this->resetSelection();
     }
 
     public function updatedKategoriDipilih(): void
     {
         $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedStatusKondisiFilter(): void
+    {
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedKecamatanFilter(): void
+    {
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedPerPage(): void
+    {
+        $this->resetPage();
+    }
+
+    public function sortBy(string $field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function updatedPilihSemua(bool $value): void
+    {
+        if ($value) {
+            $this->selectedSapras = $this->getSaprasQuery()->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selectedSapras = [];
+        }
+    }
+
+    public function resetSelection(): void
+    {
+        $this->selectedSapras = [];
+        $this->pilihSemua = false;
+    }
+
+    public function resetSemuaFilter(): void
+    {
+        $this->cari = '';
+        $this->kategoriDipilih = 'Semua';
+        $this->statusKondisiFilter = 'Semua';
+        $this->kecamatanFilter = 'Semua';
+        $this->sortField = 'nama_fasilitas';
+        $this->sortDirection = 'asc';
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function setFilterKategori(string $kategori): void
+    {
+        $this->kategoriDipilih = $kategori;
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function setFilterStatus(string $status): void
+    {
+        $this->statusKondisiFilter = $status;
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function setFilterKecamatan(string $kecamatanId): void
+    {
+        $this->kecamatanFilter = $kecamatanId;
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function bulkSetKondisi(string $kondisi): void
+    {
+        if (empty($this->selectedSapras)) return;
+
+        SaprasModel::whereIn('id', $this->selectedSapras)->update(['status_kondisi' => $kondisi]);
+        $count = count($this->selectedSapras);
+        session()->flash('pesan', "Status kondisi {$count} fasilitas berhasil diubah menjadi {$kondisi}.");
+        $this->resetSelection();
+    }
+
+    public function bulkDelete(): void
+    {
+        if (empty($this->selectedSapras)) return;
+
+        $items = SaprasModel::whereIn('id', $this->selectedSapras)->get();
+        $storage = app(StorageService::class);
+
+        foreach ($items as $item) {
+            if ($item->foto_url) {
+                $storage->hapusFile($item->foto_url);
+            }
+            $item->delete();
+        }
+
+        $count = count($this->selectedSapras);
+        session()->flash('pesan', "{$count} data fasilitas berhasil dihapus.");
+        $this->resetSelection();
     }
 
     public function kembaliKeTabel(): void
@@ -174,9 +291,12 @@ class SaprasKelola extends Component
     {
         $item = SaprasModel::findOrFail($id);
         $nama = $item->nama_fasilitas;
-        app(StorageService::class)->hapusFile($item->foto_url);
+        if ($item->foto_url) {
+            app(StorageService::class)->hapusFile($item->foto_url);
+        }
         $item->delete();
         session()->flash('pesan', 'Fasilitas "' . $nama . '" berhasil dihapus.');
+        $this->resetSelection();
     }
 
     public function resetInput(): void
@@ -192,24 +312,41 @@ class SaprasKelola extends Component
         $this->uploadFoto              = null;
     }
 
+    protected function getSaprasQuery()
+    {
+        $allowedSorts = ['nama_fasilitas', 'kategori_fasilitas', 'status_kondisi', 'created_at'];
+        $sort = in_array($this->sortField, $allowedSorts) ? $this->sortField : 'nama_fasilitas';
+        $direction = strtolower($this->sortDirection) === 'desc' ? 'desc' : 'asc';
+
+        return SaprasModel::with('kecamatan')
+            ->when($this->kategoriDipilih !== 'Semua', fn($q) => $q->where('kategori_fasilitas', $this->kategoriDipilih))
+            ->when($this->statusKondisiFilter !== 'Semua', fn($q) => $q->where('status_kondisi', $this->statusKondisiFilter))
+            ->when($this->kecamatanFilter !== 'Semua', fn($q) => $q->where('kecamatan_id', $this->kecamatanFilter))
+            ->when($this->cari, fn($q) => $q->where(function ($sub) {
+                $sub->where('nama_fasilitas', 'like', "%{$this->cari}%")
+                    ->orWhere('alamat_lengkap', 'like', "%{$this->cari}%")
+                    ->orWhere('jenis_olahraga_tersedia', 'like', "%{$this->cari}%")
+                    ->orWhereHas('kecamatan', fn($kq) => $kq->where('nama_kecamatan', 'like', "%{$this->cari}%"));
+            }))
+            ->orderBy($sort, $direction);
+    }
+
     public function render()
     {
         $kecamatanList = Kecamatan::orderBy('nama_kecamatan')->get();
-
-        $query = SaprasModel::with('kecamatan')
-            ->when($this->kategoriDipilih !== 'Semua', fn($q) => $q->where('kategori_fasilitas', $this->kategoriDipilih))
-            ->when($this->cari, fn($q) => $q->where('nama_fasilitas', 'like', "%{$this->cari}%"))
-            ->orderBy('nama_fasilitas');
+        $saprasList = $this->getSaprasQuery()->paginate($this->perPage);
 
         $totalFasilitas = SaprasModel::count();
         $totalKondisiBaik = SaprasModel::where('status_kondisi', 'Baik')->count();
+        $totalRenovasi = SaprasModel::where('status_kondisi', 'Perlu Renovasi')->count();
         $totalKecamatan = SaprasModel::distinct('kecamatan_id')->count('kecamatan_id');
 
         return view('livewire.admin.sapras.sapras-kelola', [
             'kecamatanList' => $kecamatanList,
-            'saprasList' => $query->paginate(10),
+            'saprasList' => $saprasList,
             'totalFasilitas' => $totalFasilitas,
             'totalKondisiBaik' => $totalKondisiBaik,
+            'totalRenovasi' => $totalRenovasi,
             'totalKecamatan' => $totalKecamatan,
         ]);
     }

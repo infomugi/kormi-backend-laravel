@@ -23,38 +23,34 @@
         <!-- ========================================================= -->
         <div wire:key="berita-view-tabel" class="space-y-6">
 
-            <!-- 1. HEADER & PRIMARY ACTION -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
-                        <span>PUBLIKASI MEDIA</span>
-                        <span>•</span>
-                        <span class="text-indigo-600 font-black">BERITA & ARTIKEL</span>
-                    </div>
-                    <h1 class="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">Kelola Berita & Publikasi</h1>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-1">Pusat manajemen konten warta, siaran pers liputan, dan dokumentasi inorga KORMI Kabupaten Bandung.</p>
-                </div>
-                
-                <div class="flex items-center gap-2.5 self-start md:self-auto flex-wrap">
+            <!-- 1. HEADER & PRIMARY ACTION (COMPACT PRO COMPONENT) -->
+            <x-table.header
+                title="Kelola Berita & Publikasi"
+                subtitle="Pusat manajemen konten warta, siaran pers liputan, dan dokumentasi inorga KORMI Kabupaten Bandung."
+                badge="Publikasi Media • Berita & Artikel"
+                icon="newspaper"
+                color="indigo"
+            >
+                <x-slot:actions>
                     <button 
                         type="button" 
                         wire:click="bukaModalTambahKategori"
-                        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs shadow-2xs transition-all cursor-pointer active:scale-95"
+                        class="inline-flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/90 text-slate-700 font-bold text-xs shadow-2xs hover:shadow-xs transition-all cursor-pointer active:scale-95 group"
                     >
-                        <i data-lucide="tag" class="w-4 h-4 text-indigo-600"></i>
+                        <i data-lucide="tag" class="w-3.5 h-3.5 text-indigo-600"></i>
                         <span>+ Kategori Baru</span>
                     </button>
 
                     <a 
                         href="{{ route('admin.berita.tambah') }}" 
                         wire:navigate
-                        class="inline-flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs uppercase tracking-wider shadow-md shadow-indigo-600/20 hover:shadow-lg transition-all cursor-pointer active:scale-95"
+                        class="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-md shadow-indigo-600/20 hover:shadow-lg transition-all cursor-pointer active:scale-95 group"
                     >
-                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <i data-lucide="plus-circle" class="w-4 h-4 transition-transform group-hover:rotate-90 duration-200"></i>
                         <span>Tulis Berita Baru</span>
                     </a>
-                </div>
-            </div>
+                </x-slot:actions>
+            </x-table.header>
 
             <!-- 2. KPI METRIC STATS (6 Cards Symmetric Grid with Animated Shimmer Placeholder) -->
             <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">

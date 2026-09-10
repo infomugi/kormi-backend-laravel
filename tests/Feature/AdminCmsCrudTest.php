@@ -298,6 +298,45 @@ class AdminCmsCrudTest extends TestCase
         $this->assertNull(Sapras::find($sapras->id));
     }
 
+    public function test_sapras_bulk_actions(): void
+    {
+        $kecamatan = Kecamatan::first();
+
+        $s1 = Sapras::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'kecamatan_id' => $kecamatan->id,
+            'nama_fasilitas' => 'Lap Uji Bulk 1',
+            'kategori_fasilitas' => 'Lapangan',
+            'alamat_lengkap' => 'Jl. Uji 1',
+            'status_kondisi' => 'Baik',
+            'jenis_olahraga_tersedia' => 'Senam',
+        ]);
+
+        $s2 = Sapras::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'kecamatan_id' => $kecamatan->id,
+            'nama_fasilitas' => 'Lap Uji Bulk 2',
+            'kategori_fasilitas' => 'Lapangan',
+            'alamat_lengkap' => 'Jl. Uji 2',
+            'status_kondisi' => 'Baik',
+            'jenis_olahraga_tersedia' => 'Senam',
+        ]);
+
+        Livewire::test(SaprasKelola::class)
+            ->set('selectedSapras', [$s1->id, $s2->id])
+            ->call('bulkSetKondisi', 'Perlu Renovasi');
+
+        $this->assertEquals('Perlu Renovasi', $s1->fresh()->status_kondisi);
+        $this->assertEquals('Perlu Renovasi', $s2->fresh()->status_kondisi);
+
+        Livewire::test(SaprasKelola::class)
+            ->set('selectedSapras', [$s1->id, $s2->id])
+            ->call('bulkDelete');
+
+        $this->assertNull(Sapras::find($s1->id));
+        $this->assertNull(Sapras::find($s2->id));
+    }
+
     public function test_sdi_crud(): void
     {
         Livewire::test(SdiKelola::class)
@@ -449,4 +488,315 @@ class AdminCmsCrudTest extends TestCase
         $this->assertNull(Pengguna::find($u1->id));
         $this->assertNull(Pengguna::find($u2->id));
     }
+
+    public function test_event_crud_and_bulk_actions(): void
+    {
+        $kategori = \App\Models\KategoriEvent::first();
+
+        // 1. Create Event
+        Livewire::test(\App\Livewire\Admin\Event\EventKelola::class)
+            ->call('bukaFormTambahEvent')
+            ->set('judul_event', 'FORKAB Uji Coba 2026')
+            ->set('slug', 'forkab-uji-coba-2026')
+            ->set('kategori_event_id', $kategori->id)
+            ->set('tahun_edisi', 2026)
+            ->set('lokasi_utama', 'Stadion Si Jalak Harupat')
+            ->set('tanggal_mulai', '2026-10-01')
+            ->set('tanggal_selesai', '2026-10-05')
+            ->set('status_publikasi', true)
+            ->call('simpanEvent')
+            ->assertHasNoErrors();
+
+        $event = \App\Models\Event::where('judul_event', 'FORKAB Uji Coba 2026')->first();
+        $this->assertNotNull($event);
+
+        // 2. Edit Event
+        Livewire::test(\App\Livewire\Admin\Event\EventKelola::class)
+            ->call('bukaFormEditEvent', $event->id)
+            ->set('judul_event', 'FORKAB Uji Coba 2026 Updated')
+            ->call('simpanEvent')
+            ->assertHasNoErrors();
+
+        $this->assertEquals('FORKAB Uji Coba 2026 Updated', $event->fresh()->judul_event);
+
+        // 3. Toggle Status & Bulk Actions
+        Livewire::test(\App\Livewire\Admin\Event\EventKelola::class)
+            ->call('toggleStatusPublikasi', $event->id);
+
+        $this->assertFalse((bool) $event->fresh()->status_publikasi);
+
+        Livewire::test(\App\Livewire\Admin\Event\EventKelola::class)
+            ->set('selectedEvent', [$event->id])
+            ->call('bulkPublish');
+
+        $this->assertTrue((bool) $event->fresh()->status_publikasi);
+
+        // 4. Bulk Delete
+        Livewire::test(\App\Livewire\Admin\Event\EventKelola::class)
+            ->set('selectedEvent', [$event->id])
+            ->call('bulkDelete');
+
+        $this->assertNull(\App\Models\Event::find($event->id));
+    }
+
+    public function test_sejarah_crud_and_bulk_actions(): void
+    {
+        // 1. Create Sejarah
+        Livewire::test(\App\Livewire\Admin\Organisasi\SejarahKelola::class)
+            ->call('bukaFormTambah')
+            ->set('tahun', '2026')
+            ->set('judul', 'Tonggak Sejarah Uji Coba')
+            ->set('deskripsi', 'Deskripsi narasi pengujian linimasa sejarah KORMI Kabupaten Bandung.')
+            ->set('urutan', 1)
+            ->set('status_tampil', true)
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $sejarah = \App\Models\LinimasaSejarah::where('judul', 'Tonggak Sejarah Uji Coba')->first();
+        $this->assertNotNull($sejarah);
+
+        // 2. Edit Sejarah
+        Livewire::test(\App\Livewire\Admin\Organisasi\SejarahKelola::class)
+            ->call('bukaFormEdit', $sejarah->id)
+            ->set('judul', 'Tonggak Sejarah Uji Coba Updated')
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $this->assertEquals('Tonggak Sejarah Uji Coba Updated', $sejarah->fresh()->judul);
+
+        // 3. Toggle Status & Bulk Actions
+        Livewire::test(\App\Livewire\Admin\Organisasi\SejarahKelola::class)
+            ->call('toggleStatus', $sejarah->id);
+
+        $this->assertFalse((bool) $sejarah->fresh()->status_tampil);
+
+        Livewire::test(\App\Livewire\Admin\Organisasi\SejarahKelola::class)
+            ->set('selectedSejarah', [$sejarah->id])
+            ->call('bulkSetStatus', true);
+
+        $this->assertTrue((bool) $sejarah->fresh()->status_tampil);
+
+        // 4. Bulk Delete
+        Livewire::test(\App\Livewire\Admin\Organisasi\SejarahKelola::class)
+            ->set('selectedSejarah', [$sejarah->id])
+            ->call('bulkDelete');
+
+        $this->assertNull(\App\Models\LinimasaSejarah::find($sejarah->id));
+    }
+
+    public function test_visimisi_crud_and_bulk_actions(): void
+    {
+        // 1. Create VisiMisi
+        Livewire::test(\App\Livewire\Admin\Organisasi\VisiMisiKelola::class)
+            ->call('bukaFormTambah')
+            ->set('jenis', 'misi')
+            ->set('konten', 'Membangun ekosistem olahraga rekreasi yang inklusif dan berkelanjutan.')
+            ->set('ikon', 'target')
+            ->set('urutan', 1)
+            ->set('status_tampil', true)
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $item = \App\Models\VisiMisiModel::where('konten', 'Membangun ekosistem olahraga rekreasi yang inklusif dan berkelanjutan.')->first();
+        $this->assertNotNull($item);
+
+        // 2. Edit VisiMisi
+        Livewire::test(\App\Livewire\Admin\Organisasi\VisiMisiKelola::class)
+            ->call('bukaFormEdit', $item->id)
+            ->set('konten', 'Membangun ekosistem olahraga rekreasi yang inklusif dan berkelanjutan di Kab Bandung.')
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $this->assertEquals('Membangun ekosistem olahraga rekreasi yang inklusif dan berkelanjutan di Kab Bandung.', $item->fresh()->konten);
+
+        // 3. Toggle Status & Bulk Actions
+        Livewire::test(\App\Livewire\Admin\Organisasi\VisiMisiKelola::class)
+            ->call('toggleStatus', $item->id);
+
+        $this->assertFalse((bool) $item->fresh()->status_tampil);
+
+        Livewire::test(\App\Livewire\Admin\Organisasi\VisiMisiKelola::class)
+            ->set('selectedVisiMisi', [$item->id])
+            ->call('bulkSetStatus', true);
+
+        $this->assertTrue((bool) $item->fresh()->status_tampil);
+
+        // 4. Bulk Delete
+        Livewire::test(\App\Livewire\Admin\Organisasi\VisiMisiKelola::class)
+            ->set('selectedVisiMisi', [$item->id])
+            ->call('bulkDelete');
+
+        $this->assertNull(\App\Models\VisiMisiModel::find($item->id));
+    }
+
+    public function test_pengurus_crud_and_bulk_actions(): void
+    {
+        $periode = \App\Models\PeriodeKepengurusan::first();
+
+        // 1. Create Pengurus
+        Livewire::test(\App\Livewire\Admin\Organisasi\PengurusKelola::class)
+            ->call('bukaFormTambah')
+            ->set('periode_id', $periode->id)
+            ->set('nama_lengkap', 'Drs. H. Uji Coba Pengurus, M.Si.')
+            ->set('jabatan', 'Wakil Ketua Bidang Umum')
+            ->set('kategori_bidang', 'Pimpinan Harian')
+            ->set('urutan', 2)
+            ->set('status_tampil', true)
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $pengurus = \App\Models\PengurusModel::where('nama_lengkap', 'Drs. H. Uji Coba Pengurus, M.Si.')->first();
+        $this->assertNotNull($pengurus);
+
+        // 2. Edit Pengurus
+        Livewire::test(\App\Livewire\Admin\Organisasi\PengurusKelola::class)
+            ->call('bukaFormEdit', $pengurus->id)
+            ->set('jabatan', 'Wakil Ketua Umum I')
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $this->assertEquals('Wakil Ketua Umum I', $pengurus->fresh()->jabatan);
+
+        // 3. Toggle Status & Bulk Actions
+        Livewire::test(\App\Livewire\Admin\Organisasi\PengurusKelola::class)
+            ->call('toggleStatus', $pengurus->id);
+
+        $this->assertFalse((bool) $pengurus->fresh()->status_tampil);
+
+        Livewire::test(\App\Livewire\Admin\Organisasi\PengurusKelola::class)
+            ->set('selectedPengurus', [$pengurus->id])
+            ->call('bulkSetStatus', true);
+
+        $this->assertTrue((bool) $pengurus->fresh()->status_tampil);
+
+        // 4. Bulk Delete
+        Livewire::test(\App\Livewire\Admin\Organisasi\PengurusKelola::class)
+            ->set('selectedPengurus', [$pengurus->id])
+            ->call('bulkDelete');
+
+        $this->assertNull(\App\Models\PengurusModel::find($pengurus->id));
+    }
+
+    public function test_kordik_crud_and_bulk_actions(): void
+    {
+        $kecamatan = \App\Models\Kecamatan::first();
+        $periode = \App\Models\PeriodeKepengurusan::first();
+
+        // 1. Create Kordik
+        Livewire::test(\App\Livewire\Admin\Organisasi\KordikKelola::class)
+            ->call('bukaFormTambah')
+            ->set('kecamatan_id', $kecamatan->id)
+            ->set('periode_id', $periode->id)
+            ->set('nama_ketua', 'Ahmad Subarkah, S.Pd.')
+            ->set('nama_sekretaris', 'Budi Santoso')
+            ->set('nama_bendahara', 'Citra Dewi')
+            ->set('nomor_telepon', '081298765432')
+            ->set('nomor_sk', 'SK/KORDIK/001/2026')
+            ->set('status_aktif', true)
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $kordik = \App\Models\KordikPengurus::where('nama_ketua', 'Ahmad Subarkah, S.Pd.')->first();
+        $this->assertNotNull($kordik);
+
+        // 2. Edit Kordik
+        Livewire::test(\App\Livewire\Admin\Organisasi\KordikKelola::class)
+            ->call('bukaFormEdit', $kordik->id)
+            ->set('nama_ketua', 'Ahmad Subarkah, S.Pd., M.M.')
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $this->assertEquals('Ahmad Subarkah, S.Pd., M.M.', $kordik->fresh()->nama_ketua);
+
+        // 3. Toggle Status & Bulk Actions
+        Livewire::test(\App\Livewire\Admin\Organisasi\KordikKelola::class)
+            ->call('toggleStatus', $kordik->id);
+
+        $this->assertFalse((bool) $kordik->fresh()->status_aktif);
+
+        Livewire::test(\App\Livewire\Admin\Organisasi\KordikKelola::class)
+            ->set('selectedKordik', [$kordik->id])
+            ->call('bulkSetStatus', true);
+
+        $this->assertTrue((bool) $kordik->fresh()->status_aktif);
+
+        // 4. Bulk Delete
+        Livewire::test(\App\Livewire\Admin\Organisasi\KordikKelola::class)
+            ->set('selectedKordik', [$kordik->id])
+            ->call('bulkDelete');
+
+        $this->assertNull(\App\Models\KordikPengurus::find($kordik->id));
+    }
+
+    public function test_proker_crud_and_bulk_actions(): void
+    {
+        // 1. Create Proker
+        Livewire::test(\App\Livewire\Admin\Organisasi\ProkerKelola::class)
+            ->call('bukaFormTambah')
+            ->set('tahun_anggaran', 2026)
+            ->set('nama_bidang', 'Bidang Olahraga Tradisional')
+            ->set('nama_kegiatan', 'Festival Olahraga Tradisional Jawa Barat 2026')
+            ->set('tujuan_kegiatan', 'Pelestarian permainan dan olahraga tradisional warisan budaya.')
+            ->set('target_sasaran', '500 Peserta Pelajar & Umum')
+            ->set('estimasi_anggaran', 50000000)
+            ->set('status_kegiatan', 'rencana')
+            ->set('bulan_mulai', 6)
+            ->set('bulan_selesai', 6)
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $proker = \App\Models\ProgramKerja::where('nama_kegiatan', 'Festival Olahraga Tradisional Jawa Barat 2026')->first();
+        $this->assertNotNull($proker);
+
+        // 2. Edit Proker
+        Livewire::test(\App\Livewire\Admin\Organisasi\ProkerKelola::class)
+            ->call('bukaFormEdit', $proker->id)
+            ->set('estimasi_anggaran', 75000000)
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $this->assertEquals(75000000, (float) $proker->fresh()->estimasi_anggaran);
+
+        // 3. Quick Status Update & Bulk Status
+        Livewire::test(\App\Livewire\Admin\Organisasi\ProkerKelola::class)
+            ->call('updateStatus', $proker->id, 'berjalan');
+
+        $this->assertEquals('berjalan', $proker->fresh()->status_kegiatan);
+
+        Livewire::test(\App\Livewire\Admin\Organisasi\ProkerKelola::class)
+            ->set('selectedProker', [$proker->id])
+            ->call('bulkSetStatus', 'selesai');
+
+        $this->assertEquals('selesai', $proker->fresh()->status_kegiatan);
+
+        // 4. Bulk Delete
+        Livewire::test(\App\Livewire\Admin\Organisasi\ProkerKelola::class)
+            ->set('selectedProker', [$proker->id])
+            ->call('bulkDelete');
+
+        $this->assertNull(\App\Models\ProgramKerja::find($proker->id));
+    }
+
+    public function test_pengaturan_situs_save(): void
+    {
+        Livewire::test(\App\Livewire\Admin\Pengaturan\PengaturanKelola::class)
+            ->set('nama_situs', 'KORMI Kabupaten Bandung Official')
+            ->set('tagline_situs', 'Sehat, Bugar, Gembira, Luar Biasa!')
+            ->set('email_kontak', 'kontak@kormikabbdg.id')
+            ->set('nomor_telepon', '022-85871234')
+            ->set('nomor_whatsapp', '081234567890')
+            ->set('instagram', 'https://instagram.com/kormikabupatenbandung')
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $this->assertEquals('KORMI Kabupaten Bandung Official', \App\Models\PengaturanSitus::ambil('nama_situs'));
+        $this->assertEquals('kontak@kormikabbdg.id', \App\Models\PengaturanSitus::ambil('email_kontak'));
+        $this->assertEquals('https://instagram.com/kormikabupatenbandung', \App\Models\PengaturanSitus::ambil('instagram'));
+    }
 }
+
+
+
+
+
+

@@ -27,9 +27,18 @@ class GaleriKelola extends Component
     public string $sortDirection = 'asc';
     public int $perPage = 12;
 
-    // Bulk selection
+    // Album sort & filter
+    public string $albumSortField = 'tanggal_kegiatan';
+    public string $albumSortDirection = 'desc';
+    public string $albumStatusFilter = 'semua'; // 'semua', 'publik', 'draft'
+
+    // Bulk selection Foto
     public array $selectedFoto = [];
     public bool $pilihSemua = false;
+
+    // Bulk selection Album
+    public array $selectedAlbum = [];
+    public bool $pilihSemuaAlbum = false;
 
     // Form Foto Tunggal
     public bool $tampilkanModalFoto = false;
@@ -129,10 +138,13 @@ class GaleriKelola extends Component
         $this->tanggal_kegiatan = date('Y-m-d');
     }
 
-    public function updatedCari(): void        { $this->resetPage(); }
-    public function updatedAlbumDipilih(): void { $this->resetPage(); }
-    public function updatedTabAktif(): void     { $this->resetPage(); $this->resetSelection(); }
-    public function updatedPerPage(): void      { $this->resetPage(); }
+    public function updatedCari(): void               { $this->resetPage(); }
+    public function updatedAlbumDipilih(): void        { $this->resetPage(); }
+    public function updatedTabAktif(): void            { $this->resetPage(); $this->resetSelection(); }
+    public function updatedPerPage(): void             { $this->resetPage(); }
+    public function updatedAlbumSortField(): void      { $this->resetPage(); }
+    public function updatedAlbumSortDirection(): void  { $this->resetPage(); }
+    public function updatedAlbumStatusFilter(): void   { $this->resetPage(); }
 
     public function sortBy(string $field): void
     {
@@ -141,6 +153,17 @@ class GaleriKelola extends Component
         } else {
             $this->sortField = $field;
             $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function sortAlbumBy(string $field): void
+    {
+        if ($this->albumSortField === $field) {
+            $this->albumSortDirection = $this->albumSortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->albumSortField = $field;
+            $this->albumSortDirection = 'asc';
         }
         $this->resetPage();
     }
@@ -157,10 +180,25 @@ class GaleriKelola extends Component
         }
     }
 
+    public function updatedPilihSemuaAlbum(bool $value): void
+    {
+        if ($value) {
+            $query = GaleriAlbum::query()
+                ->when($this->albumStatusFilter === 'publik', fn($q) => $q->where('status_tampil', true))
+                ->when($this->albumStatusFilter === 'draft', fn($q) => $q->where('status_tampil', false))
+                ->when($this->cari, fn($q) => $q->where(fn($sub) => $sub->where('judul_album', 'like', "%{$this->cari}%")->orWhere('lokasi', 'like', "%{$this->cari}%")));
+            $this->selectedAlbum = $query->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selectedAlbum = [];
+        }
+    }
+
     public function resetSelection(): void
     {
         $this->selectedFoto = [];
         $this->pilihSemua = false;
+        $this->selectedAlbum = [];
+        $this->pilihSemuaAlbum = false;
     }
 
     public function bulkDeleteFoto(): void
@@ -180,6 +218,35 @@ class GaleriKelola extends Component
         session()->flash('pesan', "{$count} foto berhasil dihapus dari galeri!");
     }
 
+    public function bulkDeleteAlbum(): void
+    {
+        if (empty($this->selectedAlbum)) return;
+
+        $count = count($this->selectedAlbum);
+        $albums = GaleriAlbum::with('foto')->whereIn('id', $this->selectedAlbum)->get();
+        $storage = app(StorageService::class);
+
+        foreach ($albums as $album) {
+            $storage->hapusFile($album->gambar_sampul);
+            foreach ($album->foto as $foto) {
+                $storage->hapusFile($foto->gambar_url);
+            }
+            $album->delete();
+        }
+
+        $this->resetSelection();
+        session()->flash('pesan', "{$count} album beserta fotonya berhasil dihapus!");
+    }
+
+    public function toggleStatusAlbum(string $id): void
+    {
+        $album = GaleriAlbum::findOrFail($id);
+        $album->status_tampil = !$album->status_tampil;
+        $album->save();
+
+        session()->flash('pesan', 'Status album "' . Str::limit($album->judul_album, 30) . '" berhasil diubah menjadi ' . ($album->status_tampil ? 'Publik' : 'Disembunyikan') . '!');
+    }
+
     public function setFilterAlbum(string $albumId): void
     {
         $this->albumDipilih = $albumId;
@@ -192,6 +259,9 @@ class GaleriKelola extends Component
         $this->albumDipilih = 'Semua';
         $this->sortField = 'urutan';
         $this->sortDirection = 'asc';
+        $this->albumSortField = 'tanggal_kegiatan';
+        $this->albumSortDirection = 'desc';
+        $this->albumStatusFilter = 'semua';
         $this->resetPage();
     }
 
@@ -533,13 +603,15 @@ class GaleriKelola extends Component
             ->orderBy($this->sortField, $this->sortDirection);
 
         $queryAlbum = GaleriAlbum::withCount('foto')
-            ->when($this->cari, fn($q) => $q->where(fn($sub) => $sub->where('judul_album', 'like', "%{$this->cari}%")->orWhere('lokasi', 'like', "%{$this->cari}%")))
-            ->orderByDesc('tanggal_kegiatan');
+            ->when($this->albumStatusFilter === 'publik', fn($q) => $q->where('status_tampil', true))
+            ->when($this->albumStatusFilter === 'draft', fn($q) => $q->where('status_tampil', false))
+            ->when($this->cari, fn($q) => $q->where(fn($sub) => $sub->where('judul_album', 'like', "%{$this->cari}%")->orWhere('lokasi', 'like', "%{$this->cari}%")->orWhere('deskripsi', 'like', "%{$this->cari}%")))
+            ->orderBy($this->albumSortField, $this->albumSortDirection);
 
         return view('livewire.admin.galeri.galeri-kelola', [
             'albumList'   => $albumList,
             'fotoList'    => $queryFoto->paginate($this->perPage, ['*'], 'fotoPage'),
-            'daftarAlbum' => $queryAlbum->paginate(8, ['*'], 'albumPage'),
+            'daftarAlbum' => $queryAlbum->paginate($this->perPage, ['*'], 'albumPage'),
             'totalFoto'   => GaleriFoto::count(),
             'totalAlbum'  => GaleriAlbum::count(),
             'totalAlbumAktif' => GaleriAlbum::where('status_tampil', true)->count(),

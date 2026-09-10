@@ -23,9 +23,18 @@ class EventKelola extends Component
 
     // Mode: 'tabel', 'form_event', 'detail_event', 'form_kategori'
     public string $mode = 'tabel';
+    public string $tampilanMode = 'tabel'; // 'tabel' atau 'grid'
     public string $tabAktif = 'info'; // 'info', 'cabang', 'jadwal'
     public string $cari = '';
     public string $kategoriDipilih = 'Semua';
+    public string $statusPublikasiFilter = 'Semua'; // 'Semua', '1', '0'
+    public string $sortField = 'tanggal_mulai';
+    public string $sortDirection = 'desc';
+    public int $perPage = 10;
+
+    // Bulk Actions
+    public array $selectedEvent = [];
+    public bool $pilihSemua = false;
 
     // Form Event Utama
     public ?string $editEventId = null;
@@ -87,11 +96,152 @@ class EventKelola extends Component
     public function updatedCari(): void
     {
         $this->resetPage();
+        $this->resetSelection();
     }
 
     public function updatedKategoriDipilih(): void
     {
         $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedStatusPublikasiFilter(): void
+    {
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedSortField(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSortDirection(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage(): void
+    {
+        $this->resetPage();
+    }
+
+    public function sortBy(string $field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function updatedPilihSemua(bool $value): void
+    {
+        if ($value) {
+            $this->selectedEvent = $this->getCurrentPageEventIds();
+        } else {
+            $this->selectedEvent = [];
+        }
+    }
+
+    public function resetSelection(): void
+    {
+        $this->selectedEvent = [];
+        $this->pilihSemua = false;
+    }
+
+    public function resetSemuaFilter(): void
+    {
+        $this->cari = '';
+        $this->kategoriDipilih = 'Semua';
+        $this->statusPublikasiFilter = 'Semua';
+        $this->sortField = 'tanggal_mulai';
+        $this->sortDirection = 'desc';
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function setFilterKategori(string $kategoriId): void
+    {
+        $this->kategoriDipilih = $kategoriId;
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function setFilterStatus(string $status): void
+    {
+        $this->statusPublikasiFilter = $status;
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function toggleStatusPublikasi(string $id): void
+    {
+        $item = Event::findOrFail($id);
+        $item->update(['status_publikasi' => !$item->status_publikasi]);
+        session()->flash('pesan', 'Status publikasi event "' . $item->judul_event . '" berhasil diubah.');
+    }
+
+    public function bulkPublish(): void
+    {
+        if (empty($this->selectedEvent)) return;
+
+        Event::whereIn('id', $this->selectedEvent)->update(['status_publikasi' => true]);
+        session()->flash('pesan', count($this->selectedEvent) . ' event berhasil dipublikasikan.');
+        $this->resetSelection();
+    }
+
+    public function bulkDraft(): void
+    {
+        if (empty($this->selectedEvent)) return;
+
+        Event::whereIn('id', $this->selectedEvent)->update(['status_publikasi' => false]);
+        session()->flash('pesan', count($this->selectedEvent) . ' event diubah statusnya menjadi draft.');
+        $this->resetSelection();
+    }
+
+    public function bulkDelete(): void
+    {
+        if (empty($this->selectedEvent)) return;
+
+        $events = Event::whereIn('id', $this->selectedEvent)->get();
+        $storage = app(StorageService::class);
+
+        foreach ($events as $ev) {
+            if ($ev->banner_url) {
+                $storage->hapusFile($ev->banner_url);
+            }
+            if ($ev->logo_event_url) {
+                $storage->hapusFile($ev->logo_event_url);
+            }
+            $ev->delete();
+        }
+
+        session()->flash('pesan', count($this->selectedEvent) . ' event berhasil dihapus.');
+        $this->resetSelection();
+    }
+
+    protected function getCurrentPageEventIds(): array
+    {
+        return $this->getEventQuery()->pluck('id')->map(fn($id) => (string) $id)->toArray();
+    }
+
+    protected function getEventQuery()
+    {
+        $allowedSorts = ['judul_event', 'tanggal_mulai', 'tahun_edisi', 'lokasi_utama', 'created_at'];
+        $sort = in_array($this->sortField, $allowedSorts) ? $this->sortField : 'tanggal_mulai';
+        $direction = strtolower($this->sortDirection) === 'asc' ? 'asc' : 'desc';
+
+        return Event::with(['kategoriEvent', 'cabang', 'jadwal'])
+            ->when($this->kategoriDipilih !== 'Semua', fn($q) => $q->where('kategori_event_id', $this->kategoriDipilih))
+            ->when($this->statusPublikasiFilter !== 'Semua', fn($q) => $q->where('status_publikasi', (bool) $this->statusPublikasiFilter))
+            ->when($this->cari, fn($q) => $q->where(function ($sub) {
+                $sub->where('judul_event', 'like', "%{$this->cari}%")
+                    ->orWhere('lokasi_utama', 'like', "%{$this->cari}%");
+            }))
+            ->orderBy($sort, $direction);
     }
 
     public function updatedJudulEvent(): void
@@ -478,22 +628,20 @@ class EventKelola extends Component
         $kategoriList = KategoriEvent::withCount('events')->orderBy('nama_kategori')->get();
         $inorgaList = Inorga::orderBy('nama_inorga')->get();
 
-        $query = Event::with(['kategoriEvent', 'cabang', 'jadwal'])
-            ->when($this->kategoriDipilih !== 'Semua', fn($q) => $q->where('kategori_event_id', $this->kategoriDipilih))
-            ->when($this->cari, fn($q) => $q->where('judul_event', 'like', "%{$this->cari}%")
-                ->orWhere('lokasi_utama', 'like', "%{$this->cari}%"))
-            ->orderByDesc('tanggal_mulai');
+        $eventList = $this->getEventQuery()->paginate($this->perPage);
 
         $totalEvent = Event::count();
         $totalPublish = Event::where('status_publikasi', true)->count();
+        $totalDraft = Event::where('status_publikasi', false)->count();
         $totalCabang = EventCabang::count();
 
         return view('livewire.admin.event.event-kelola', [
-            'eventList'     => $query->paginate(8),
+            'eventList'     => $eventList,
             'kategoriList'  => $kategoriList,
             'inorgaList'    => $inorgaList,
             'totalEvent'    => $totalEvent,
             'totalPublish'  => $totalPublish,
+            'totalDraft'    => $totalDraft,
             'totalCabang'   => $totalCabang,
         ]);
     }

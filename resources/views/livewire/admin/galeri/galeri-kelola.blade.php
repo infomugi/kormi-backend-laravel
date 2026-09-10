@@ -21,47 +21,43 @@
         <!-- ========================================== -->
         <div wire:key="galeri-view-katalog" class="space-y-6">
 
-            <!-- 1. HEADER & PRIMARY ACTIONS -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
-                        <span>MEDIA DOKUMENTASI</span>
-                        <span>•</span>
-                        <span class="text-indigo-600 font-black">GALERI & ALBUM</span>
-                    </div>
-                    <h1 class="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">Katalog Galeri Foto & Album</h1>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-1">Kelola arsip dokumentasi visual kegiatan, event FORKAB, dan inorga KORMI Kabupaten Bandung.</p>
-                </div>
-
-                <div class="flex items-center gap-2.5 self-start md:self-auto flex-wrap">
+            <!-- 1. HEADER & PRIMARY ACTIONS (COMPACT PRO COMPONENT) -->
+            <x-table.header
+                title="Katalog Galeri Foto & Album"
+                subtitle="Kelola arsip dokumentasi visual kegiatan, event FORKAB, dan inorga KORMI Kabupaten Bandung."
+                badge="Media Dokumentasi • Galeri & Album"
+                icon="images"
+                color="indigo"
+            >
+                <x-slot:actions>
                     <button 
                         type="button" 
                         wire:click="bukaFormTambahAlbum" 
-                        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs shadow-2xs transition-all cursor-pointer active:scale-95"
+                        class="inline-flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/90 text-slate-700 font-bold text-xs shadow-2xs transition-all cursor-pointer active:scale-95"
                     >
-                        <i data-lucide="folder-plus" class="w-4 h-4 text-indigo-600"></i>
+                        <i data-lucide="folder-plus" class="w-3.5 h-3.5 text-indigo-600"></i>
                         <span>+ Buat Album</span>
                     </button>
 
                     <button 
                         type="button" 
                         wire:click="bukaFormBulkFoto('{{ $albumDipilih }}')" 
-                        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100 font-bold text-xs shadow-2xs transition-all cursor-pointer active:scale-95"
+                        class="inline-flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-xs shadow-2xs transition-all cursor-pointer active:scale-95"
                     >
-                        <i data-lucide="images" class="w-4 h-4 text-emerald-600"></i>
-                        <span>+ Unggah Banyak Foto</span>
+                        <i data-lucide="images" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <span>+ Unggah Banyak</span>
                     </button>
 
                     <button 
                         type="button" 
                         wire:click="bukaFormTambahFoto" 
-                        class="inline-flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs uppercase tracking-wider shadow-md shadow-indigo-600/20 hover:shadow-lg transition-all cursor-pointer active:scale-95"
+                        class="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-md shadow-indigo-600/20 hover:shadow-lg transition-all cursor-pointer active:scale-95"
                     >
                         <i data-lucide="upload" class="w-4 h-4"></i>
-                        <span>+ Unggah Foto Satuan</span>
+                        <span>Unggah Foto</span>
                     </button>
-                </div>
-            </div>
+                </x-slot:actions>
+            </x-table.header>
 
             <!-- 2. FULL-WIDTH KPI METRIC STATS -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full">
@@ -171,55 +167,75 @@
                             <option value="asc">Menaik (ASC)</option>
                             <option value="desc">Menurun (DESC)</option>
                         </select>
-
-                        <!-- Per Page -->
-                        <select wire:model.live="perPage" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
-                            <option value="12">12 / hal</option>
-                            <option value="24">24 / hal</option>
-                            <option value="48">48 / hal</option>
+                    @else
+                        <!-- Filter Status Album -->
+                        <select wire:model.live="albumStatusFilter" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
+                            <option value="semua">Semua Status Album</option>
+                            <option value="publik">Publik (Aktif)</option>
+                            <option value="draft">Disembunyikan</option>
                         </select>
 
-                        <!-- View Switcher with localStorage persistence -->
-                        <div 
-                            x-data="{
-                                mode: localStorage.getItem('kormi_galeri_view') || @js($tampilanMode),
-                                setMode(val) {
-                                    this.mode = val;
-                                    localStorage.setItem('kormi_galeri_view', val);
-                                    $wire.set('tampilanMode', val);
-                                }
-                            }"
-                            x-init="
-                                if (localStorage.getItem('kormi_galeri_view') && localStorage.getItem('kormi_galeri_view') !== @js($tampilanMode)) {
-                                    $wire.set('tampilanMode', localStorage.getItem('kormi_galeri_view'));
-                                }
-                            "
-                            class="flex items-center p-1 bg-slate-100 rounded-2xl border border-slate-200 shrink-0"
-                        >
-                            <button 
-                                type="button" 
-                                @click="setMode('grid')" 
-                                :class="mode === 'grid' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-400 hover:text-slate-700'"
-                                class="p-1.5 rounded-xl transition-all cursor-pointer"
-                                title="Tampilan Grid Kartu"
-                            >
-                                <i data-lucide="layout-grid" class="w-4 h-4"></i>
-                            </button>
-                            <button 
-                                type="button" 
-                                @click="setMode('tabel')" 
-                                :class="mode === 'tabel' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-400 hover:text-slate-700'"
-                                class="p-1.5 rounded-xl transition-all cursor-pointer"
-                                title="Tampilan Tabel Data"
-                            >
-                                <i data-lucide="list" class="w-4 h-4"></i>
-                            </button>
-                        </div>
+                        <!-- Urutan Album -->
+                        <select wire:model.live="albumSortField" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
+                            <option value="tanggal_kegiatan">Urutan: Tanggal Kegiatan</option>
+                            <option value="judul_album">Urutan: Judul Album (A-Z)</option>
+                            <option value="created_at">Urutan: Terbaru Dibuat</option>
+                        </select>
+
+                        <!-- Direction -->
+                        <select wire:model.live="albumSortDirection" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
+                            <option value="desc">Menurun (DESC)</option>
+                            <option value="asc">Menaik (ASC)</option>
+                        </select>
                     @endif
+
+                    <!-- Per Page -->
+                    <select wire:model.live="perPage" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
+                        <option value="12">12 / hal</option>
+                        <option value="24">24 / hal</option>
+                        <option value="48">48 / hal</option>
+                    </select>
+
+                    <!-- View Switcher with localStorage persistence -->
+                    <div 
+                        x-data="{
+                            mode: localStorage.getItem('kormi_galeri_view') || @js($tampilanMode),
+                            setMode(val) {
+                                this.mode = val;
+                                localStorage.setItem('kormi_galeri_view', val);
+                                $wire.set('tampilanMode', val);
+                            }
+                        }"
+                        x-init="
+                            if (localStorage.getItem('kormi_galeri_view') && localStorage.getItem('kormi_galeri_view') !== @js($tampilanMode)) {
+                                $wire.set('tampilanMode', localStorage.getItem('kormi_galeri_view'));
+                            }
+                        "
+                        class="flex items-center p-1 bg-slate-100 rounded-2xl border border-slate-200 shrink-0"
+                    >
+                        <button 
+                            type="button" 
+                            @click="setMode('grid')" 
+                            :class="mode === 'grid' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-400 hover:text-slate-700'"
+                            class="p-1.5 rounded-xl transition-all cursor-pointer"
+                            title="Tampilan Grid Kartu"
+                        >
+                            <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                        </button>
+                        <button 
+                            type="button" 
+                            @click="setMode('tabel')" 
+                            :class="mode === 'tabel' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-400 hover:text-slate-700'"
+                            class="p-1.5 rounded-xl transition-all cursor-pointer"
+                            title="Tampilan Datatable"
+                        >
+                            <i data-lucide="list" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </x-slot:actions>
             </x-table.filter-bar>
 
-            <!-- 4. FLOATING BULK ACTIONS BAR (When photos selected) -->
+            <!-- 4. FLOATING BULK ACTIONS BAR -->
             @if($tabAktif === 'foto')
                 <x-table.bulk-bar :count="count($selectedFoto)" label="foto dipilih" reset-action="resetSelection">
                     <button 
@@ -232,12 +248,24 @@
                         <span>Hapus Terpilih</span>
                     </button>
                 </x-table.bulk-bar>
+            @else
+                <x-table.bulk-bar :count="count($selectedAlbum)" label="album dipilih" reset-action="resetSelection">
+                    <button 
+                        type="button" 
+                        wire:click="bulkDeleteAlbum" 
+                        wire:confirm="Yakin ingin menghapus {{ count($selectedAlbum) }} album terpilih beserta seluruh fotonya secara permanen?"
+                        class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                    >
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        <span>Hapus Terpilih</span>
+                    </button>
+                </x-table.bulk-bar>
             @endif
 
             <!-- 5. CONTENT PRESENTATION (FOTO DOKUMENTASI) -->
             @if($tabAktif === 'foto')
                 @if($tampilanMode === 'tabel')
-                    <!-- TABLE VIEW -->
+                    <!-- TABLE VIEW FOR FOTO -->
                     <x-table.card>
                         <x-table.table loading-target="cari, albumDipilih, tabAktif, sortField, sortDirection, perPage, gotoPage, nextPage, previousPage">
                             <x-table.thead>
@@ -373,7 +401,7 @@
                         @endif
                     </x-table.card>
                 @else
-                    <!-- GRID CARDS VIEW -->
+                    <!-- GRID CARDS VIEW FOR FOTO -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         @forelse($fotoList as $foto)
                             <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
@@ -449,98 +477,272 @@
                 @endif
             @else
                 <!-- 6. CONTENT PRESENTATION (TAB 2: DAFTAR ALBUM) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @forelse($daftarAlbum as $album)
-                        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all p-6 flex flex-col justify-between group">
-                            <div>
-                                <div class="flex items-start justify-between gap-3 mb-4">
-                                    <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider {{ $album->status_tampil ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500' }}">
-                                        {{ $album->status_tampil ? 'Publik' : 'Disembunyikan' }}
-                                    </span>
-                                    <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
-                                        <i data-lucide="image" class="w-3.5 h-3.5"></i>
-                                        {{ $album->foto_count }} Foto
-                                    </span>
-                                </div>
+                @if($tampilanMode === 'tabel')
+                    <!-- DATATABLE VIEW FOR ALBUMS -->
+                    <x-table.card>
+                        <x-table.table loading-target="cari, tabAktif, albumSortField, albumSortDirection, albumStatusFilter, perPage, gotoPage, nextPage, previousPage">
+                            <x-table.thead>
+                                <tr>
+                                    <x-table.th align="center" class="w-12 !px-4">
+                                        <input 
+                                            type="checkbox" 
+                                            wire:model.live="pilihSemuaAlbum" 
+                                            class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                        >
+                                    </x-table.th>
+                                    <x-table.th 
+                                        sortable 
+                                        sort-field="judul_album" 
+                                        :current-sort="$albumSortField" 
+                                        :current-direction="$albumSortDirection"
+                                    >
+                                        Album & Sampul
+                                    </x-table.th>
+                                    <x-table.th 
+                                        sortable 
+                                        sort-field="tanggal_kegiatan" 
+                                        :current-sort="$albumSortField" 
+                                        :current-direction="$albumSortDirection"
+                                    >
+                                        Waktu & Lokasi
+                                    </x-table.th>
+                                    <x-table.th align="center">Jumlah Foto</x-table.th>
+                                    <x-table.th align="center">Status Publikasi</x-table.th>
+                                    <x-table.th align="right">Aksi</x-table.th>
+                                </tr>
+                            </x-table.thead>
+                            <x-table.tbody>
+                                @forelse($daftarAlbum as $album)
+                                    <x-table.tr wire:key="row-album-{{ $album->id }}" :selected="in_array($album->id, $selectedAlbum)">
+                                        <!-- Checkbox -->
+                                        <x-table.td align="center" class="!px-3.5 w-10">
+                                            <input 
+                                                type="checkbox" 
+                                                wire:model.live="selectedAlbum" 
+                                                value="{{ $album->id }}" 
+                                                class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                            >
+                                        </x-table.td>
 
-                                <h3 class="text-base font-black text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{{ $album->judul_album }}</h3>
-                                
-                                <div class="mt-2 space-y-1 text-xs text-slate-500 font-medium">
-                                    <p class="flex items-center gap-1.5">
-                                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-                                        <span>{{ \Carbon\Carbon::parse($album->tanggal_kegiatan)->format('d F Y') }}</span>
-                                    </p>
-                                    @if($album->lokasi)
+                                        <!-- Album Info & Cover -->
+                                        <x-table.td>
+                                            <div class="flex items-center gap-3.5 max-w-md">
+                                                <div class="relative shrink-0 group">
+                                                    <img 
+                                                        src="{{ $album->gambar_sampul_url ?: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=300' }}" 
+                                                        class="w-16 h-12 rounded-xl object-cover border border-slate-200/80 shadow-2xs group-hover:scale-105 transition-transform" 
+                                                        alt="{{ $album->judul_album }}"
+                                                        onerror="this.src='https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=300'"
+                                                    >
+                                                </div>
+                                                <div class="min-w-0 space-y-0.5">
+                                                    <a 
+                                                        href="javascript:void(0)" 
+                                                        wire:click="bukaFormEditAlbum('{{ $album->id }}')" 
+                                                        class="font-black text-slate-900 text-xs hover:text-indigo-600 line-clamp-1 leading-tight transition-colors cursor-pointer"
+                                                    >
+                                                        {{ $album->judul_album }}
+                                                    </a>
+                                                    @if($album->deskripsi)
+                                                        <p class="text-[11px] text-slate-400 line-clamp-1 font-normal leading-normal">{{ $album->deskripsi }}</p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </x-table.td>
+
+                                        <!-- Date & Location -->
+                                        <x-table.td>
+                                            <div class="space-y-0.5 text-xs">
+                                                <div class="font-bold text-slate-700 flex items-center gap-1.5">
+                                                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+                                                    <span>{{ \Carbon\Carbon::parse($album->tanggal_kegiatan)->format('d M Y') }}</span>
+                                                </div>
+                                                @if($album->lokasi)
+                                                    <div class="text-[11px] text-slate-400 flex items-center gap-1.5">
+                                                        <i data-lucide="map-pin" class="w-3 h-3 text-slate-400"></i>
+                                                        <span class="line-clamp-1">{{ $album->lokasi }}</span>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </x-table.td>
+
+                                        <!-- Foto Count & Quick Link -->
+                                        <x-table.td align="center">
+                                            <button 
+                                                type="button" 
+                                                wire:click="$set('albumDipilih', '{{ $album->id }}'); $set('tabAktif', 'foto');"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 transition-all cursor-pointer"
+                                                title="Lihat foto dalam album ini"
+                                            >
+                                                <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                                                <span>{{ $album->foto_count }} Foto</span>
+                                            </button>
+                                        </x-table.td>
+
+                                        <!-- Status Toggle -->
+                                        <x-table.td align="center">
+                                            <button 
+                                                type="button" 
+                                                wire:click="toggleStatusAlbum('{{ $album->id }}')" 
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer {{ $album->status_tampil ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200' }}"
+                                            >
+                                                <span class="w-1.5 h-1.5 rounded-full {{ $album->status_tampil ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400' }}"></span>
+                                                <span>{{ $album->status_tampil ? 'Publik' : 'Draft' }}</span>
+                                            </button>
+                                        </x-table.td>
+
+                                        <!-- Actions -->
+                                        <x-table.td align="right">
+                                            <div class="flex items-center justify-end gap-1">
+                                                <button 
+                                                    type="button" 
+                                                    wire:click="bukaFormBulkFoto('{{ $album->id }}')" 
+                                                    class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1"
+                                                    title="Unggah Banyak Foto ke Album Ini"
+                                                >
+                                                    <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                                                    <span>+ Foto</span>
+                                                </button>
+
+                                                <x-table.action-btn 
+                                                    size="sm"
+                                                    variant="indigo" 
+                                                    icon="edit-3" 
+                                                    loading-target="bukaFormEditAlbum('{{ $album->id }}')"
+                                                    wire:click="bukaFormEditAlbum('{{ $album->id }}')" 
+                                                    title="Edit Album" 
+                                                />
+
+                                                <x-table.action-btn 
+                                                    size="sm"
+                                                    variant="danger" 
+                                                    icon="trash-2" 
+                                                    loading-target="hapusAlbum('{{ $album->id }}')"
+                                                    wire:click="hapusAlbum('{{ $album->id }}')" 
+                                                    wire:confirm="Yakin ingin menghapus album ini beserta seluruh fotonya?"
+                                                    title="Hapus Album" 
+                                                />
+                                            </div>
+                                        </x-table.td>
+                                    </x-table.tr>
+                                @empty
+                                    <x-table.empty 
+                                        colspan="6" 
+                                        icon="folder-archive" 
+                                        title="Belum ada album kegiatan" 
+                                        description="Silakan buat album kegiatan baru untuk mengelompokkan dokumentasi foto."
+                                    />
+                                @endforelse
+                            </x-table.tbody>
+                        </x-table.table>
+
+                        @if($daftarAlbum->hasPages())
+                            <x-slot:footer>
+                                <div class="px-4 py-3 flex items-center justify-between">
+                                    {{ $daftarAlbum->links() }}
+                                </div>
+                            </x-slot:footer>
+                        @endif
+                    </x-table.card>
+                @else
+                    <!-- GRID CARDS VIEW FOR ALBUMS -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @forelse($daftarAlbum as $album)
+                            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all p-6 flex flex-col justify-between group">
+                                <div>
+                                    <div class="flex items-start justify-between gap-3 mb-4">
+                                        <button 
+                                            type="button" 
+                                            wire:click="toggleStatusAlbum('{{ $album->id }}')"
+                                            class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer {{ $album->status_tampil ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500' }}"
+                                        >
+                                            {{ $album->status_tampil ? 'Publik' : 'Disembunyikan' }}
+                                        </button>
+                                        <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                                            <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                                            {{ $album->foto_count }} Foto
+                                        </span>
+                                    </div>
+
+                                    <h3 class="text-base font-black text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{{ $album->judul_album }}</h3>
+                                    
+                                    <div class="mt-2 space-y-1 text-xs text-slate-500 font-medium">
                                         <p class="flex items-center gap-1.5">
-                                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-                                            <span>{{ $album->lokasi }}</span>
+                                            <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                                            <span>{{ \Carbon\Carbon::parse($album->tanggal_kegiatan)->format('d F Y') }}</span>
+                                        </p>
+                                        @if($album->lokasi)
+                                            <p class="flex items-center gap-1.5">
+                                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                                                <span>{{ $album->lokasi }}</span>
+                                            </p>
+                                        @endif
+                                    </div>
+
+                                    @if($album->deskripsi)
+                                        <p class="text-xs text-slate-600 line-clamp-2 mt-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                                            {{ $album->deskripsi }}
                                         </p>
                                     @endif
                                 </div>
 
-                                @if($album->deskripsi)
-                                    <p class="text-xs text-slate-600 line-clamp-2 mt-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                                        {{ $album->deskripsi }}
-                                    </p>
-                                @endif
-                            </div>
-
-                            <div class="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between">
-                                <button 
-                                    type="button" 
-                                    wire:click="$set('albumDipilih', '{{ $album->id }}'); $set('tabAktif', 'foto');" 
-                                    class="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1 cursor-pointer"
-                                >
-                                    <span>Buka Foto</span>
-                                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                                </button>
-
-                                <div class="flex items-center gap-1.5">
+                                <div class="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between">
                                     <button 
                                         type="button" 
-                                        wire:click="bukaFormBulkFoto('{{ $album->id }}')" 
-                                        class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1"
-                                        title="Unggah Banyak Foto ke Album Ini"
+                                        wire:click="$set('albumDipilih', '{{ $album->id }}'); $set('tabAktif', 'foto');" 
+                                        class="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1 cursor-pointer"
                                     >
-                                        <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
-                                        <span>+ Foto</span>
+                                        <span>Buka Foto</span>
+                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                                     </button>
 
-                                    <x-table.action-btn 
-                                        size="sm"
-                                        variant="indigo" 
-                                        icon="edit-3" 
-                                        loading-target="bukaFormEditAlbum('{{ $album->id }}')"
-                                        wire:click="bukaFormEditAlbum('{{ $album->id }}')" 
-                                        title="Edit Album" 
-                                    />
-                                    <x-table.action-btn 
-                                        size="sm"
-                                        variant="danger" 
-                                        icon="trash-2" 
-                                        loading-target="hapusAlbum('{{ $album->id }}')"
-                                        wire:click="hapusAlbum('{{ $album->id }}')" 
-                                        wire:confirm="Yakin ingin menghapus album ini beserta seluruh fotonya?"
-                                        title="Hapus Album" 
-                                    />
+                                    <div class="flex items-center gap-1.5">
+                                        <button 
+                                            type="button" 
+                                            wire:click="bukaFormBulkFoto('{{ $album->id }}')" 
+                                            class="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1"
+                                            title="Unggah Banyak Foto ke Album Ini"
+                                        >
+                                            <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                                            <span>+ Foto</span>
+                                        </button>
+
+                                        <x-table.action-btn 
+                                            size="sm"
+                                            variant="indigo" 
+                                            icon="edit-3" 
+                                            loading-target="bukaFormEditAlbum('{{ $album->id }}')"
+                                            wire:click="bukaFormEditAlbum('{{ $album->id }}')" 
+                                            title="Edit Album" 
+                                        />
+                                        <x-table.action-btn 
+                                            size="sm"
+                                            variant="danger" 
+                                            icon="trash-2" 
+                                            loading-target="hapusAlbum('{{ $album->id }}')"
+                                            wire:click="hapusAlbum('{{ $album->id }}')" 
+                                            wire:confirm="Yakin ingin menghapus album ini beserta seluruh fotonya?"
+                                            title="Hapus Album" 
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @empty
-                        <div class="col-span-full py-16 text-center bg-white rounded-3xl border border-slate-200">
-                            <i data-lucide="folder-archive" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
-                            <p class="text-sm font-bold text-slate-600">Belum ada album kegiatan ditemukan.</p>
-                            <button type="button" wire:click="bukaFormTambahAlbum" class="mt-4 px-5 py-2.5 rounded-2xl bg-slate-900 text-white font-bold text-xs cursor-pointer">
-                                + Buat Album Sekarang
-                            </button>
-                        </div>
-                    @endforelse
-                </div>
-
-                @if($daftarAlbum->hasPages())
-                    <div class="mt-4">
-                        {{ $daftarAlbum->links() }}
+                        @empty
+                            <div class="col-span-full py-16 text-center bg-white rounded-3xl border border-slate-200">
+                                <i data-lucide="folder-archive" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+                                <p class="text-sm font-bold text-slate-600">Belum ada album kegiatan ditemukan.</p>
+                                <button type="button" wire:click="bukaFormTambahAlbum" class="mt-4 px-5 py-2.5 rounded-2xl bg-slate-900 text-white font-bold text-xs cursor-pointer">
+                                    + Buat Album Sekarang
+                                </button>
+                            </div>
+                        @endforelse
                     </div>
+
+                    @if($daftarAlbum->hasPages())
+                        <div class="mt-4">
+                            {{ $daftarAlbum->links() }}
+                        </div>
+                    @endif
                 @endif
             @endif
         </div>

@@ -15,27 +15,25 @@
         </div>
     @endif
 
-    <!-- 1. HEADER & EVENT SELECTOR -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
-                <span>EVENT & KOMPETISI</span>
-                <span>•</span>
-                <span class="text-amber-600">KLASEMEN PEROLEHAN MEDALI</span>
+    <!-- 1. HEADER & EVENT SELECTOR (COMPACT PRO COMPONENT) -->
+    <x-table.header
+        title="Input & Kelola Klasemen Medali"
+        subtitle="Perbarui perolehan medali Emas, Perak, Perunggu untuk 31 Kontingen Kecamatan se-Kabupaten Bandung secara realtime."
+        badge="Event & Kompetisi • Klasemen Medali"
+        icon="trophy"
+        color="amber"
+    >
+        <x-slot:actions>
+            <div class="flex items-center gap-2.5 bg-white px-3 py-1.5 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs">
+                <span class="text-xs font-bold text-slate-500 shrink-0">Pilih Event:</span>
+                <select wire:model.live="eventDipilih" class="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer">
+                    @foreach($eventList as $e)
+                        <option value="{{ $e->id }}">{{ $e->judul_event }} ({{ $e->tahun_edisi }})</option>
+                    @endforeach
+                </select>
             </div>
-            <h1 class="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">Input & Kelola Klasemen Medali</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1">Perbarui perolehan medali Emas, Perak, Perunggu untuk 31 Kontingen Kecamatan se-Kabupaten Bandung secara realtime.</p>
-        </div>
-
-        <div class="flex items-center gap-3 bg-white p-2 rounded-2xl border border-slate-200/80 shadow-xs self-start sm:self-auto">
-            <span class="text-xs font-bold text-slate-500 pl-2">Pilih Event:</span>
-            <select wire:model.live="eventDipilih" class="px-4 py-2 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-amber-500">
-                @foreach($eventList as $e)
-                    <option value="{{ $e->id }}">{{ $e->judul_event }} ({{ $e->tahun_edisi }})</option>
-                @endforeach
-            </select>
-        </div>
-    </div>
+        </x-slot:actions>
+    </x-table.header>
 
     <!-- 2. MINI KPI STATS -->
     <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">

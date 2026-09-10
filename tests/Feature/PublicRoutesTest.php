@@ -41,12 +41,15 @@ class PublicRoutesTest extends TestCase
                 ['slug' => 'kegiatan'],
                 ['nama_kategori' => 'Kegiatan', 'deskripsi' => 'Berita kegiatan']
             );
+            $penulis = \App\Models\Pengguna::first();
             $berita = \App\Models\Berita::create([
                 'judul' => 'Persiapan Menuju FORKAB 2026',
                 'slug' => 'persiapan-menuju-forkab-2026-rapat-koordinasi-wilayah',
                 'ringkasan' => 'Rapat koordinasi persiapan FORKAB',
                 'isi_konten' => '<p>Konten berita persiapan FORKAB</p>',
+                'gambar_utama' => 'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=800',
                 'kategori_id' => $kategori->id,
+                'penulis_id' => $penulis?->id,
                 'status_publikasi' => 'published',
                 'tanggal_publikasi' => now(),
             ]);

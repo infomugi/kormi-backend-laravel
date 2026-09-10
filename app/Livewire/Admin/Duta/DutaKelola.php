@@ -20,8 +20,18 @@ class DutaKelola extends Component
     use WithPagination, WithFileUploads;
 
     public string $mode = 'tabel'; // 'tabel' atau 'form'
+    public string $tampilanMode = 'tabel'; // 'tabel' atau 'grid'
     public string $cari = '';
     public string $kecamatanDipilih = 'Semua';
+    public string $tahunDipilih = 'Semua';
+    public string $kategoriDipilih = 'Semua';
+    public string $sortField = 'nama_lengkap';
+    public string $sortDirection = 'asc';
+    public int $perPage = 12;
+
+    // Bulk actions
+    public array $selectedDuta = [];
+    public bool $pilihSemua = false;
 
     // Backward compatibility for automated tests
     public bool $tampilkanModal = false;
@@ -41,10 +51,10 @@ class DutaKelola extends Component
     protected function rules(): array
     {
         return [
-            'kecamatan_id' => 'required|exists:kormi_kecamatan,id',
-            'nama_lengkap' => 'required|max:150',
+            'kecamatan_id'    => 'required|exists:kormi_kecamatan,id',
+            'nama_lengkap'    => 'required|max:150',
             'tahun_pemilihan' => 'required|integer|min:2020|max:2030',
-            'kategori_duta' => 'required|string|max:100',
+            'kategori_duta'   => 'required|string|max:100',
         ];
     }
 
@@ -58,14 +68,70 @@ class DutaKelola extends Component
         }
     }
 
-    public function updatedCari(): void
+    public function updatedCari(): void             { $this->resetPage(); }
+    public function updatedKecamatanDipilih(): void  { $this->resetPage(); }
+    public function updatedTahunDipilih(): void      { $this->resetPage(); }
+    public function updatedKategoriDipilih(): void   { $this->resetPage(); }
+    public function updatedPerPage(): void           { $this->resetPage(); }
+
+    public function sortBy(string $field): void
     {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
         $this->resetPage();
     }
 
-    public function updatedKecamatanDipilih(): void
+    public function updatedPilihSemua(bool $value): void
     {
+        if ($value) {
+            $query = DutaOlahraga::query()
+                ->when($this->kecamatanDipilih !== 'Semua', fn($q) => $q->where('kecamatan_id', $this->kecamatanDipilih))
+                ->when($this->tahunDipilih !== 'Semua', fn($q) => $q->where('tahun_pemilihan', $this->tahunDipilih))
+                ->when($this->kategoriDipilih !== 'Semua', fn($q) => $q->where('kategori_duta', $this->kategoriDipilih))
+                ->when($this->cari, fn($q) => $q->where(function ($sub) {
+                    $sub->where('nama_lengkap', 'like', '%' . $this->cari . '%')
+                        ->orWhereHas('desaKelurahan', fn($dq) => $dq->where('nama_desa_kelurahan', 'like', '%' . $this->cari . '%'));
+                }));
+            $this->selectedDuta = $query->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selectedDuta = [];
+        }
+    }
+
+    public function resetSelection(): void
+    {
+        $this->selectedDuta = [];
+        $this->pilihSemua = false;
+    }
+
+    public function resetSemuaFilter(): void
+    {
+        $this->cari = '';
+        $this->kecamatanDipilih = 'Semua';
+        $this->tahunDipilih = 'Semua';
+        $this->kategoriDipilih = 'Semua';
         $this->resetPage();
+    }
+
+    public function bulkDelete(): void
+    {
+        if (empty($this->selectedDuta)) return;
+
+        $count = count($this->selectedDuta);
+        $dutas = DutaOlahraga::whereIn('id', $this->selectedDuta)->get();
+        $storage = app(StorageService::class);
+
+        foreach ($dutas as $duta) {
+            $storage->hapusFile($duta->foto_url);
+            $duta->delete();
+        }
+
+        $this->resetSelection();
+        session()->flash('pesan', "{$count} data Duta Olahraga berhasil dihapus!");
     }
 
     public function updatedKecamatanId(string $value): void
@@ -209,23 +275,30 @@ class DutaKelola extends Component
 
         $query = DutaOlahraga::with('kecamatan', 'desaKelurahan')
             ->when($this->kecamatanDipilih !== 'Semua', fn($q) => $q->where('kecamatan_id', $this->kecamatanDipilih))
+            ->when($this->tahunDipilih !== 'Semua', fn($q) => $q->where('tahun_pemilihan', $this->tahunDipilih))
+            ->when($this->kategoriDipilih !== 'Semua', fn($q) => $q->where('kategori_duta', $this->kategoriDipilih))
             ->when($this->cari, fn($q) => $q->where(function ($sub) {
                 $sub->where('nama_lengkap', 'like', '%' . $this->cari . '%')
-                    ->orWhereHas('desaKelurahan', fn($dq) => $dq->where('nama_desa_kelurahan', 'like', '%' . $this->cari . '%'));
+                    ->orWhere('prestasi', 'like', '%' . $this->cari . '%')
+                    ->orWhere('kontak', 'like', '%' . $this->cari . '%')
+                    ->orWhereHas('desaKelurahan', fn($dq) => $dq->where('nama_desa_kelurahan', 'like', '%' . $this->cari . '%'))
+                    ->orWhereHas('kecamatan', fn($kq) => $kq->where('nama_kecamatan', 'like', '%' . $this->cari . '%'));
             }))
-            ->orderBy('nama_lengkap');
+            ->orderBy($this->sortField, $this->sortDirection);
 
         $totalDuta = DutaOlahraga::count();
         $totalKecamatanTerwakili = DutaOlahraga::distinct('kecamatan_id')->count('kecamatan_id');
         $dutaTahunIni = DutaOlahraga::where('tahun_pemilihan', 2026)->count();
+        $tahunList = DutaOlahraga::distinct()->orderByDesc('tahun_pemilihan')->pluck('tahun_pemilihan');
 
         return view('livewire.admin.duta.duta-kelola', [
             'kecamatanList' => $kecamatanList,
             'desaList' => $desaList,
-            'dutaList' => $query->paginate(12),
+            'dutaList' => $query->paginate($this->perPage),
             'totalDuta' => $totalDuta,
             'totalKecamatanTerwakili' => $totalKecamatanTerwakili,
             'dutaTahunIni' => $dutaTahunIni,
+            'tahunList' => $tahunList,
         ]);
     }
 }

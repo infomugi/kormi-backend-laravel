@@ -19,6 +19,17 @@ class SejarahKelola extends Component
 
     public string $mode = 'tabel';
     public string $cari = '';
+    public string $statusFilter = 'Semua';
+
+    // Sorting & Pagination
+    public string $sortField = 'urutan';
+    public string $sortDirection = 'asc';
+    public int $perPage = 10;
+    public string $tampilanMode = 'tabel'; // 'tabel' atau 'grid'
+
+    // Bulk selection
+    public array $selectedSejarah = [];
+    public bool $pilihSemua = false;
 
     // Form fields
     public ?string $editId = null;
@@ -118,6 +129,75 @@ class SejarahKelola extends Component
         session()->flash('pesan', 'Timeline sejarah berhasil dihapus.');
     }
 
+    public function sortBy(string $field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function updatedPilihSemua(bool $value): void
+    {
+        if ($value) {
+            $this->selectedSejarah = LinimasaSejarah::pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selectedSejarah = [];
+        }
+    }
+
+    public function resetSelection(): void
+    {
+        $this->selectedSejarah = [];
+        $this->pilihSemua = false;
+    }
+
+    public function setFilterStatus(string $status): void
+    {
+        $this->statusFilter = $status;
+        $this->resetPage();
+    }
+
+    public function resetSemuaFilter(): void
+    {
+        $this->cari = '';
+        $this->statusFilter = 'Semua';
+        $this->resetPage();
+    }
+
+    public function toggleStatus(string $id): void
+    {
+        $item = LinimasaSejarah::findOrFail($id);
+        $item->status_tampil = !$item->status_tampil;
+        $item->save();
+        session()->flash('pesan', 'Status visibilitas timeline tahun ' . $item->tahun . ' berhasil diperbarui!');
+    }
+
+    public function bulkSetStatus(bool $status): void
+    {
+        if (empty($this->selectedSejarah)) return;
+        LinimasaSejarah::whereIn('id', $this->selectedSejarah)->update(['status_tampil' => $status]);
+        $text = $status ? 'ditampilkan di publik' : 'disembunyikan';
+        session()->flash('pesan', count($this->selectedSejarah) . ' timeline sejarah berhasil ' . $text . '.');
+        $this->resetSelection();
+    }
+
+    public function bulkDelete(): void
+    {
+        if (empty($this->selectedSejarah)) return;
+        $items = LinimasaSejarah::whereIn('id', $this->selectedSejarah)->get();
+        $storage = app(StorageService::class);
+        foreach ($items as $item) {
+            $storage->hapusFile($item->gambar_url);
+            $item->delete();
+        }
+        session()->flash('pesan', count($this->selectedSejarah) . ' data timeline sejarah berhasil dihapus.');
+        $this->resetSelection();
+    }
+
     public function resetInput(): void
     {
         $this->editId = null;
@@ -133,14 +213,30 @@ class SejarahKelola extends Component
     public function render()
     {
         $query = LinimasaSejarah::query()
+            ->when($this->statusFilter !== 'Semua', function ($q) {
+                if ($this->statusFilter === 'Tampil') {
+                    $q->where('status_tampil', true);
+                } elseif ($this->statusFilter === 'Disembunyikan') {
+                    $q->where('status_tampil', false);
+                }
+            })
             ->when($this->cari, fn($q) => $q->where('judul', 'like', "%{$this->cari}%")
-                ->orWhere('tahun', 'like', "%{$this->cari}%"))
-            ->orderBy('urutan')
-            ->orderBy('tahun');
+                ->orWhere('tahun', 'like', "%{$this->cari}%")
+                ->orWhere('deskripsi', 'like', "%{$this->cari}%"));
+
+        if (in_array($this->sortField, ['urutan', 'tahun', 'judul', 'status_tampil', 'created_at'])) {
+            $query->orderBy($this->sortField, $this->sortDirection);
+        } else {
+            $query->orderBy('urutan')->orderBy('tahun');
+        }
 
         return view('livewire.admin.organisasi.sejarah-kelola', [
-            'sejarahList' => $query->paginate(10),
+            'sejarahList' => $query->paginate($this->perPage),
             'totalSejarah' => LinimasaSejarah::count(),
+            'totalTampil' => LinimasaSejarah::where('status_tampil', true)->count(),
+            'totalSembunyi' => LinimasaSejarah::where('status_tampil', false)->count(),
+            'tahunPertama' => LinimasaSejarah::orderBy('tahun')->value('tahun'),
+            'tahunTerakhir' => LinimasaSejarah::orderByDesc('tahun')->value('tahun'),
         ]);
     }
 }

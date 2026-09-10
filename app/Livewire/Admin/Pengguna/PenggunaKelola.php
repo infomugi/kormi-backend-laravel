@@ -24,6 +24,12 @@ class PenggunaKelola extends Component
     public string $peranDipilih = 'Semua';
     public string $statusDipilih = 'Semua';
 
+    // Sorting & Pagination
+    public string $sortField = 'dibuat_pada';
+    public string $sortDirection = 'desc';
+    public int $perPage = 10;
+    public string $tampilanMode = 'tabel'; // 'tabel' atau 'grid'
+
     // Bulk Selection State
     public array $selectedUsers = [];
     public bool $selectAll = false;
@@ -103,9 +109,40 @@ class PenggunaKelola extends Component
         $this->selectAll = false;
     }
 
+    public function sortBy(string $field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function setFilterStatus(string $status): void
+    {
+        $this->statusDipilih = $status;
+        $this->resetPage();
+    }
+
+    public function setFilterPeran(string $peran): void
+    {
+        $this->peranDipilih = $peran;
+        $this->resetPage();
+    }
+
+    public function resetSemuaFilter(): void
+    {
+        $this->cari = '';
+        $this->peranDipilih = 'Semua';
+        $this->statusDipilih = 'Semua';
+        $this->resetPage();
+    }
+
     protected function getFilteredQuery()
     {
-        return Pengguna::with('peran')
+        $query = Pengguna::with('peran')
             ->when($this->peranDipilih !== 'Semua', fn($q) => $q->where('peran_id', $this->peranDipilih))
             ->when($this->statusDipilih !== 'Semua', function ($q) {
                 if ($this->statusDipilih === 'Aktif') {
@@ -120,14 +157,21 @@ class PenggunaKelola extends Component
                         ->orWhere('email', 'like', '%' . $this->cari . '%')
                         ->orWhere('nomor_telepon', 'like', '%' . $this->cari . '%');
                 });
-            })
-            ->orderByDesc('dibuat_pada');
+            });
+
+        if (in_array($this->sortField, ['nama_lengkap', 'email', 'status_aktif', 'dibuat_pada', 'created_at', 'terakhir_login_pada'])) {
+            $query->orderBy($this->sortField, $this->sortDirection);
+        } else {
+            $query->orderByDesc('dibuat_pada');
+        }
+
+        return $query;
     }
 
     public function updatedSelectAll(bool $value): void
     {
         if ($value) {
-            $currentPageItems = $this->getFilteredQuery()->paginate(10)->items();
+            $currentPageItems = $this->getFilteredQuery()->paginate($this->perPage)->items();
             $this->selectedUsers = array_map(fn($item) => (string) $item->id, $currentPageItems);
         } else {
             $this->selectedUsers = [];
@@ -136,7 +180,7 @@ class PenggunaKelola extends Component
 
     public function updatedSelectedUsers(): void
     {
-        $currentPageIds = array_map(fn($item) => (string) $item->id, $this->getFilteredQuery()->paginate(10)->items());
+        $currentPageIds = array_map(fn($item) => (string) $item->id, $this->getFilteredQuery()->paginate($this->perPage)->items());
         if (!empty($currentPageIds) && count(array_intersect($currentPageIds, $this->selectedUsers)) === count($currentPageIds)) {
             $this->selectAll = true;
         } else {
@@ -387,7 +431,7 @@ class PenggunaKelola extends Component
 
         return view('livewire.admin.pengguna.pengguna-kelola', [
             'peranList' => $peranList,
-            'penggunaList' => $this->getFilteredQuery()->paginate(10),
+            'penggunaList' => $this->getFilteredQuery()->paginate($this->perPage),
             'totalPengguna' => Pengguna::count(),
             'totalAktif' => Pengguna::where('status_aktif', true)->count(),
             'totalNonAktif' => Pengguna::where('status_aktif', false)->count(),

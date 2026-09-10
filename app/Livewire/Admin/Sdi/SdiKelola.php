@@ -21,6 +21,20 @@ class SdiKelola extends Component
     public string $mode = 'tabel'; // 'tabel', 'form_program', 'form_jadwal'
     public string $tabAktif = 'program'; // 'program' atau 'jadwal'
     public string $cari = '';
+    public string $jenisSertifikasiFilter = 'Semua';
+    public string $statusPendaftaranFilter = 'Semua';
+
+    // Sorting & Pagination
+    public string $sortField = 'dibuat_pada';
+    public string $sortDirection = 'desc';
+    public int $perPage = 10;
+    public string $tampilanMode = 'grid'; // 'grid' atau 'tabel' untuk program
+
+    // Bulk actions
+    public array $selectedProgram = [];
+    public bool $pilihSemuaProgram = false;
+    public array $selectedJadwal = [];
+    public bool $pilihSemuaJadwal = false;
 
     // Backward compatibility for automated tests
     public bool $tampilkanModalProgram = false;
@@ -293,6 +307,107 @@ class SdiKelola extends Component
         $this->status_pendaftaran = 'dibuka';
     }
 
+    public function sortBy(string $field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage('programPage');
+        $this->resetPage('jadwalPage');
+    }
+
+    public function updatedPilihSemuaProgram(bool $value): void
+    {
+        if ($value) {
+            $this->selectedProgram = SdiProgram::pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selectedProgram = [];
+        }
+    }
+
+    public function updatedPilihSemuaJadwal(bool $value): void
+    {
+        if ($value) {
+            $this->selectedJadwal = SdiJadwal::pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selectedJadwal = [];
+        }
+    }
+
+    public function resetSelectionProgram(): void
+    {
+        $this->selectedProgram = [];
+        $this->pilihSemuaProgram = false;
+    }
+
+    public function resetSelectionJadwal(): void
+    {
+        $this->selectedJadwal = [];
+        $this->pilihSemuaJadwal = false;
+    }
+
+    public function bulkSetStatusProgram(bool $status): void
+    {
+        if (empty($this->selectedProgram)) return;
+        SdiProgram::whereIn('id', $this->selectedProgram)->update(['status_aktif' => $status]);
+        $statusText = $status ? 'diaktifkan' : 'dinonaktifkan';
+        session()->flash('pesan', count($this->selectedProgram) . ' program pelatihan berhasil ' . $statusText . '.');
+        $this->resetSelectionProgram();
+    }
+
+    public function bulkDeleteProgram(): void
+    {
+        if (empty($this->selectedProgram)) return;
+        $progs = SdiProgram::whereIn('id', $this->selectedProgram)->get();
+        $storage = app(StorageService::class);
+        foreach ($progs as $p) {
+            $storage->hapusFile($p->banner_url);
+            $p->delete();
+        }
+        session()->flash('pesan', count($this->selectedProgram) . ' program pelatihan berhasil dihapus.');
+        $this->resetSelectionProgram();
+    }
+
+    public function bulkSetStatusJadwal(string $status): void
+    {
+        if (empty($this->selectedJadwal)) return;
+        SdiJadwal::whereIn('id', $this->selectedJadwal)->update(['status_pendaftaran' => $status]);
+        session()->flash('pesan', count($this->selectedJadwal) . ' jadwal angkatan berhasil diubah status menjadi ' . $status . '.');
+        $this->resetSelectionJadwal();
+    }
+
+    public function bulkDeleteJadwal(): void
+    {
+        if (empty($this->selectedJadwal)) return;
+        SdiJadwal::whereIn('id', $this->selectedJadwal)->delete();
+        session()->flash('pesan', count($this->selectedJadwal) . ' jadwal angkatan berhasil dihapus.');
+        $this->resetSelectionJadwal();
+    }
+
+    public function setFilterJenisSertifikasi(string $jenis): void
+    {
+        $this->jenisSertifikasiFilter = $jenis;
+        $this->resetPage('programPage');
+    }
+
+    public function setFilterStatusPendaftaran(string $status): void
+    {
+        $this->statusPendaftaranFilter = $status;
+        $this->resetPage('jadwalPage');
+    }
+
+    public function resetSemuaFilter(): void
+    {
+        $this->cari = '';
+        $this->jenisSertifikasiFilter = 'Semua';
+        $this->statusPendaftaranFilter = 'Semua';
+        $this->resetPage('programPage');
+        $this->resetPage('jadwalPage');
+    }
+
     public function render()
     {
         $semuaProgram = SdiProgram::orderBy('judul_program')->get();
@@ -302,21 +417,39 @@ class SdiKelola extends Component
                 $q->where('judul_program', 'like', '%' . $this->cari . '%')
                   ->orWhere('sasaran_peserta', 'like', '%' . $this->cari . '%');
             })
-            ->orderByDesc('dibuat_pada');
+            ->when($this->jenisSertifikasiFilter !== 'Semua', function ($q) {
+                $q->where('jenis_sertifikasi', $this->jenisSertifikasiFilter);
+            });
+
+        if (in_array($this->sortField, ['judul_program', 'jenis_sertifikasi', 'status_aktif', 'dibuat_pada', 'created_at'])) {
+            $queryProgram->orderBy($this->sortField, $this->sortDirection);
+        } else {
+            $queryProgram->orderByDesc('dibuat_pada');
+        }
 
         $queryJadwal = SdiJadwal::with('program')
             ->when($this->cari, function ($q) {
                 $q->where('nama_angkatan', 'like', '%' . $this->cari . '%')
                   ->orWhere('lokasi_pelatihan', 'like', '%' . $this->cari . '%');
             })
-            ->orderByDesc('tanggal_mulai');
+            ->when($this->statusPendaftaranFilter !== 'Semua', function ($q) {
+                $q->where('status_pendaftaran', $this->statusPendaftaranFilter);
+            });
+
+        if (in_array($this->sortField, ['nama_angkatan', 'tanggal_mulai', 'status_pendaftaran', 'kuota_peserta', 'jumlah_pendaftar'])) {
+            $queryJadwal->orderBy($this->sortField, $this->sortDirection);
+        } else {
+            $queryJadwal->orderByDesc('tanggal_mulai');
+        }
 
         return view('livewire.admin.sdi.sdi-kelola', [
-            'daftarProgram' => $queryProgram->paginate(8, ['*'], 'programPage'),
-            'daftarJadwal' => $queryJadwal->paginate(8, ['*'], 'jadwalPage'),
+            'daftarProgram' => $queryProgram->paginate($this->perPage, ['*'], 'programPage'),
+            'daftarJadwal' => $queryJadwal->paginate($this->perPage, ['*'], 'jadwalPage'),
             'semuaProgram' => $semuaProgram,
             'totalProgram' => SdiProgram::count(),
+            'totalProgramAktif' => SdiProgram::where('status_aktif', true)->count(),
             'totalJadwal' => SdiJadwal::count(),
+            'totalJadwalDibuka' => SdiJadwal::where('status_pendaftaran', 'dibuka')->count(),
             'totalPendaftar' => SdiJadwal::sum('jumlah_pendaftar'),
         ]);
     }

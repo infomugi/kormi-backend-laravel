@@ -20,6 +20,7 @@ class UnduhanKelola extends Component
     use WithPagination, WithFileUploads;
 
     public string $mode = 'tabel'; // 'tabel' atau 'form'
+    public string $tampilanMode = 'tabel'; // 'tabel' atau 'grid'
     public string $cari = '';
     public string $kategoriDipilih = 'Semua';
     public string $statusDipilih = 'Semua';

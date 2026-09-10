@@ -15,131 +15,379 @@
         </div>
     @endif
 
-    <!-- HEADER -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
-                <span>KONFIGURASI</span>
-                <span>•</span>
-                <span class="text-emerald-600">PENGATURAN SITUS</span>
-            </div>
-            <h1 class="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">Pengaturan Situs</h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1">Kelola informasi umum, kontak, media sosial, dan branding situs KORMI Kabupaten Bandung.</p>
-        </div>
+    <!-- 1. HEADER BANNER -->
+    <x-form.header
+        title="Pengaturan & Konfigurasi Portal"
+        subtitle="Kelola identitas resmi, informasi kontak sekretariat, tautan media sosial, serta aset logo branding KORMI Kabupaten Bandung."
+        badge="Konfigurasi Global"
+        icon="settings"
+    >
+        <x-slot:actions>
+            <x-form.button 
+                type="button"
+                variant="primary" 
+                size="default" 
+                icon="save" 
+                loading-target="simpan"
+                wire:click="simpan"
+            >
+                Simpan Semua Pengaturan
+            </x-form.button>
+        </x-slot:actions>
+    </x-form.header>
+
+    <!-- 2. SUB-NAVIGATION TABS -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none border-b border-slate-200">
+        @php
+            $tabs = [
+                'umum' => ['label' => 'Profil & Umum', 'icon' => 'globe'],
+                'kontak' => ['label' => 'Kontak & Sekretariat', 'icon' => 'phone-call'],
+                'sosmed' => ['label' => 'Media Sosial & Tautan', 'icon' => 'share-2'],
+                'branding' => ['label' => 'Logo & Identitas Visual', 'icon' => 'palette'],
+            ];
+        @endphp
+
+        @foreach($tabs as $tabKey => $tabCfg)
+            <button 
+                type="button" 
+                wire:click="setTab('{{ $tabKey }}')"
+                class="px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer shrink-0 {{ $tabAktif === $tabKey ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200/80' }}"
+            >
+                <i data-lucide="{{ $tabCfg['icon'] }}" class="w-4 h-4"></i>
+                <span>{{ $tabCfg['label'] }}</span>
+            </button>
+        @endforeach
     </div>
 
-    <form wire:submit="simpan" class="space-y-6">
+    <!-- 3. FORM BODY (2 Columns: 8 cols Form + 4 cols Live Preview) -->
+    <form wire:submit.prevent="simpan" class="space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left Column (8 cols): Active Tab Inputs -->
+            <div class="lg:col-span-8 space-y-6">
 
-        <!-- INFORMASI UMUM -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200/80">
-                <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                    <i data-lucide="globe" class="w-4 h-4 text-emerald-600"></i>
-                    Informasi Umum
-                </h2>
-            </div>
-            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-bold text-slate-600 mb-1.5">Nama Situs <span class="text-red-500">*</span></label>
-                    <input type="text" wire:model="nama_situs" class="w-full px-4 py-3 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors" placeholder="KORMI Kabupaten Bandung">
-                    @error('nama_situs') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-bold text-slate-600 mb-1.5">Deskripsi Situs</label>
-                    <textarea wire:model="deskripsi_situs" rows="3" class="w-full px-4 py-3 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors resize-none" placeholder="Deskripsi singkat tentang KORMI..."></textarea>
-                    @error('deskripsi_situs') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-bold text-slate-600 mb-1.5">Alamat Kantor</label>
-                    <textarea wire:model="alamat_kantor" rows="2" class="w-full px-4 py-3 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors resize-none" placeholder="Jl. ..."></textarea>
-                    @error('alamat_kantor') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                </div>
-            </div>
-        </div>
+                <!-- TAB 1: PROFIL & INFORMASI UMUM -->
+                @if($tabAktif === 'umum')
+                    <x-form.card 
+                        title="Identitas & Profil Situs" 
+                        subtitle="Informasi dasar institusi yang muncul pada judul browser, header, dan meta deskripsi pencarian."
+                        icon="globe"
+                    >
+                        <!-- Nama Situs -->
+                        <x-form.field label="Nama Portal / Situs" name="nama_situs" :required="true">
+                            <x-form.input 
+                                name="nama_situs" 
+                                wire:model.live.debounce.300ms="nama_situs" 
+                                placeholder="Contoh: KORMI Kabupaten Bandung" 
+                                icon="globe"
+                            />
+                        </x-form.field>
 
-        <!-- KONTAK -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200/80">
-                <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                    <i data-lucide="phone" class="w-4 h-4 text-blue-600"></i>
-                    Informasi Kontak
-                </h2>
-            </div>
-            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1.5">Email Kontak</label>
-                    <input type="email" wire:model="email_kontak" class="w-full px-4 py-3 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors" placeholder="sekretariat@kormibdg.id">
-                    @error('email_kontak') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1.5">Nomor Telepon</label>
-                    <input type="text" wire:model="nomor_telepon" class="w-full px-4 py-3 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors" placeholder="022-xxxxxxx">
-                    @error('nomor_telepon') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                </div>
-            </div>
-        </div>
+                        <!-- Tagline / Slogan -->
+                        <x-form.field label="Tagline / Slogan Resmi" name="tagline_situs">
+                            <x-form.input 
+                                name="tagline_situs" 
+                                wire:model.live.debounce.300ms="tagline_situs" 
+                                placeholder="Contoh: Sehat, Bugar, Gembira, Luar Biasa!" 
+                                icon="award"
+                            />
+                        </x-form.field>
 
-        <!-- MEDIA SOSIAL -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200/80">
-                <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                    <i data-lucide="share-2" class="w-4 h-4 text-purple-600"></i>
-                    Media Sosial
-                </h2>
-            </div>
-            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1.5">Instagram</label>
-                    <input type="text" wire:model="instagram" class="w-full px-4 py-3 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors" placeholder="https://instagram.com/kormibandung">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1.5">Facebook</label>
-                    <input type="text" wire:model="facebook" class="w-full px-4 py-3 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors" placeholder="https://facebook.com/...">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1.5">YouTube</label>
-                    <input type="text" wire:model="youtube" class="w-full px-4 py-3 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors" placeholder="https://youtube.com/@...">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1.5">TikTok</label>
-                    <input type="text" wire:model="tiktok" class="w-full px-4 py-3 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors" placeholder="https://tiktok.com/@...">
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-xs font-bold text-slate-600 mb-1.5">Website KORMI Pusat</label>
-                    <input type="text" wire:model="website_kormi_pusat" class="w-full px-4 py-3 border border-slate-300 rounded-2xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors" placeholder="https://kormi.or.id">
-                </div>
-            </div>
-        </div>
+                        <!-- Deskripsi Situs -->
+                        <x-form.field label="Deskripsi Profil Organisasi" name="deskripsi_situs" hint="Ditampilkan di footer dan meta tag search engine">
+                            <x-form.textarea 
+                                name="deskripsi_situs" 
+                                wire:model.live.debounce.300ms="deskripsi_situs" 
+                                rows="3" 
+                                placeholder="Deskripsi ringkas mengenai peran dan fungsi KORMI Kabupaten Bandung..."
+                            />
+                        </x-form.field>
 
-        <!-- LOGO -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-200/80">
-                <h2 class="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                    <i data-lucide="image" class="w-4 h-4 text-amber-600"></i>
-                    Logo & Branding
-                </h2>
-            </div>
-            <div class="p-6">
-                <label class="block text-xs font-bold text-slate-600 mb-1.5">Upload Logo</label>
-                <input type="file" wire:model="uploadLogo" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
-                @error('uploadLogo') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                        <!-- Alamat Kantor -->
+                        <x-form.field label="Alamat Kantor Sekretariat" name="alamat_kantor">
+                            <x-form.textarea 
+                                name="alamat_kantor" 
+                                wire:model.live.debounce.300ms="alamat_kantor" 
+                                rows="2" 
+                                placeholder="Jl. Raya Soreang No. ... Kompleks Stadion Si Jalak Harupat, Kabupaten Bandung..."
+                            />
+                        </x-form.field>
 
-                @if($uploadLogo)
-                    <div class="mt-3">
-                        <img src="{{ $uploadLogo->temporaryUrl() }}" class="h-20 rounded-xl border border-slate-200" alt="Preview Logo">
+                        <!-- Google Maps Embed -->
+                        <x-form.field label="Tautan / Embed Google Maps" name="gmaps_embed" hint="URL embed peta lokasi sekretariat">
+                            <x-form.input 
+                                name="gmaps_embed" 
+                                wire:model="gmaps_embed" 
+                                placeholder="https://www.google.com/maps/embed?..." 
+                                icon="map-pin"
+                            />
+                        </x-form.field>
+                    </x-form.card>
+                @endif
+
+                <!-- TAB 2: KONTAK & SEKRETARIAT -->
+                @if($tabAktif === 'kontak')
+                    <x-form.card 
+                        title="Informasi Kontak & Layanan" 
+                        subtitle="Kanal komunikasi resmi masyarakat dan induk organisasi olahraga rekreasi."
+                        icon="phone-call"
+                    >
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Email -->
+                            <x-form.field label="Email Resmi Sekretariat" name="email_kontak">
+                                <x-form.input 
+                                    type="email" 
+                                    name="email_kontak" 
+                                    wire:model.live.debounce.300ms="email_kontak" 
+                                    placeholder="sekretariat@kormikabbdg.id" 
+                                    icon="mail"
+                                />
+                            </x-form.field>
+
+                            <!-- Nomor Telepon -->
+                            <x-form.field label="Nomor Telepon Kantor" name="nomor_telepon">
+                                <x-form.input 
+                                    name="nomor_telepon" 
+                                    wire:model.live.debounce.300ms="nomor_telepon" 
+                                    placeholder="022-8587xxxx" 
+                                    icon="phone"
+                                />
+                            </x-form.field>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- WhatsApp -->
+                            <x-form.field label="Nomor WhatsApp Helpdesk" name="nomor_whatsapp">
+                                <x-form.input 
+                                    name="nomor_whatsapp" 
+                                    wire:model.live.debounce.300ms="nomor_whatsapp" 
+                                    placeholder="081234567890" 
+                                    icon="message-circle"
+                                />
+                            </x-form.field>
+
+                            <!-- Jam Operasional -->
+                            <x-form.field label="Jam Layanan Kantor" name="jam_operasional">
+                                <x-form.input 
+                                    name="jam_operasional" 
+                                    wire:model="jam_operasional" 
+                                    placeholder="Senin - Jumat: 08.00 - 16.00 WIB" 
+                                    icon="clock"
+                                />
+                            </x-form.field>
+                        </div>
+                    </x-form.card>
+                @endif
+
+                <!-- TAB 3: MEDIA SOSIAL -->
+                @if($tabAktif === 'sosmed')
+                    <x-form.card 
+                        title="Media Sosial & Portal Mitra" 
+                        subtitle="Tautan akun media sosial publikasi kegiatan dan afiliasi KORMI Nasional / Jawa Barat."
+                        icon="share-2"
+                    >
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Instagram -->
+                            <x-form.field label="Instagram URL" name="instagram">
+                                <x-form.input 
+                                    name="instagram" 
+                                    wire:model.live.debounce.300ms="instagram" 
+                                    placeholder="https://instagram.com/kormikabupatenbandung" 
+                                    icon="instagram"
+                                />
+                            </x-form.field>
+
+                            <!-- Facebook -->
+                            <x-form.field label="Facebook Fanpage URL" name="facebook">
+                                <x-form.input 
+                                    name="facebook" 
+                                    wire:model.live.debounce.300ms="facebook" 
+                                    placeholder="https://facebook.com/kormikabbdg" 
+                                    icon="facebook"
+                                />
+                            </x-form.field>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- YouTube -->
+                            <x-form.field label="YouTube Channel URL" name="youtube">
+                                <x-form.input 
+                                    name="youtube" 
+                                    wire:model.live.debounce.300ms="youtube" 
+                                    placeholder="https://youtube.com/@kormikabupatenbandung" 
+                                    icon="video"
+                                />
+                            </x-form.field>
+
+                            <!-- TikTok -->
+                            <x-form.field label="TikTok Account URL" name="tiktok">
+                                <x-form.input 
+                                    name="tiktok" 
+                                    wire:model.live.debounce.300ms="tiktok" 
+                                    placeholder="https://tiktok.com/@kormikabbdg" 
+                                    icon="play"
+                                />
+                            </x-form.field>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                            <!-- KORMI Pusat -->
+                            <x-form.field label="Website KORMI Nasional (Pusat)" name="website_kormi_pusat">
+                                <x-form.input 
+                                    name="website_kormi_pusat" 
+                                    wire:model="website_kormi_pusat" 
+                                    placeholder="https://kormi.or.id" 
+                                    icon="external-link"
+                                />
+                            </x-form.field>
+
+                            <!-- KORMI Jabar -->
+                            <x-form.field label="Website KORMI Jawa Barat" name="website_kormi_jabar">
+                                <x-form.input 
+                                    name="website_kormi_jabar" 
+                                    wire:model="website_kormi_jabar" 
+                                    placeholder="https://kormijabar.or.id" 
+                                    icon="external-link"
+                                />
+                            </x-form.field>
+                        </div>
+                    </x-form.card>
+                @endif
+
+                <!-- TAB 4: LOGO & BRANDING -->
+                @if($tabAktif === 'branding')
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Logo Utama -->
+                        <x-form.card 
+                            title="Logo Utama Portal" 
+                            subtitle="Format PNG transparan atau WEBP / SVG."
+                            icon="image"
+                        >
+                            <x-form.image-upload
+                                :upload="$uploadLogo"
+                                :saved-path="$logo_path"
+                                name="uploadLogo"
+                                input-id="uploadLogoUtama"
+                                empty-title="Unggah Logo Utama KORMI"
+                                empty-subtitle="Format PNG, SVG, WEBP (Maksimal 5MB)"
+                                :max-size-m-b="5"
+                                aspect-ratio="h-44 sm:h-52"
+                            />
+                        </x-form.card>
+
+                        <!-- Favicon -->
+                        <x-form.card 
+                            title="Favicon / Icon Tab Browser" 
+                            subtitle="Ikon kecil persegi pada browser tab."
+                            icon="layout"
+                        >
+                            <x-form.image-upload
+                                :upload="$uploadFavicon"
+                                :saved-path="$favicon_path"
+                                name="uploadFavicon"
+                                input-id="uploadFaviconBrowser"
+                                empty-title="Unggah Favicon"
+                                empty-subtitle="Format PNG, ICO (Maksimal 2MB)"
+                                :max-size-m-b="2"
+                                aspect-ratio="h-44 sm:h-52"
+                            />
+                        </x-form.card>
                     </div>
                 @endif
+
+            </div>
+
+            <!-- Right Column (4 cols): Live Brand Preview & Info Card -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Live Brand Preview Card -->
+                <x-form.card 
+                    title="Pratinjau Branding" 
+                    subtitle="Simulasi tampilan identitas di portal publik."
+                    icon="eye"
+                >
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white space-y-4 shadow-lg">
+                        <!-- Header Mockup -->
+                        <div class="flex items-center gap-3 pb-3 border-b border-white/10">
+                            @if($uploadLogo)
+                                <img src="{{ $uploadLogo->temporaryUrl() }}" class="h-10 w-auto object-contain" alt="Logo">
+                            @elseif($logo_path)
+                                <img src="{{ app(\App\Services\StorageService::class)->getTemporaryUrl($logo_path) }}" class="h-10 w-auto object-contain" alt="Logo">
+                            @else
+                                <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-black text-sm">
+                                    KB
+                                </div>
+                            @endif
+
+                            <div class="min-w-0">
+                                <h4 class="text-xs font-black text-white truncate tracking-tight">
+                                    {{ $nama_situs ?: 'KORMI Kabupaten Bandung' }}
+                                </h4>
+                                <p class="text-[10px] text-emerald-400 font-bold truncate">
+                                    {{ $tagline_situs ?: 'Sehat, Bugar, Gembira, Luar Biasa!' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Description & Contact -->
+                        <div class="space-y-2 text-xs text-slate-300">
+                            @if($alamat_kantor)
+                                <p class="line-clamp-2 text-[11px] leading-relaxed">
+                                    📍 {{ $alamat_kantor }}
+                                </p>
+                            @endif
+                            @if($nomor_telepon || $email_kontak)
+                                <div class="flex flex-wrap gap-2 text-[10px] pt-1">
+                                    @if($nomor_telepon)
+                                        <span class="px-2 py-0.5 rounded-md bg-white/10 text-white font-mono">📞 {{ $nomor_telepon }}</span>
+                                    @endif
+                                    @if($email_kontak)
+                                        <span class="px-2 py-0.5 rounded-md bg-white/10 text-white">✉️ {{ $email_kontak }}</span>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Social Media Mockup -->
+                        <div class="pt-3 border-t border-white/10 flex items-center gap-2">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Sosmed:</span>
+                            <div class="flex items-center gap-1.5 text-xs text-emerald-400">
+                                @if($instagram)<i data-lucide="instagram" class="w-4 h-4"></i>@endif
+                                @if($facebook)<i data-lucide="facebook" class="w-4 h-4"></i>@endif
+                                @if($youtube)<i data-lucide="youtube" class="w-4 h-4"></i>@endif
+                                @if($tiktok)<i data-lucide="play" class="w-4 h-4"></i>@endif
+                            </div>
+                        </div>
+                    </div>
+                </x-form.card>
+
+                <!-- Information Guide Card -->
+                <div class="bg-emerald-50/70 border border-emerald-200/80 rounded-3xl p-5 space-y-3">
+                    <h4 class="text-xs font-black text-emerald-900 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Penyimpanan Aman</span>
+                    </h4>
+                    <p class="text-xs text-emerald-950 leading-relaxed">
+                        Seluruh pengaturan situs disimpan dalam basis data terpusat dan aset logo secara otomatis disinkronkan dengan media storage MinIO S3 terenkripsi.
+                    </p>
+                </div>
             </div>
         </div>
 
-        <!-- SUBMIT -->
-        <div class="flex justify-end">
-            <button type="submit" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider shadow-md shadow-emerald-600/20 transition-all cursor-pointer active:scale-95">
-                <i data-lucide="save" class="w-4 h-4"></i>
-                <span>Simpan Pengaturan</span>
-            </button>
-        </div>
+        <!-- 4. ACTION BAR -->
+        <x-form.action-bar>
+            <div class="text-xs text-slate-500 font-medium">
+                Perubahan pengaturan langsung diterapkan pada seluruh halaman portal publik.
+            </div>
 
+            <x-form.button 
+                type="submit" 
+                variant="primary" 
+                icon="save" 
+                loading-target="simpan"
+            >
+                Simpan Semua Pengaturan
+            </x-form.button>
+        </x-form.action-bar>
     </form>
 
 </div>

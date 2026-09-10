@@ -22,6 +22,19 @@ class ApmoKelola extends Component
     public string $tabAktif = 'penerima'; // 'penerima' atau 'edisi'
     public string $cari = '';
     public string $tahunDipilih = 'Semua';
+    public string $kategoriFilter = 'Semua';
+
+    // Sorting & Pagination
+    public string $sortField = 'urutan';
+    public string $sortDirection = 'asc';
+    public int $perPage = 9;
+    public string $tampilanMode = 'grid'; // 'grid' atau 'tabel' untuk penerima
+
+    // Bulk selection
+    public array $selectedPenerima = [];
+    public bool $pilihSemuaPenerima = false;
+    public array $selectedEdisi = [];
+    public bool $pilihSemuaEdisi = false;
 
     // Backward compatibility for automated tests
     public bool $tampilkanModalPenerima = false;
@@ -297,6 +310,84 @@ class ApmoKelola extends Component
         $this->deskripsi = '';
     }
 
+    public function sortBy(string $field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage('penerimaPage');
+        $this->resetPage('edisiPage');
+    }
+
+    public function updatedPilihSemuaPenerima(bool $value): void
+    {
+        if ($value) {
+            $this->selectedPenerima = ApmoPenerima::pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selectedPenerima = [];
+        }
+    }
+
+    public function updatedPilihSemuaEdisi(bool $value): void
+    {
+        if ($value) {
+            $this->selectedEdisi = ApmoTahun::pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selectedEdisi = [];
+        }
+    }
+
+    public function resetSelectionPenerima(): void
+    {
+        $this->selectedPenerima = [];
+        $this->pilihSemuaPenerima = false;
+    }
+
+    public function resetSelectionEdisi(): void
+    {
+        $this->selectedEdisi = [];
+        $this->pilihSemuaEdisi = false;
+    }
+
+    public function bulkDeletePenerima(): void
+    {
+        if (empty($this->selectedPenerima)) return;
+        $penerimas = ApmoPenerima::whereIn('id', $this->selectedPenerima)->get();
+        $storage = app(StorageService::class);
+        foreach ($penerimas as $p) {
+            $storage->hapusFile($p->foto_url);
+            $p->delete();
+        }
+        session()->flash('pesan', count($this->selectedPenerima) . ' data penerima anugerah APMO berhasil dihapus.');
+        $this->resetSelectionPenerima();
+    }
+
+    public function bulkDeleteEdisi(): void
+    {
+        if (empty($this->selectedEdisi)) return;
+        ApmoTahun::whereIn('id', $this->selectedEdisi)->delete();
+        session()->flash('pesan', count($this->selectedEdisi) . ' edisi tahunan APMO berhasil dihapus.');
+        $this->resetSelectionEdisi();
+    }
+
+    public function setFilterKategori(string $kat): void
+    {
+        $this->kategoriFilter = $kat;
+        $this->resetPage('penerimaPage');
+    }
+
+    public function resetSemuaFilter(): void
+    {
+        $this->cari = '';
+        $this->tahunDipilih = 'Semua';
+        $this->kategoriFilter = 'Semua';
+        $this->resetPage('penerimaPage');
+        $this->resetPage('edisiPage');
+    }
+
     public function render()
     {
         $semuaEdisi = ApmoTahun::orderByDesc('tahun')->get();
@@ -305,26 +396,43 @@ class ApmoKelola extends Component
             ->when($this->tahunDipilih !== 'Semua', function ($q) {
                 $q->whereHas('tahun', fn($t) => $t->where('tahun', $this->tahunDipilih));
             })
+            ->when($this->kategoriFilter !== 'Semua', function ($q) {
+                $q->where('kategori_penghargaan', $this->kategoriFilter);
+            })
             ->when($this->cari, function ($q) {
                 $q->where('nama_penerima', 'like', '%' . $this->cari . '%')
                   ->orWhere('kategori_penghargaan', 'like', '%' . $this->cari . '%')
                   ->orWhere('asal_lembaga_wilayah', 'like', '%' . $this->cari . '%');
-            })
-            ->orderBy('urutan');
+            });
+
+        if (in_array($this->sortField, ['urutan', 'nama_penerima', 'kategori_penghargaan', 'created_at'])) {
+            $queryPenerima->orderBy($this->sortField, $this->sortDirection);
+        } else {
+            $queryPenerima->orderBy('urutan');
+        }
 
         $queryEdisi = ApmoTahun::withCount('penerima')
             ->when($this->cari, function ($q) {
                 $q->where('tahun', 'like', '%' . $this->cari . '%')
-                  ->orWhere('tema_acara', 'like', '%' . $this->cari . '%');
-            })
-            ->orderByDesc('tahun');
+                  ->orWhere('tema_acara', 'like', '%' . $this->cari . '%')
+                  ->orWhere('tempat_acara', 'like', '%' . $this->cari . '%');
+            });
+
+        if (in_array($this->sortField, ['tahun', 'tanggal_penganugerahan', 'tema_acara'])) {
+            $queryEdisi->orderBy($this->sortField, $this->sortDirection);
+        } else {
+            $queryEdisi->orderByDesc('tahun');
+        }
+
+        $edisiTerbaru = ApmoTahun::orderByDesc('tahun')->first();
 
         return view('livewire.admin.apmo.apmo-kelola', [
-            'daftarPenerima' => $queryPenerima->paginate(9, ['*'], 'penerimaPage'),
-            'daftarEdisi' => $queryEdisi->paginate(8, ['*'], 'edisiPage'),
+            'daftarPenerima' => $queryPenerima->paginate($this->perPage, ['*'], 'penerimaPage'),
+            'daftarEdisi' => $queryEdisi->paginate($this->perPage, ['*'], 'edisiPage'),
             'semuaEdisi' => $semuaEdisi,
             'totalPenerima' => ApmoPenerima::count(),
             'totalEdisi' => ApmoTahun::count(),
+            'edisiTerbaru' => $edisiTerbaru,
         ]);
     }
 }
