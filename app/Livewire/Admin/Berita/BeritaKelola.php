@@ -6,56 +6,94 @@ use App\Models\Berita;
 use App\Models\KategoriBerita;
 use App\Models\Pengguna;
 use App\Services\StorageService;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 #[Layout('components.layouts.admin')]
-#[Title('Kelola Berita & Artikel - KORMI CMS')]
+#[Title('Kelola Berita & Publikasi Media - KORMI CMS')]
 class BeritaKelola extends Component
 {
     use WithPagination, WithFileUploads;
 
+    // View state
     public string $mode = 'tabel'; // 'tabel' atau 'form'
+    public string $tampilanMode = 'tabel'; // 'tabel' atau 'grid'
+
+    // Filter & Search
+    #[Url(as: 'q')]
     public string $cari = '';
+
+    #[Url(as: 'kat')]
     public string $kategoriDipilih = 'Semua';
+
+    #[Url(as: 'status')]
     public string $statusDipilih = 'Semua';
 
-    // Form state
-    public bool $tampilkanModal = false;
-    public bool $tampilkanModalHapus = false;
+    #[Url(as: 'unggulan')]
+    public string $unggulanDipilih = 'Semua';
+
+    #[Url(as: 'urut')]
+    public string $urutkan = 'terbaru'; // terbaru, terlama, terpopuler, judul_asc
+
+    public int $perPage = 10;
+
+    // Checkbox Bulk Selection
+    public array $selectedBerita = [];
+    public bool $pilihSemua = false;
+
+    // Form fields
     public ?string $beritaId = null;
     public string $judul = '';
+    public string $slug = '';
     public string $kategori_id = '';
+    public ?string $penulis_id = null;
     public string $ringkasan = '';
     public string $isi_konten = '';
-    public string $gambar_utama = ''; // menyimpan path MinIO yang sudah diupload
+    public string $gambar_utama = '';
+    public string $keterangan_gambar = '';
     public string $status_publikasi = 'published';
     public bool $status_unggulan = false;
+    public ?string $tanggal_publikasi = null;
+    public string $tabEditor = 'editor'; // 'editor' atau 'preview'
 
-    // File upload sementara
+    // File upload
     public $uploadGambar = null;
 
-    // Progress/status upload
-    public bool $uploadingGambar = false;
+    // Modals
+    public bool $tampilkanModal = false; // Backward compatibility
+    public bool $tampilkanModalHapus = false;
+    public ?string $hapusId = null;
+    public ?string $hapusJudul = null;
+
+    public bool $tampilkanModalPratinjau = false;
+    public ?Berita $pratinjauBerita = null;
+
+    public bool $tampilkanModalKategori = false;
+    public string $kategoriBaruNama = '';
+    public string $kategoriBaruWarna = '#4f46e5';
 
     protected function rules(): array
     {
         $rules = [
-            'judul'            => 'required|min:5|max:255',
-            'kategori_id'      => 'required|exists:kormi_kategori_berita,id',
-            'ringkasan'        => 'required|max:500',
-            'isi_konten'       => 'required|min:10',
-            'status_publikasi' => 'required|in:draft,published,archived',
+            'judul'             => 'required|min:5|max:255',
+            'slug'              => 'required|max:255',
+            'kategori_id'       => 'required|exists:kormi_kategori_berita,id',
+            'ringkasan'         => 'required|max:500',
+            'isi_konten'        => 'required|min:10',
+            'status_publikasi'  => 'required|in:draft,published,archived',
+            'penulis_id'        => 'nullable|exists:kormi_pengguna,id',
+            'keterangan_gambar' => 'nullable|max:255',
+            'tanggal_publikasi' => 'nullable|date',
         ];
 
-        // Saat buat baru, gambar wajib diupload
-        if (!$this->beritaId) {
-            $rules['uploadGambar'] = 'required|image|mimes:jpg,jpeg,png,webp|max:5120'; // max 5MB
+        if (!$this->beritaId && empty($this->gambar_utama)) {
+            $rules['uploadGambar'] = 'required|image|mimes:jpg,jpeg,png,webp|max:5120';
         } else {
             $rules['uploadGambar'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120';
         }
@@ -64,38 +102,206 @@ class BeritaKelola extends Component
     }
 
     protected $messages = [
-        'judul.required'           => 'Judul berita wajib diisi.',
-        'judul.min'                => 'Judul minimal 5 karakter.',
-        'kategori_id.required'     => 'Kategori berita wajib dipilih.',
-        'ringkasan.required'       => 'Ringkasan berita wajib diisi.',
-        'isi_konten.required'      => 'Isi konten wajib diisi.',
-        'uploadGambar.required'    => 'Gambar utama wajib diunggah untuk berita baru.',
-        'uploadGambar.image'       => 'File harus berupa gambar.',
-        'uploadGambar.mimes'       => 'Format gambar harus: jpg, jpeg, png, atau webp.',
-        'uploadGambar.max'         => 'Ukuran gambar maksimal 5 MB.',
+        'judul.required'        => 'Judul artikel berita wajib diisi.',
+        'judul.min'             => 'Judul minimal 5 karakter.',
+        'slug.required'         => 'Slug URL wajib diisi.',
+        'kategori_id.required'  => 'Kategori berita wajib dipilih.',
+        'kategori_id.exists'    => 'Kategori yang dipilih tidak valid.',
+        'ringkasan.required'    => 'Ringkasan / sinopsis berita wajib diisi.',
+        'ringkasan.max'         => 'Ringkasan maksimal 500 karakter.',
+        'isi_konten.required'   => 'Naskah isi konten berita wajib diisi.',
+        'uploadGambar.required' => 'Gambar utama / thumbnail wajib diunggah untuk berita baru.',
+        'uploadGambar.image'    => 'File harus berupa file gambar.',
+        'uploadGambar.mimes'    => 'Format gambar harus JPG, JPEG, PNG, atau WEBP.',
+        'uploadGambar.max'      => 'Ukuran gambar maksimal 5 MB.',
     ];
+
+    public function mount(): void
+    {
+        // Set default penulis jika ada user login
+        $this->penulis_id = auth()->id() ?? Pengguna::first()?->id;
+    }
 
     public function updatedCari(): void
     {
         $this->resetPage();
+        $this->resetSelection();
     }
 
     public function updatedKategoriDipilih(): void
     {
         $this->resetPage();
+        $this->resetSelection();
     }
 
     public function updatedStatusDipilih(): void
     {
         $this->resetPage();
+        $this->resetSelection();
     }
+
+    public function updatedUnggulanDipilih(): void
+    {
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function updatedUrutkan(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedJudul(string $value): void
+    {
+        if (empty($this->beritaId) || empty($this->slug)) {
+            $this->slug = Str::slug($value);
+        }
+    }
+
+    public function generateSlugOtomatis(): void
+    {
+        $this->slug = Str::slug($this->judul);
+    }
+
+    public function setFilterKategori(string $id): void
+    {
+        $this->kategoriDipilih = $id;
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function setFilterStatus(string $status): void
+    {
+        $this->statusDipilih = $status;
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function setFilterUnggulan(string $val): void
+    {
+        $this->unggulanDipilih = $val;
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    public function resetSemuaFilter(): void
+    {
+        $this->reset(['cari', 'kategoriDipilih', 'statusDipilih', 'unggulanDipilih', 'urutkan']);
+        $this->resetPage();
+        $this->resetSelection();
+    }
+
+    // ==========================================
+    // SELECTION & BULK ACTIONS
+    // ==========================================
+
+    public function updatedPilihSemua(bool $value): void
+    {
+        if ($value) {
+            $this->selectedBerita = $this->getBeritaQuery()->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selectedBerita = [];
+        }
+    }
+
+    public function resetSelection(): void
+    {
+        $this->selectedBerita = [];
+        $this->pilihSemua = false;
+    }
+
+    public function bulkPublish(): void
+    {
+        if (empty($this->selectedBerita)) return;
+
+        Berita::whereIn('id', $this->selectedBerita)->update([
+            'status_publikasi' => 'published',
+            'tanggal_publikasi' => now(),
+        ]);
+
+        session()->flash('pesan', count($this->selectedBerita) . ' artikel berita berhasil dipublikasikan!');
+        $this->resetSelection();
+    }
+
+    public function bulkDraft(): void
+    {
+        if (empty($this->selectedBerita)) return;
+
+        Berita::whereIn('id', $this->selectedBerita)->update([
+            'status_publikasi' => 'draft',
+        ]);
+
+        session()->flash('pesan', count($this->selectedBerita) . ' artikel berita diubah menjadi Draf.');
+        $this->resetSelection();
+    }
+
+    public function bulkArchive(): void
+    {
+        if (empty($this->selectedBerita)) return;
+
+        Berita::whereIn('id', $this->selectedBerita)->update([
+            'status_publikasi' => 'archived',
+        ]);
+
+        session()->flash('pesan', count($this->selectedBerita) . ' artikel berita diarsipkan.');
+        $this->resetSelection();
+    }
+
+    public function bulkToggleUnggulan(bool $status): void
+    {
+        if (empty($this->selectedBerita)) return;
+
+        Berita::whereIn('id', $this->selectedBerita)->update([
+            'status_unggulan' => $status,
+        ]);
+
+        $label = $status ? 'dijadikan Berita Utama' : 'dihapus dari Berita Utama';
+        session()->flash('pesan', count($this->selectedBerita) . ' artikel ' . $label . '!');
+        $this->resetSelection();
+    }
+
+    public function bulkDelete(): void
+    {
+        if (empty($this->selectedBerita)) return;
+
+        $count = count($this->selectedBerita);
+        $beritas = Berita::whereIn('id', $this->selectedBerita)->get();
+        $storage = app(StorageService::class);
+
+        foreach ($beritas as $b) {
+            $storage->hapusFile($b->gambar_utama);
+            $b->delete();
+        }
+
+        session()->flash('pesan', $count . ' artikel berita berhasil dihapus dari sistem!');
+        $this->resetSelection();
+    }
+
+    // ==========================================
+    // FORM CRUD OPERATIONS
+    // ==========================================
 
     public function bukaFormTambah(): void
     {
-        $this->reset(['beritaId', 'judul', 'kategori_id', 'ringkasan', 'isi_konten', 'gambar_utama', 'status_unggulan', 'uploadGambar']);
+        $this->reset([
+            'beritaId', 'judul', 'slug', 'kategori_id', 'ringkasan', 
+            'isi_konten', 'gambar_utama', 'keterangan_gambar', 
+            'status_unggulan', 'uploadGambar'
+        ]);
+
         $this->status_publikasi = 'published';
+        $this->tanggal_publikasi = now()->format('Y-m-d\TH:i');
+        $this->penulis_id = auth()->id() ?? Pengguna::first()?->id;
+        
         $firstKat = KategoriBerita::first();
         $this->kategori_id = $firstKat ? $firstKat->id : '';
+
+        $this->tabEditor = 'editor';
         $this->mode = 'form';
         $this->tampilkanModal = true;
         $this->resetErrorBag();
@@ -109,15 +315,21 @@ class BeritaKelola extends Component
     public function bukaFormEdit(string $id): void
     {
         $berita = Berita::findOrFail($id);
-        $this->beritaId     = $berita->id;
-        $this->judul        = $berita->judul;
-        $this->kategori_id  = $berita->kategori_id;
-        $this->ringkasan    = $berita->ringkasan;
-        $this->isi_konten   = $berita->isi_konten;
-        $this->gambar_utama = $berita->gambar_utama;
-        $this->status_publikasi = $berita->status_publikasi;
-        $this->status_unggulan  = (bool) $berita->status_unggulan;
-        $this->uploadGambar = null;
+        $this->beritaId          = $berita->id;
+        $this->judul             = $berita->judul;
+        $this->slug              = $berita->slug;
+        $this->kategori_id       = $berita->kategori_id;
+        $this->penulis_id        = $berita->penulis_id;
+        $this->ringkasan         = $berita->ringkasan;
+        $this->isi_konten        = $berita->isi_konten;
+        $this->gambar_utama      = $berita->gambar_utama;
+        $this->keterangan_gambar = $berita->keterangan_gambar ?? '';
+        $this->status_publikasi  = $berita->status_publikasi;
+        $this->status_unggulan   = (bool) $berita->status_unggulan;
+        $this->tanggal_publikasi = $berita->tanggal_publikasi ? Carbon::parse($berita->tanggal_publikasi)->format('Y-m-d\TH:i') : null;
+        $this->uploadGambar      = null;
+
+        $this->tabEditor = 'editor';
         $this->mode = 'form';
         $this->tampilkanModal = true;
         $this->resetErrorBag();
@@ -132,7 +344,11 @@ class BeritaKelola extends Component
     {
         $this->mode = 'tabel';
         $this->tampilkanModal = false;
-        $this->reset(['beritaId', 'judul', 'ringkasan', 'isi_konten', 'gambar_utama', 'uploadGambar']);
+        $this->reset([
+            'beritaId', 'judul', 'slug', 'ringkasan', 'isi_konten', 
+            'gambar_utama', 'keterangan_gambar', 'uploadGambar'
+        ]);
+        $this->resetErrorBag();
     }
 
     public function simpan(): void
@@ -142,27 +358,44 @@ class BeritaKelola extends Component
         /** @var StorageService $storage */
         $storage = app(StorageService::class);
 
-        $penulisId = auth()->id() ?? Pengguna::first()?->id ?? Berita::first()?->penulis_id;
+        $penulisId = $this->penulis_id ?: (auth()->id() ?? Pengguna::first()?->id ?? Berita::first()?->penulis_id);
 
         // Upload gambar baru ke MinIO jika ada
         $pathGambar = $this->gambar_utama;
         if ($this->uploadGambar) {
-            // Hapus gambar lama jika update
+            // Hapus gambar lama jika ada dan bukan URL eksternal
             if ($this->beritaId && !empty($this->gambar_utama)) {
                 $storage->hapusFile($this->gambar_utama);
             }
             $pathGambar = $storage->uploadGambar($this->uploadGambar, 'berita');
         }
 
+        // Generate slug unik jika duplikat
+        $finalSlug = Str::slug($this->slug ?: $this->judul);
+        $slugCount = Berita::where('slug', $finalSlug)
+            ->when($this->beritaId, fn($q) => $q->where('id', '!=', $this->beritaId))
+            ->count();
+
+        if ($slugCount > 0) {
+            $finalSlug .= '-' . rand(100, 999);
+        }
+
+        $tanggalPublikasi = $this->tanggal_publikasi 
+            ? Carbon::parse($this->tanggal_publikasi) 
+            : ($this->status_publikasi === 'published' ? now() : null);
+
         $data = [
-            'judul'            => $this->judul,
-            'kategori_id'      => $this->kategori_id,
-            'ringkasan'        => $this->ringkasan,
-            'isi_konten'       => $this->isi_konten,
-            'gambar_utama'     => $pathGambar,
-            'status_publikasi' => $this->status_publikasi,
-            'status_unggulan'  => $this->status_unggulan,
-            'penulis_id'       => $penulisId,
+            'judul'             => $this->judul,
+            'slug'              => $finalSlug,
+            'kategori_id'       => $this->kategori_id,
+            'penulis_id'        => $penulisId,
+            'ringkasan'         => $this->ringkasan,
+            'isi_konten'        => $this->isi_konten,
+            'gambar_utama'      => $pathGambar,
+            'keterangan_gambar' => $this->keterangan_gambar ?: null,
+            'status_publikasi'  => $this->status_publikasi,
+            'status_unggulan'   => $this->status_unggulan,
+            'tanggal_publikasi' => $tanggalPublikasi,
         ];
 
         if ($this->beritaId) {
@@ -170,15 +403,87 @@ class BeritaKelola extends Component
             $berita->update($data);
             session()->flash('pesan', 'Berita "' . Str::limit($this->judul, 40) . '" berhasil diperbarui!');
         } else {
-            $data['id']                = (string) Str::uuid();
-            $data['slug']              = Str::slug($this->judul) . '-' . rand(100, 999);
-            $data['tanggal_publikasi'] = now();
-            $data['jumlah_dilihat']    = 0;
+            $data['id']             = (string) Str::uuid();
+            $data['jumlah_dilihat'] = 0;
             Berita::create($data);
-            session()->flash('pesan', 'Berita baru berhasil diterbitkan!');
+            session()->flash('pesan', 'Berita baru "' . Str::limit($this->judul, 40) . '" berhasil diterbitkan!');
         }
 
         $this->kembaliKeTabel();
+    }
+
+    // ==========================================
+    // QUICK INLINE ACTIONS & MODALS
+    // ==========================================
+
+    public function toggleUnggulan(string $id): void
+    {
+        $berita = Berita::findOrFail($id);
+        $berita->status_unggulan = !$berita->status_unggulan;
+        $berita->save();
+
+        $pesan = $berita->status_unggulan ? 'dijadikan Berita Utama (Headline)!' : 'dilepas dari Berita Utama.';
+        session()->flash('pesan', 'Status Berita "' . Str::limit($berita->judul, 30) . '" ' . $pesan);
+    }
+
+    public function toggleStatus(string $id): void
+    {
+        $berita = Berita::findOrFail($id);
+        $nextStatus = match ($berita->status_publikasi) {
+            'published' => 'draft',
+            'draft'     => 'published',
+            'archived'  => 'published',
+            default     => 'published',
+        };
+
+        $berita->status_publikasi = $nextStatus;
+        if ($nextStatus === 'published' && !$berita->tanggal_publikasi) {
+            $berita->tanggal_publikasi = now();
+        }
+        $berita->save();
+
+        session()->flash('pesan', 'Status berita diubah menjadi: ' . strtoupper($nextStatus));
+    }
+
+
+    public function duplikatBerita(string $id): void
+    {
+        $sumber = Berita::findOrFail($id);
+        
+        $duplikat = $sumber->replicate();
+        $duplikat->id = (string) Str::uuid();
+        $duplikat->judul = '[Salinan] ' . $sumber->judul;
+        $duplikat->slug = Str::slug($duplikat->judul) . '-' . rand(100, 999);
+        $duplikat->status_publikasi = 'draft';
+        $duplikat->status_unggulan = false;
+        $duplikat->jumlah_dilihat = 0;
+        $duplikat->tanggal_publikasi = null;
+        $duplikat->save();
+
+        session()->flash('pesan', 'Berita berhasil diduplikasi sebagai draf baru.');
+    }
+
+    public function konfirmasiHapus(string $id): void
+    {
+        $berita = Berita::findOrFail($id);
+        $this->hapusId = $berita->id;
+        $this->hapusJudul = $berita->judul;
+        $this->tampilkanModalHapus = true;
+    }
+
+    public function batalHapus(): void
+    {
+        $this->hapusId = null;
+        $this->hapusJudul = null;
+        $this->tampilkanModalHapus = false;
+    }
+
+    public function prosesHapus(): void
+    {
+        if ($this->hapusId) {
+            $this->hapus($this->hapusId);
+            $this->batalHapus();
+        }
     }
 
     public function hapus(string $id): void
@@ -190,34 +495,110 @@ class BeritaKelola extends Component
         app(StorageService::class)->hapusFile($berita->gambar_utama);
 
         $berita->delete();
-        session()->flash('pesan', 'Berita "' . Str::limit($judul, 35) . '" berhasil dihapus dari sistem!');
+        session()->flash('pesan', 'Berita "' . Str::limit($judul, 35) . '" berhasil dihapus dari sistem.');
+        $this->resetSelection();
     }
 
-    public function toggleUnggulan(string $id): void
+    // Modal Live Preview
+    public function bukaModalPratinjau(string $id): void
     {
-        $berita = Berita::findOrFail($id);
-        $berita->status_unggulan = !$berita->status_unggulan;
-        $berita->save();
-        session()->flash('pesan', 'Status berita utama berhasil diperbarui!');
+        $this->pratinjauBerita = Berita::with('kategori', 'penulis')->findOrFail($id);
+        $this->tampilkanModalPratinjau = true;
+    }
+
+    public function tutupModalPratinjau(): void
+    {
+        $this->pratinjauBerita = null;
+        $this->tampilkanModalPratinjau = false;
+    }
+
+    // Modal Tambah Kategori Cepat
+    public function bukaModalTambahKategori(): void
+    {
+        $this->kategoriBaruNama = '';
+        $this->kategoriBaruWarna = '#4f46e5';
+        $this->tampilkanModalKategori = true;
+        $this->resetErrorBag(['kategoriBaruNama']);
+    }
+
+    public function tutupModalTambahKategori(): void
+    {
+        $this->tampilkanModalKategori = false;
+    }
+
+    public function simpanKategoriBaru(): void
+    {
+        $this->validate([
+            'kategoriBaruNama' => 'required|min:3|max:100|unique:kormi_kategori_berita,nama_kategori',
+            'kategoriBaruWarna' => 'required|regex:/^#[a-fA-F0-9]{6}$/',
+        ], [
+            'kategoriBaruNama.required' => 'Nama kategori wajib diisi.',
+            'kategoriBaruNama.unique'   => 'Nama kategori sudah ada.',
+            'kategoriBaruWarna.regex'   => 'Format kode warna harus heksadesimal (contoh: #4f46e5).',
+        ]);
+
+        $kategori = KategoriBerita::create([
+            'id'             => (string) Str::uuid(),
+            'nama_kategori'  => trim($this->kategoriBaruNama),
+            'slug'           => Str::slug($this->kategoriBaruNama),
+            'kode_warna_hex' => $this->kategoriBaruWarna ?: '#4f46e5',
+        ]);
+
+        $this->kategori_id = $kategori->id;
+        $this->tutupModalTambahKategori();
+        session()->flash('pesan', 'Kategori "' . $kategori->nama_kategori . '" berhasil ditambahkan!');
+    }
+
+    // ==========================================
+    // QUERY BUILDER & RENDER
+    // ==========================================
+
+    protected function getBeritaQuery()
+    {
+        return Berita::with('kategori', 'penulis')
+            ->when($this->kategoriDipilih !== 'Semua', fn($q) => $q->where('kategori_id', $this->kategoriDipilih))
+            ->when($this->statusDipilih !== 'Semua', fn($q) => $q->where('status_publikasi', $this->statusDipilih))
+            ->when($this->unggulanDipilih !== 'Semua', fn($q) => $q->where('status_unggulan', (bool) $this->unggulanDipilih))
+            ->when($this->cari, function ($q) {
+                $term = '%' . trim($this->cari) . '%';
+                $q->where(function ($sub) use ($term) {
+                    $sub->where('judul', 'like', $term)
+                        ->orWhere('ringkasan', 'like', $term)
+                        ->orWhere('isi_konten', 'like', $term);
+                });
+            })
+            ->when($this->urutkan === 'terbaru', fn($q) => $q->orderByDesc('dibuat_pada'))
+            ->when($this->urutkan === 'terlama', fn($q) => $q->orderBy('dibuat_pada'))
+            ->when($this->urutkan === 'terpopuler', fn($q) => $q->orderByDesc('jumlah_dilihat'))
+            ->when($this->urutkan === 'judul_asc', fn($q) => $q->orderBy('judul', 'asc'));
     }
 
     public function render()
     {
         $kategoriList = KategoriBerita::withCount('berita')->orderBy('nama_kategori')->get();
+        $penulisList = Pengguna::where('status_aktif', true)->orderBy('nama_lengkap')->get();
 
-        $query = Berita::with('kategori', 'penulis')
-            ->when($this->kategoriDipilih !== 'Semua', fn($q) => $q->where('kategori_id', $this->kategoriDipilih))
-            ->when($this->statusDipilih !== 'Semua', fn($q) => $q->where('status_publikasi', $this->statusDipilih))
-            ->when($this->cari, fn($q) => $q->where(fn($sub) => $sub->where('judul', 'like', '%' . $this->cari . '%')->orWhere('ringkasan', 'like', '%' . $this->cari . '%')))
-            ->orderByDesc('kormi_berita.dibuat_pada');
+        $beritaList = $this->getBeritaQuery()->paginate($this->perPage);
+
+        $totalBerita    = Berita::count();
+        $totalPublished = Berita::where('status_publikasi', 'published')->count();
+        $totalDraft     = Berita::where('status_publikasi', 'draft')->count();
+        $totalArchived  = Berita::where('status_publikasi', 'archived')->count();
+        $totalUnggulan  = Berita::where('status_unggulan', true)->count();
+        $totalViews     = (int) Berita::sum('jumlah_dilihat');
+        $rataRataViews  = $totalBerita > 0 ? round($totalViews / $totalBerita) : 0;
 
         return view('livewire.admin.berita.berita-kelola', [
             'kategoriList'   => $kategoriList,
-            'beritaList'     => $query->paginate(8),
-            'totalBerita'    => Berita::count(),
-            'totalPublished' => Berita::where('status_publikasi', 'published')->count(),
-            'totalDraft'     => Berita::where('status_publikasi', 'draft')->count(),
-            'totalViews'     => Berita::sum('jumlah_dilihat'),
+            'penulisList'    => $penulisList,
+            'beritaList'     => $beritaList,
+            'totalBerita'    => $totalBerita,
+            'totalPublished' => $totalPublished,
+            'totalDraft'     => $totalDraft,
+            'totalArchived'  => $totalArchived,
+            'totalUnggulan'  => $totalUnggulan,
+            'totalViews'     => $totalViews,
+            'rataRataViews'  => $rataRataViews,
         ]);
     }
 }

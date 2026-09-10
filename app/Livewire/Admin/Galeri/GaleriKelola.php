@@ -54,11 +54,7 @@ class GaleriKelola extends Component
             'urutan_foto'=> 'required|integer',
         ];
 
-        if (!$this->editFotoId) {
-            $rules['uploadFoto'] = 'required|image|mimes:jpg,jpeg,png,webp|max:10240'; // max 10MB
-        } else {
-            $rules['uploadFoto'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
-        }
+        $rules['uploadFoto'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
 
         return $rules;
     }
@@ -70,11 +66,7 @@ class GaleriKelola extends Component
             'tanggal_kegiatan'=> 'nullable|date',
         ];
 
-        if (!$this->editAlbumId) {
-            $rules['uploadSampul'] = 'required|image|mimes:jpg,jpeg,png,webp|max:10240';
-        } else {
-            $rules['uploadSampul'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
-        }
+        $rules['uploadSampul'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
 
         return $rules;
     }

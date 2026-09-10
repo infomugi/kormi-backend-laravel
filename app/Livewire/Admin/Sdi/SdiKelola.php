@@ -117,11 +117,7 @@ class SdiKelola extends Component
             'jenis_sertifikasi' => 'nullable|string|max:100',
         ];
 
-        if (!$this->editProgramId) {
-            $rules['uploadBanner'] = 'required|image|mimes:jpg,jpeg,png,webp|max:10240';
-        } else {
-            $rules['uploadBanner'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
-        }
+        $rules['uploadBanner'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
 
         $this->validate($rules, [
             'uploadBanner.required' => 'Banner program wajib diunggah untuk data baru.',

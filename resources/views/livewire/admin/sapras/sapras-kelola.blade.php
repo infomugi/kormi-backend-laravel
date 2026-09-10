@@ -356,7 +356,7 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                    File Foto Fasilitas {{ !$saprasId ? '*' : '(opsional)' }}
+                                    File Foto Fasilitas {{ !$editId ? '*' : '(opsional)' }}
                                     <span class="normal-case font-normal text-slate-400 ml-1">(jpg/png/webp &mdash; maks. 10MB)</span>
                                 </label>
                                 <label for="uploadFotoSapras" class="flex items-center gap-3 w-full px-4 py-3 bg-white border-2 border-dashed {{ $uploadFoto ? 'border-emerald-400 bg-emerald-50' : 'border-slate-200 hover:border-emerald-400' }} text-slate-600 rounded-2xl text-xs font-semibold cursor-pointer transition-colors">

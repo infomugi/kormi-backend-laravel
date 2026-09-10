@@ -136,11 +136,7 @@ class DutaKelola extends Component
             'kontak'          => 'nullable|string|max:100',
         ];
 
-        if (!$this->dutaId) {
-            $rules['uploadFotoDuta'] = 'required|image|mimes:jpg,jpeg,png,webp|max:5120';
-        } else {
-            $rules['uploadFotoDuta'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120';
-        }
+        $rules['uploadFotoDuta'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120';
 
         $this->validate($rules, [
             'uploadFotoDuta.required' => 'Foto duta wajib diunggah untuk data baru.',

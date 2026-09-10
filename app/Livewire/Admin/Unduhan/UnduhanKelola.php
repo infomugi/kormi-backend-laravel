@@ -47,11 +47,7 @@ class UnduhanKelola extends Component
             'ekstensi_berkas'=> 'required|max:10',
         ];
 
-        if (!$this->unduhanId) {
-            $rules['uploadBerkas'] = 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar|max:51200'; // max 50MB
-        } else {
-            $rules['uploadBerkas'] = 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar|max:51200';
-        }
+        $rules['uploadBerkas'] = 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar|max:51200';
 
         return $rules;
     }

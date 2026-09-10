@@ -57,6 +57,7 @@ class PenggunaKelola extends Component
             'nomor_telepon' => 'nullable|min:8|max:20',
             'peran_id' => 'required|exists:kormi_peran,id',
             'status_aktif' => 'boolean',
+            'uploadFotoProfil' => 'nullable|image|max:5120',
         ];
 
         if (!$this->penggunaId) {
@@ -84,40 +85,62 @@ class PenggunaKelola extends Component
     public function updatedCari(): void
     {
         $this->resetPage();
+        $this->selectedUsers = [];
+        $this->selectAll = false;
     }
 
     public function updatedPeranDipilih(): void
     {
         $this->resetPage();
+        $this->selectedUsers = [];
+        $this->selectAll = false;
     }
 
     public function updatedStatusDipilih(): void
     {
         $this->resetPage();
+        $this->selectedUsers = [];
+        $this->selectAll = false;
+    }
+
+    protected function getFilteredQuery()
+    {
+        return Pengguna::with('peran')
+            ->when($this->peranDipilih !== 'Semua', fn($q) => $q->where('peran_id', $this->peranDipilih))
+            ->when($this->statusDipilih !== 'Semua', function ($q) {
+                if ($this->statusDipilih === 'Aktif') {
+                    $q->where('status_aktif', true);
+                } elseif ($this->statusDipilih === 'Non-Aktif') {
+                    $q->where('status_aktif', false);
+                }
+            })
+            ->when($this->cari, function ($q) {
+                $q->where(function ($sub) {
+                    $sub->where('nama_lengkap', 'like', '%' . $this->cari . '%')
+                        ->orWhere('email', 'like', '%' . $this->cari . '%')
+                        ->orWhere('nomor_telepon', 'like', '%' . $this->cari . '%');
+                });
+            })
+            ->orderByDesc('dibuat_pada');
     }
 
     public function updatedSelectAll(bool $value): void
     {
         if ($value) {
-            $query = Pengguna::when($this->peranDipilih !== 'Semua', fn($q) => $q->where('peran_id', $this->peranDipilih))
-                ->when($this->statusDipilih !== 'Semua', function ($q) {
-                    if ($this->statusDipilih === 'Aktif') {
-                        $q->where('status_aktif', true);
-                    } elseif ($this->statusDipilih === 'Non-Aktif') {
-                        $q->where('status_aktif', false);
-                    }
-                })
-                ->when($this->cari, function ($q) {
-                    $q->where(function ($sub) {
-                        $sub->where('nama_lengkap', 'like', '%' . $this->cari . '%')
-                            ->orWhere('email', 'like', '%' . $this->cari . '%')
-                            ->orWhere('nomor_telepon', 'like', '%' . $this->cari . '%');
-                    });
-                });
-
-            $this->selectedUsers = $query->paginate(10)->pluck('id')->map(fn($id) => (string) $id)->toArray();
+            $currentPageItems = $this->getFilteredQuery()->paginate(10)->items();
+            $this->selectedUsers = array_map(fn($item) => (string) $item->id, $currentPageItems);
         } else {
             $this->selectedUsers = [];
+        }
+    }
+
+    public function updatedSelectedUsers(): void
+    {
+        $currentPageIds = array_map(fn($item) => (string) $item->id, $this->getFilteredQuery()->paginate(10)->items());
+        if (!empty($currentPageIds) && count(array_intersect($currentPageIds, $this->selectedUsers)) === count($currentPageIds)) {
+            $this->selectAll = true;
+        } else {
+            $this->selectAll = false;
         }
     }
 
@@ -128,9 +151,9 @@ class PenggunaKelola extends Component
 
     public function bukaFormTambah(): void
     {
-        $this->reset(['penggunaId', 'nama_lengkap', 'email', 'nomor_telepon', 'kata_sandi', 'foto_profil']);
+        $this->reset(['penggunaId', 'nama_lengkap', 'email', 'nomor_telepon', 'kata_sandi', 'foto_profil', 'uploadFotoProfil', 'showPassword']);
         $this->status_aktif = true;
-        $this->foto_profil = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+        $this->foto_profil = '';
         $firstRole = Peran::first();
         $this->peran_id = $firstRole ? $firstRole->id : '';
         $this->mode = 'form';
@@ -148,6 +171,8 @@ class PenggunaKelola extends Component
         $this->peran_id = $user->peran_id ?? '';
         $this->kata_sandi = '';
         $this->foto_profil = $user->foto_profil ?? '';
+        $this->uploadFotoProfil = null;
+        $this->showPassword = false;
         $this->status_aktif = (bool) $user->status_aktif;
         $this->mode = 'form';
         $this->tampilkanModal = true;
@@ -159,7 +184,7 @@ class PenggunaKelola extends Component
         $this->mode = 'tabel';
         $this->tampilkanModal = false;
         $this->tampilkanModalReset = false;
-        $this->reset(['penggunaId', 'nama_lengkap', 'email', 'nomor_telepon', 'kata_sandi', 'foto_profil', 'resetUserId', 'resetPasswordBaru']);
+        $this->reset(['penggunaId', 'nama_lengkap', 'email', 'nomor_telepon', 'kata_sandi', 'foto_profil', 'uploadFotoProfil', 'showPassword', 'resetUserId', 'resetPasswordBaru']);
         $this->resetErrorBag();
     }
 
@@ -360,27 +385,9 @@ class PenggunaKelola extends Component
     {
         $peranList = Peran::orderBy('nama_peran')->get();
 
-        $query = Pengguna::with('peran')
-            ->when($this->peranDipilih !== 'Semua', fn($q) => $q->where('peran_id', $this->peranDipilih))
-            ->when($this->statusDipilih !== 'Semua', function ($q) {
-                if ($this->statusDipilih === 'Aktif') {
-                    $q->where('status_aktif', true);
-                } elseif ($this->statusDipilih === 'Non-Aktif') {
-                    $q->where('status_aktif', false);
-                }
-            })
-            ->when($this->cari, function ($q) {
-                $q->where(function ($sub) {
-                    $sub->where('nama_lengkap', 'like', '%' . $this->cari . '%')
-                        ->orWhere('email', 'like', '%' . $this->cari . '%')
-                        ->orWhere('nomor_telepon', 'like', '%' . $this->cari . '%');
-                });
-            })
-            ->orderByDesc('dibuat_pada');
-
         return view('livewire.admin.pengguna.pengguna-kelola', [
             'peranList' => $peranList,
-            'penggunaList' => $query->paginate(10),
+            'penggunaList' => $this->getFilteredQuery()->paginate(10),
             'totalPengguna' => Pengguna::count(),
             'totalAktif' => Pengguna::where('status_aktif', true)->count(),
             'totalNonAktif' => Pengguna::where('status_aktif', false)->count(),

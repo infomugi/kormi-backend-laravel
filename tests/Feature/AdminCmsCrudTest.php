@@ -73,6 +73,71 @@ class AdminCmsCrudTest extends TestCase
         $this->assertNull(Berita::find($berita->id));
     }
 
+    public function test_berita_advanced_features(): void
+    {
+        $kategori = KategoriBerita::first();
+
+        // 1. Buat Berita untuk pengujian
+        $b1 = Berita::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'kategori_id' => $kategori->id,
+            'penulis_id' => Pengguna::first()->id,
+            'judul' => 'Berita Fitur Lanjutan 1',
+            'slug' => 'berita-fitur-lanjutan-1',
+            'ringkasan' => 'Ringkasan pengujian fitur lanjutan',
+            'isi_konten' => 'Konten lengkap pengujian fitur lanjutan',
+            'gambar_utama' => 'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=800',
+            'status_publikasi' => 'draft',
+            'status_unggulan' => false,
+        ]);
+
+        $b2 = Berita::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'kategori_id' => $kategori->id,
+            'penulis_id' => Pengguna::first()->id,
+            'judul' => 'Berita Fitur Lanjutan 2',
+            'slug' => 'berita-fitur-lanjutan-2',
+            'ringkasan' => 'Ringkasan pengujian fitur lanjutan 2',
+            'isi_konten' => 'Konten lengkap pengujian fitur lanjutan 2',
+            'gambar_utama' => 'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=800',
+            'status_publikasi' => 'draft',
+            'status_unggulan' => false,
+        ]);
+
+        // 2. Test Toggle Unggulan & Toggle Status
+        Livewire::test(BeritaKelola::class)
+            ->call('toggleUnggulan', $b1->id)
+            ->assertHasNoErrors();
+        $this->assertTrue((bool) $b1->fresh()->status_unggulan);
+
+        Livewire::test(BeritaKelola::class)
+            ->call('toggleStatus', $b1->id)
+            ->assertHasNoErrors();
+        $this->assertEquals('published', $b1->fresh()->status_publikasi);
+
+        // 3. Test Duplikat Berita
+        Livewire::test(BeritaKelola::class)
+            ->call('duplikatBerita', $b1->id)
+            ->assertHasNoErrors();
+        $this->assertTrue(Berita::where('judul', 'like', '%[Salinan] Berita Fitur Lanjutan 1%')->exists());
+
+        // 4. Test Bulk Publish
+        Livewire::test(BeritaKelola::class)
+            ->set('selectedBerita', [$b1->id, $b2->id])
+            ->call('bulkPublish')
+            ->assertHasNoErrors();
+        $this->assertEquals('published', $b2->fresh()->status_publikasi);
+
+        // 5. Test Bulk Delete
+        Livewire::test(BeritaKelola::class)
+            ->set('selectedBerita', [$b1->id, $b2->id])
+            ->call('bulkDelete')
+            ->assertHasNoErrors();
+        $this->assertNull(Berita::find($b1->id));
+        $this->assertNull(Berita::find($b2->id));
+    }
+
+
     public function test_galeri_crud(): void
     {
         $album = GaleriAlbum::first();
@@ -348,7 +413,7 @@ class AdminCmsCrudTest extends TestCase
         // Test bulk disable login
         Livewire::test(\App\Livewire\Admin\Pengguna\PenggunaKelola::class)
             ->set('selectedUsers', [(string) $u1->id, (string) $u2->id])
-            ->call('bulkDisableLogin');
+            ->call('bulkDisableLogin', [(string) $u1->id, (string) $u2->id]);
 
         $this->assertFalse((bool) $u1->fresh()->status_aktif);
         $this->assertFalse((bool) $u2->fresh()->status_aktif);
@@ -356,7 +421,7 @@ class AdminCmsCrudTest extends TestCase
         // Test bulk enable login
         Livewire::test(\App\Livewire\Admin\Pengguna\PenggunaKelola::class)
             ->set('selectedUsers', [(string) $u1->id, (string) $u2->id])
-            ->call('bulkEnableLogin');
+            ->call('bulkEnableLogin', [(string) $u1->id, (string) $u2->id]);
 
         $this->assertTrue((bool) $u1->fresh()->status_aktif);
         $this->assertTrue((bool) $u2->fresh()->status_aktif);
@@ -373,7 +438,7 @@ class AdminCmsCrudTest extends TestCase
         // Test bulk delete
         Livewire::test(\App\Livewire\Admin\Pengguna\PenggunaKelola::class)
             ->set('selectedUsers', [(string) $u1->id, (string) $u2->id])
-            ->call('bulkHapus');
+            ->call('bulkHapus', [(string) $u1->id, (string) $u2->id]);
 
         $this->assertNull(Pengguna::find($u1->id));
         $this->assertNull(Pengguna::find($u2->id));

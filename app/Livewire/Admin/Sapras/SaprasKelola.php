@@ -48,11 +48,7 @@ class SaprasKelola extends Component
             'jenis_olahraga_tersedia'=> 'required|string',
         ];
 
-        if (!$this->editId) {
-            $rules['uploadFoto'] = 'required|image|mimes:jpg,jpeg,png,webp|max:10240';
-        } else {
-            $rules['uploadFoto'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
-        }
+        $rules['uploadFoto'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
 
         return $rules;
     }

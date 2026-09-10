@@ -20,47 +20,47 @@
 
     <!-- 2. QUICK ACTION PILLS (COLORFUL BADGES WITH PLUS ICON) -->
     <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
-        <a href="{{ route('admin.berita') }}" wire:navigate.hover class="px-4 py-2.5 rounded-2xl bg-cyan-500 hover:bg-cyan-600 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+        <a href="{{ route('admin.berita') }}" class="px-4 py-2.5 rounded-2xl bg-cyan-500 hover:bg-cyan-600 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
             <i data-lucide="newspaper" class="w-4 h-4"></i>
             <span>Tulis Berita +</span>
         </a>
 
-        <a href="{{ route('admin.galeri') }}" wire:navigate.hover class="px-4 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+        <a href="{{ route('admin.galeri') }}" class="px-4 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
             <i data-lucide="image" class="w-4 h-4"></i>
             <span>Unggah Galeri +</span>
         </a>
 
-        <a href="{{ route('admin.unduhan') }}" wire:navigate.hover class="px-4 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+        <a href="{{ route('admin.unduhan') }}" class="px-4 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
             <i data-lucide="file-text" class="w-4 h-4"></i>
             <span>Dokumen SK +</span>
         </a>
 
-        <a href="{{ route('admin.duta') }}" wire:navigate.hover class="px-4 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+        <a href="{{ route('admin.duta') }}" class="px-4 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
             <i data-lucide="user-check" class="w-4 h-4"></i>
             <span>Duta Olahraga +</span>
         </a>
 
-        <a href="{{ route('admin.inorga') }}" wire:navigate.hover class="px-4 py-2.5 rounded-2xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+        <a href="{{ route('admin.inorga') }}" class="px-4 py-2.5 rounded-2xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
             <i data-lucide="shapes" class="w-4 h-4"></i>
             <span>Inorga & Komisi +</span>
         </a>
 
-        <a href="{{ route('admin.klasemen') }}" wire:navigate.hover class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+        <a href="{{ route('admin.klasemen') }}" class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
             <i data-lucide="trophy" class="w-4 h-4"></i>
             <span>Input Medali +</span>
         </a>
 
-        <a href="{{ route('admin.sapras') }}" wire:navigate.hover class="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+        <a href="{{ route('admin.sapras') }}" class="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
             <i data-lucide="map-pin" class="w-4 h-4"></i>
             <span>Fasilitas SAPRAS +</span>
         </a>
 
-        <a href="{{ route('admin.sdi') }}" wire:navigate.hover class="px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+        <a href="{{ route('admin.sdi') }}" class="px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
             <i data-lucide="graduation-cap" class="w-4 h-4"></i>
             <span>Pelatihan SDI +</span>
         </a>
 
-        <a href="{{ route('admin.apmo') }}" wire:navigate.hover class="px-4 py-2.5 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+        <a href="{{ route('admin.apmo') }}" class="px-4 py-2.5 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
             <i data-lucide="award" class="w-4 h-4"></i>
             <span>Anugerah APMO +</span>
         </a>
@@ -115,7 +115,7 @@
                     </div>
 
                     <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                        <a href="{{ route('admin.berita') }}" wire:navigate class="text-xs font-bold text-slate-700 hover:text-slate-950">Lihat semua artikel & berita</a>
+                        <a href="{{ route('admin.berita') }}" class="text-xs font-bold text-slate-700 hover:text-slate-950">Lihat semua artikel & berita</a>
                         <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
                     </div>
                 </div>
@@ -145,7 +145,7 @@
                     </div>
 
                     <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                        <a href="{{ route('admin.duta') }}" wire:navigate class="text-xs font-bold text-slate-700 hover:text-slate-950 flex items-center gap-2">
+                        <a href="{{ route('admin.duta') }}" class="text-xs font-bold text-slate-700 hover:text-slate-950 flex items-center gap-2">
                             <i data-lucide="user-check" class="w-4 h-4 text-amber-500"></i>
                             <span>Kelola data duta olahraga</span>
                         </a>
@@ -287,7 +287,7 @@
                     </div>
 
                     <div class="mt-4 pt-3 border-t border-slate-100 text-left">
-                        <a href="{{ route('admin.klasemen') }}" wire:navigate class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                        <a href="{{ route('admin.klasemen') }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
                             <span>Lihat Semua Klasemen</span>
                             <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
                         </a>
@@ -302,7 +302,7 @@
                         <span>Publikasi & Liputan Terkini</span>
                         <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
                     </span>
-                    <a href="{{ route('admin.berita') }}" wire:navigate class="text-xs font-bold text-indigo-600 hover:underline">Kelola Berita</a>
+                    <a href="{{ route('admin.berita') }}" class="text-xs font-bold text-indigo-600 hover:underline">Kelola Berita</a>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -338,7 +338,7 @@
                                         </div>
                                     </td>
                                     <td class="py-3.5 text-right">
-                                        <a href="{{ route('admin.berita') }}" wire:navigate class="px-4 py-1.5 rounded-xl border border-slate-200 text-slate-800 font-bold text-xs hover:bg-slate-900 hover:text-white transition-all inline-block shadow-2xs">
+                                        <a href="{{ route('admin.berita') }}" class="px-4 py-1.5 rounded-xl border border-slate-200 text-slate-800 font-bold text-xs hover:bg-slate-900 hover:text-white transition-all inline-block shadow-2xs">
                                             Kelola
                                         </a>
                                     </td>

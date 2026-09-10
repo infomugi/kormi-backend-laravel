@@ -47,4 +47,13 @@ class Pengguna extends Authenticatable
     {
         return $this->belongsTo(Peran::class, 'peran_id');
     }
+
+    public function getFotoProfilUrlAttribute(): ?string
+    {
+        if (empty($this->foto_profil)) {
+            return null;
+        }
+
+        return app(\App\Services\StorageService::class)->getTemporaryUrl($this->foto_profil);
+    }
 }

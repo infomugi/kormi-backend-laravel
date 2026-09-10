@@ -245,8 +245,8 @@
                                 <td class="py-4 px-4">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-700 font-extrabold flex items-center justify-center shrink-0 border border-indigo-100 overflow-hidden shadow-xs">
-                                            @if($user->foto_profil)
-                                                <img src="{{ $user->foto_profil }}" alt="{{ $user->nama_lengkap }}" class="w-full h-full object-cover">
+                                            @if($user->foto_profil_url)
+                                                <img src="{{ $user->foto_profil_url }}" alt="{{ $user->nama_lengkap }}" class="w-full h-full object-cover" onerror="this.remove()">
                                             @else
                                                 <span>{{ strtoupper(substr($user->nama_lengkap, 0, 2)) }}</span>
                                             @endif
@@ -515,13 +515,15 @@
                             </div>
                         @elseif($foto_profil)
                             @php $tmpProfil = app(\App\Services\StorageService::class)->getTemporaryUrl($foto_profil) @endphp
-                            <div class="mb-2 flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
-                                <img src="{{ $tmpProfil }}" class="w-12 h-12 rounded-xl object-cover shrink-0" alt="Foto Profil Saat Ini" onerror="this.src=''"; this.closest('div').classList.add('hidden')">
-                                <div class="text-xs">
-                                    <p class="font-semibold text-slate-600">Foto profil saat ini</p>
-                                    <p class="text-slate-400 font-mono">{{ Str::limit($foto_profil, 40) }}</p>
+                            @if($tmpProfil)
+                                <div class="mb-2 flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+                                    <img src="{{ $tmpProfil }}" class="w-12 h-12 rounded-xl object-cover shrink-0" alt="Foto Profil Saat Ini">
+                                    <div class="text-xs">
+                                        <p class="font-semibold text-slate-600">Foto profil saat ini</p>
+                                        <p class="text-slate-400 font-mono">{{ Str::limit($foto_profil, 40) }}</p>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
                         @endif
 
                         <label for="uploadFotoProfilPengguna" class="flex items-center gap-3 w-full px-4 py-3 bg-slate-50 border-2 border-dashed {{ $uploadFotoProfil ? 'border-emerald-400 bg-emerald-50' : 'border-slate-200 hover:border-indigo-400' }} text-slate-700 rounded-2xl text-xs font-semibold cursor-pointer transition-all">

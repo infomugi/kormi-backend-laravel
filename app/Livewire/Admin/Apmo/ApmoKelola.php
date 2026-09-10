@@ -138,11 +138,7 @@ class ApmoKelola extends Component
             'urutan'               => 'required|integer',
         ];
 
-        if (!$this->editPenerimaId) {
-            $rules['uploadFotoPenerima'] = 'required|image|mimes:jpg,jpeg,png,webp|max:5120';
-        } else {
-            $rules['uploadFotoPenerima'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120';
-        }
+        $rules['uploadFotoPenerima'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120';
 
         $this->validate($rules, [
             'uploadFotoPenerima.required' => 'Foto penerima wajib diunggah untuk data baru.',
