@@ -10,13 +10,13 @@
     <!-- Google Fonts Plus Jakarta Sans / Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     <style>
         body { 
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
         }
         @keyframes spin {
             from { transform: rotate(0deg); }
@@ -27,7 +27,7 @@
         }
     </style>
 </head>
-<body class="h-full bg-white text-slate-800 antialiased overflow-x-hidden selection:bg-blue-600 selection:text-white">
+<body class="h-full bg-slate-50 text-slate-900 antialiased overflow-x-hidden selection:bg-emerald-600 selection:text-white">
     
     {{ $slot }}
 
