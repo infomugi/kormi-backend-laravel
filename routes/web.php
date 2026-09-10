@@ -28,6 +28,7 @@ use App\Livewire\Admin\Auth\Daftar;
 use App\Livewire\Admin\Auth\LupaPassword;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Berita\BeritaKelola;
+use App\Livewire\Admin\Berita\BeritaForm;
 use App\Livewire\Admin\Galeri\GaleriKelola;
 use App\Livewire\Admin\Unduhan\UnduhanKelola;
 use App\Livewire\Admin\Inorga\InorgaKelola;
@@ -169,6 +170,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/', Dashboard::class)->name('admin.dashboard');
         Route::get('/dashboard', Dashboard::class);
         Route::get('/berita', BeritaKelola::class)->name('admin.berita');
+        Route::get('/berita/tambah', BeritaForm::class)->name('admin.berita.tambah');
+        Route::get('/berita/{id}/edit', BeritaForm::class)->name('admin.berita.edit');
         Route::get('/galeri', GaleriKelola::class)->name('admin.galeri');
         Route::get('/unduhan', UnduhanKelola::class)->name('admin.unduhan');
         Route::get('/inorga', InorgaKelola::class)->name('admin.inorga');

@@ -288,23 +288,7 @@ class BeritaKelola extends Component
 
     public function bukaFormTambah(): void
     {
-        $this->reset([
-            'beritaId', 'judul', 'slug', 'kategori_id', 'ringkasan', 
-            'isi_konten', 'gambar_utama', 'keterangan_gambar', 
-            'status_unggulan', 'uploadGambar'
-        ]);
-
-        $this->status_publikasi = 'published';
-        $this->tanggal_publikasi = now()->format('Y-m-d\TH:i');
-        $this->penulis_id = auth()->id() ?? Pengguna::first()?->id;
-        
-        $firstKat = KategoriBerita::first();
-        $this->kategori_id = $firstKat ? $firstKat->id : '';
-
-        $this->tabEditor = 'editor';
-        $this->mode = 'form';
-        $this->tampilkanModal = true;
-        $this->resetErrorBag();
+        $this->redirect(route('admin.berita.tambah'), navigate: true);
     }
 
     public function bukaModalTambah(): void
@@ -314,25 +298,7 @@ class BeritaKelola extends Component
 
     public function bukaFormEdit(string $id): void
     {
-        $berita = Berita::findOrFail($id);
-        $this->beritaId          = $berita->id;
-        $this->judul             = $berita->judul;
-        $this->slug              = $berita->slug;
-        $this->kategori_id       = $berita->kategori_id;
-        $this->penulis_id        = $berita->penulis_id;
-        $this->ringkasan         = $berita->ringkasan;
-        $this->isi_konten        = $berita->isi_konten;
-        $this->gambar_utama      = $berita->gambar_utama;
-        $this->keterangan_gambar = $berita->keterangan_gambar ?? '';
-        $this->status_publikasi  = $berita->status_publikasi;
-        $this->status_unggulan   = (bool) $berita->status_unggulan;
-        $this->tanggal_publikasi = $berita->tanggal_publikasi ? Carbon::parse($berita->tanggal_publikasi)->format('Y-m-d\TH:i') : null;
-        $this->uploadGambar      = null;
-
-        $this->tabEditor = 'editor';
-        $this->mode = 'form';
-        $this->tampilkanModal = true;
-        $this->resetErrorBag();
+        $this->redirect(route('admin.berita.edit', $id), navigate: true);
     }
 
     public function bukaModalEdit(string $id): void
@@ -412,8 +378,12 @@ class BeritaKelola extends Component
         $this->kembaliKeTabel();
     }
 
-    // ==========================================
-    // QUICK INLINE ACTIONS & MODALS
+    public function simpanDraft(): void
+    {
+        $this->status_publikasi = 'draft';
+        $this->simpan();
+    }
+
     // ==========================================
 
     public function toggleUnggulan(string $id): void

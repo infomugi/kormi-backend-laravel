@@ -1,48 +1,34 @@
+import '../css/app.css';
 import './bootstrap';
 import { createIcons, icons } from 'lucide';
 
-window.createLucideIcons = () => createIcons({ icons });
-
-// Reusable & Batched Icon Initializer
-let iconInitQueued = false;
-const initIcons = () => {
-    if (iconInitQueued) return;
-    iconInitQueued = true;
-    requestAnimationFrame(() => {
-        iconInitQueued = false;
-        try {
-            createIcons({ icons });
-        } catch (e) {
-            console.warn('Lucide icon init warning:', e);
-        }
-    });
+window.createLucideIcons = () => {
+    try {
+        createIcons({ icons });
+    } catch (e) {
+        // Safe catch
+    }
 };
 
-// 1. Initial DOM and Livewire SPA Lifecycle Hooks
-document.addEventListener('DOMContentLoaded', () => {
-    initIcons();
-});
+let initTimer = null;
+const initIcons = () => {
+    clearTimeout(initTimer);
+    initTimer = setTimeout(() => {
+        window.createLucideIcons();
+    }, 50);
+};
 
-// 2. Livewire 3 SPA Navigation Hooks (wire:navigate)
-document.addEventListener('livewire:navigating', () => {
-    // Optional prep
-});
-
+// 1. Initial DOM & Livewire SPA Navigation Hooks
+document.addEventListener('DOMContentLoaded', initIcons);
 document.addEventListener('livewire:navigated', () => {
     initIcons();
-    
-    // Auto scroll handling for SPA navigation
     if (window.location.hash) {
         const target = document.querySelector(window.location.hash);
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth' });
-        }
-    } else {
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
     }
 });
 
-// 3. Livewire Morph & Commit Hooks
+// 2. Livewire 3 Morph & Commit Hooks
 document.addEventListener('livewire:initialized', () => {
     initIcons();
 
@@ -52,14 +38,15 @@ document.addEventListener('livewire:initialized', () => {
         });
     });
 
-    // Graceful Handling for Page Expired / Session Refresh in SPA
+    // Prevent automatic reload loops and default alert dialogs on temporary request failures
     Livewire.hook('request', ({ fail }) => {
         fail(({ status, preventDefault }) => {
             if (status === 419) {
-                preventDefault();
-                window.location.reload();
+                preventDefault(); // Suppress the default Livewire "Page Expired" alert dialog
+                console.warn('[Livewire] Sesi / CSRF token 419 diabaikan agar input tidak terganggu.');
             }
         });
     });
 });
+
 
