@@ -62,6 +62,6 @@ class BeritaIndex extends Component
             'kategoriList' => $kategoriList,
             'beritaList' => $beritaList,
             'beritaUtama' => $beritaUtama,
-        ]);
+        ])->layout('components.layouts.app');
     }
 }

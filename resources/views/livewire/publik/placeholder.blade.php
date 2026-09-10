@@ -1,4 +1,4 @@
-<x-layouts.app :title="$title">
+<div>
     <div class="py-20 bg-white">
         <div class="container mx-auto px-6 max-w-4xl text-center">
             <h1 class="text-3xl sm:text-5xl font-black text-slate-900 uppercase tracking-tight mb-4">{{ $title }}</h1>
@@ -8,4 +8,4 @@
             </a>
         </div>
     </div>
-</x-layouts.app>
+</div>

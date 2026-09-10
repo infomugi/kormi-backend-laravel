@@ -16,6 +16,11 @@ class Event extends ModelDasar
         'tahun_edisi' => 'integer',
     ];
 
+    public function kategoriEvent(): BelongsTo
+    {
+        return $this->belongsTo(KategoriEvent::class, 'kategori_event_id');
+    }
+
     public function cabang(): HasMany
     {
         return $this->hasMany(EventCabang::class, 'event_id');

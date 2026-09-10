@@ -41,7 +41,24 @@ class BeritaKelola extends Component
     #[Url(as: 'urut')]
     public string $urutkan = 'terbaru'; // terbaru, terlama, terpopuler, judul_asc
 
+    #[Url(as: 'sort_field')]
+    public string $sortField = 'dibuat_pada';
+
+    #[Url(as: 'sort_dir')]
+    public string $sortDirection = 'desc';
+
     public int $perPage = 10;
+
+    public function sortBy(string $field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
 
     // Checkbox Bulk Selection
     public array $selectedBerita = [];
@@ -525,7 +542,7 @@ class BeritaKelola extends Component
 
     protected function getBeritaQuery()
     {
-        return Berita::with('kategori', 'penulis')
+        $query = Berita::with('kategori', 'penulis')
             ->when($this->kategoriDipilih !== 'Semua', fn($q) => $q->where('kategori_id', $this->kategoriDipilih))
             ->when($this->statusDipilih !== 'Semua', fn($q) => $q->where('status_publikasi', $this->statusDipilih))
             ->when($this->unggulanDipilih !== 'Semua', fn($q) => $q->where('status_unggulan', (bool) $this->unggulanDipilih))
@@ -536,11 +553,21 @@ class BeritaKelola extends Component
                         ->orWhere('ringkasan', 'like', $term)
                         ->orWhere('isi_konten', 'like', $term);
                 });
-            })
-            ->when($this->urutkan === 'terbaru', fn($q) => $q->orderByDesc('dibuat_pada'))
-            ->when($this->urutkan === 'terlama', fn($q) => $q->orderBy('dibuat_pada'))
-            ->when($this->urutkan === 'terpopuler', fn($q) => $q->orderByDesc('jumlah_dilihat'))
-            ->when($this->urutkan === 'judul_asc', fn($q) => $q->orderBy('judul', 'asc'));
+            });
+
+        // Apply sorting based on sortField if specified
+        $direction = strtolower($this->sortDirection) === 'asc' ? 'asc' : 'desc';
+
+        if (in_array($this->sortField, ['judul', 'dibuat_pada', 'tanggal_publikasi', 'jumlah_dilihat', 'status_publikasi'])) {
+            return $query->orderBy($this->sortField, $direction);
+        }
+
+        return match ($this->urutkan) {
+            'terlama'   => $query->orderBy('dibuat_pada', 'asc'),
+            'terpopuler'=> $query->orderBy('jumlah_dilihat', 'desc'),
+            'judul_asc' => $query->orderBy('judul', 'asc'),
+            default     => $query->orderBy('dibuat_pada', 'desc'),
+        };
     }
 
     public function render()

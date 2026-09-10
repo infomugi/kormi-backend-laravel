@@ -55,14 +55,24 @@
             <span>Fasilitas SAPRAS +</span>
         </a>
 
-        <a href="{{ route('admin.sdi') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="graduation-cap" class="w-4 h-4"></i>
-            <span>Pelatihan SDI +</span>
+        <a href="{{ route('admin.event') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <span>Event & Jadwal +</span>
         </a>
 
-        <a href="{{ route('admin.apmo') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="award" class="w-4 h-4"></i>
-            <span>Anugerah APMO +</span>
+        <a href="{{ route('admin.pengurus') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-teal-800 hover:bg-teal-900 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+            <i data-lucide="user-check" class="w-4 h-4"></i>
+            <span>Pengurus +</span>
+        </a>
+
+        <a href="{{ route('admin.proker') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-emerald-900 hover:bg-slate-900 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+            <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+            <span>Program Kerja +</span>
+        </a>
+
+        <a href="{{ route('admin.pengaturan') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span>Pengaturan Situs</span>
         </a>
     </div>
 

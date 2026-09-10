@@ -36,6 +36,6 @@ class GaleriIndex extends Component
         return view('livewire.publik.media.galeri-index', [
             'albumList' => $albumList,
             'fotoList' => $fotoList,
-        ]);
+        ])->layout('components.layouts.app');
     }
 }

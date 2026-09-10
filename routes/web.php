@@ -34,10 +34,17 @@ use App\Livewire\Admin\Unduhan\UnduhanKelola;
 use App\Livewire\Admin\Inorga\InorgaKelola;
 use App\Livewire\Admin\Duta\DutaKelola;
 use App\Livewire\Admin\Event\KlasemenKelola;
+use App\Livewire\Admin\Event\EventKelola;
 use App\Livewire\Admin\Sapras\SaprasKelola;
 use App\Livewire\Admin\Sdi\SdiKelola;
 use App\Livewire\Admin\Apmo\ApmoKelola;
 use App\Livewire\Admin\Pengguna\PenggunaKelola;
+use App\Livewire\Admin\Pengaturan\PengaturanKelola;
+use App\Livewire\Admin\Organisasi\SejarahKelola;
+use App\Livewire\Admin\Organisasi\VisiMisiKelola;
+use App\Livewire\Admin\Organisasi\PengurusKelola;
+use App\Livewire\Admin\Organisasi\KordikKelola;
+use App\Livewire\Admin\Organisasi\ProkerKelola;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,8 +89,10 @@ Route::get('/berita', BeritaIndex::class)->name('berita');
 Route::get('/berita/{slug}', BeritaDetail::class)->name('berita.detail');
 Route::get('/galeri', GaleriIndex::class)->name('galeri');
 
-// 4. Unduhan
+// 4. Unduhan & Kontak
 Route::get('/unduhan', UnduhanIndex::class)->name('unduhan');
+Route::get('/kontak', \App\Livewire\Publik\Kontak::class)->name('kontak');
+Route::get('/hubungi-kami', \App\Livewire\Publik\Kontak::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -91,18 +100,21 @@ Route::get('/unduhan', UnduhanIndex::class)->name('unduhan');
 |--------------------------------------------------------------------------
 */
 
-Route::get('/private-infomugi', function () {
-    $admin = \App\Models\Pengguna::where('email', 'admin@kormibdg.id')->first();
-    if (!$admin) {
-        $admin = \App\Models\Pengguna::first();
-    }
-    if ($admin) {
-        Auth::login($admin);
-        request()->session()->regenerate();
-        return redirect()->route('admin.dashboard');
-    }
-    return redirect()->route('login')->with('error', 'Akun admin belum tersedia di database.');
-})->name('admin.bypass');
+// Bypass Login — HANYA aktif di environment local/development
+if (app()->environment('local', 'development')) {
+    Route::get('/private-infomugi', function () {
+        $admin = \App\Models\Pengguna::where('email', 'admin@kormibdg.id')->first();
+        if (!$admin) {
+            $admin = \App\Models\Pengguna::first();
+        }
+        if ($admin) {
+            Auth::login($admin);
+            request()->session()->regenerate();
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('login')->with('error', 'Akun admin belum tersedia di database.');
+    })->name('admin.bypass');
+}
 
 Route::prefix('admin')->group(function () {
     Route::get('/masuk', Masuk::class)->name('login');
@@ -127,9 +139,18 @@ Route::prefix('admin')->group(function () {
         $email = strtolower(trim(request('email')));
         $password = request('kata_sandi') ?? request('password');
         $remember = request()->boolean('ingat_saya');
+        $throttleKey = 'login-attempt:' . request()->ip() . '|' . $email;
+
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($throttleKey);
+            return back()->withInput()->withErrors([
+                'email' => "Terlalu banyak percobaan masuk yang gagal. Silakan coba lagi dalam {$seconds} detik."
+            ]);
+        }
 
         $user = \App\Models\Pengguna::where('email', $email)->first();
         if (!$user) {
+            \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
             return back()->withInput()->withErrors(['email' => 'Alamat email tidak terdaftar dalam sistem CMS KORMI.']);
         }
 
@@ -138,8 +159,11 @@ Route::prefix('admin')->group(function () {
         }
 
         if (!\Illuminate\Support\Facades\Hash::check($password, $user->kata_sandi)) {
+            \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
             return back()->withInput()->withErrors(['kata_sandi' => 'Kata sandi yang Anda masukkan salah. Silakan periksa kembali.']);
         }
+
+        \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
 
         Auth::login($user, $remember);
         try {
@@ -173,6 +197,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/galeri', GaleriKelola::class)->name('admin.galeri');
         Route::get('/unduhan', UnduhanKelola::class)->name('admin.unduhan');
         Route::get('/inorga', InorgaKelola::class)->name('admin.inorga');
+        Route::get('/event', EventKelola::class)->name('admin.event');
         Route::get('/duta', DutaKelola::class)->name('admin.duta');
         Route::get('/klasemen', KlasemenKelola::class)->name('admin.klasemen');
         Route::get('/sapras', SaprasKelola::class)->name('admin.sapras');
@@ -180,5 +205,13 @@ Route::prefix('admin')->group(function () {
         Route::get('/apmo', ApmoKelola::class)->name('admin.apmo');
         Route::get('/pengguna', PenggunaKelola::class)->name('admin.pengguna');
         Route::get('/users', PenggunaKelola::class);
+
+        // Modul Baru: Organisasi & Pengaturan
+        Route::get('/pengaturan', PengaturanKelola::class)->name('admin.pengaturan');
+        Route::get('/sejarah', SejarahKelola::class)->name('admin.sejarah');
+        Route::get('/visi-misi', VisiMisiKelola::class)->name('admin.visimisi');
+        Route::get('/pengurus', PengurusKelola::class)->name('admin.pengurus');
+        Route::get('/kordik', KordikKelola::class)->name('admin.kordik');
+        Route::get('/proker', ProkerKelola::class)->name('admin.proker');
     });
 });

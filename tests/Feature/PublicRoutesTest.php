@@ -35,8 +35,25 @@ class PublicRoutesTest extends TestCase
 
     public function test_berita_detail_page_renders_successfully(): void
     {
-        $response = $this->get('/berita/persiapan-menuju-forkab-2026-rapat-koordinasi-wilayah');
+        $berita = \App\Models\Berita::where('status_publikasi', 'published')->first();
+        if (! $berita) {
+            $kategori = \App\Models\KategoriBerita::firstOrCreate(
+                ['slug' => 'kegiatan'],
+                ['nama_kategori' => 'Kegiatan', 'deskripsi' => 'Berita kegiatan']
+            );
+            $berita = \App\Models\Berita::create([
+                'judul' => 'Persiapan Menuju FORKAB 2026',
+                'slug' => 'persiapan-menuju-forkab-2026-rapat-koordinasi-wilayah',
+                'ringkasan' => 'Rapat koordinasi persiapan FORKAB',
+                'isi_konten' => '<p>Konten berita persiapan FORKAB</p>',
+                'kategori_id' => $kategori->id,
+                'status_publikasi' => 'published',
+                'tanggal_publikasi' => now(),
+            ]);
+        }
+
+        $response = $this->get('/berita/' . $berita->slug);
         $response->assertStatus(200);
-        $response->assertSee('Persiapan Menuju FORKAB 2026');
+        $response->assertSee($berita->judul);
     }
 }

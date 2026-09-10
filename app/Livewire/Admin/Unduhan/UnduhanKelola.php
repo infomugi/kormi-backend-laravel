@@ -22,6 +22,14 @@ class UnduhanKelola extends Component
     public string $mode = 'tabel'; // 'tabel' atau 'form'
     public string $cari = '';
     public string $kategoriDipilih = 'Semua';
+    public string $statusDipilih = 'Semua';
+    public string $sortField = 'dibuat_pada';
+    public string $sortDirection = 'desc';
+    public int $perPage = 10;
+
+    // Bulk selection
+    public array $selectedUnduhan = [];
+    public bool $pilihSemua = false;
 
     // Backward compatibility for automated tests
     public bool $tampilkanModal = false;
@@ -71,6 +79,94 @@ class UnduhanKelola extends Component
 
     public function updatedCari(): void           { $this->resetPage(); }
     public function updatedKategoriDipilih(): void { $this->resetPage(); }
+    public function updatedStatusDipilih(): void   { $this->resetPage(); }
+    public function updatedPerPage(): void         { $this->resetPage(); }
+
+    public function sortBy(string $field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function updatedPilihSemua(bool $value): void
+    {
+        if ($value) {
+            $query = Unduhan::query()
+                ->when($this->kategoriDipilih !== 'Semua', fn($q) => $q->where('kategori_id', $this->kategoriDipilih))
+                ->when($this->statusDipilih !== 'Semua', fn($q) => $q->where('status_publik', $this->statusDipilih === 'publik'))
+                ->when($this->cari, fn($q) => $q->where('judul_dokumen', 'like', '%' . $this->cari . '%'));
+            $this->selectedUnduhan = $query->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selectedUnduhan = [];
+        }
+    }
+
+    public function resetSelection(): void
+    {
+        $this->selectedUnduhan = [];
+        $this->pilihSemua = false;
+    }
+
+    public function bulkPublish(): void
+    {
+        if (empty($this->selectedUnduhan)) return;
+        Unduhan::whereIn('id', $this->selectedUnduhan)->update(['status_publik' => true]);
+        $count = count($this->selectedUnduhan);
+        $this->resetSelection();
+        session()->flash('pesan', "{$count} dokumen berhasil diubah menjadi Publik!");
+    }
+
+    public function bulkPrivate(): void
+    {
+        if (empty($this->selectedUnduhan)) return;
+        Unduhan::whereIn('id', $this->selectedUnduhan)->update(['status_publik' => false]);
+        $count = count($this->selectedUnduhan);
+        $this->resetSelection();
+        session()->flash('pesan', "{$count} dokumen berhasil diubah menjadi Privat!");
+    }
+
+    public function bulkDelete(): void
+    {
+        if (empty($this->selectedUnduhan)) return;
+        $count = count($this->selectedUnduhan);
+        $dokumens = Unduhan::whereIn('id', $this->selectedUnduhan)->get();
+        $storage = app(StorageService::class);
+
+        foreach ($dokumens as $u) {
+            $storage->hapusFile($u->berkas_path);
+            $u->delete();
+        }
+
+        $this->resetSelection();
+        session()->flash('pesan', "{$count} dokumen berhasil dihapus secara permanen!");
+    }
+
+    public function setFilterKategori(string $kategoriId): void
+    {
+        $this->kategoriDipilih = $kategoriId;
+        $this->resetPage();
+    }
+
+    public function setFilterStatus(string $status): void
+    {
+        $this->statusDipilih = $status;
+        $this->resetPage();
+    }
+
+    public function resetSemuaFilter(): void
+    {
+        $this->cari = '';
+        $this->kategoriDipilih = 'Semua';
+        $this->statusDipilih = 'Semua';
+        $this->sortField = 'dibuat_pada';
+        $this->sortDirection = 'desc';
+        $this->resetPage();
+    }
 
     /**
      * Update ekstensi dan ukuran otomatis saat file dipilih.
@@ -207,14 +303,16 @@ class UnduhanKelola extends Component
 
         $query = Unduhan::with('kategori', 'pengunggah')
             ->when($this->kategoriDipilih !== 'Semua', fn($q) => $q->where('kategori_id', $this->kategoriDipilih))
-            ->when($this->cari, fn($q) => $q->where('judul_dokumen', 'like', '%' . $this->cari . '%'))
-            ->orderByDesc('dibuat_pada');
+            ->when($this->statusDipilih !== 'Semua', fn($q) => $q->where('status_publik', $this->statusDipilih === 'publik'))
+            ->when($this->cari, fn($q) => $q->where(fn($sub) => $sub->where('judul_dokumen', 'like', '%' . $this->cari . '%')->orWhere('deskripsi_singkat', 'like', '%' . $this->cari . '%')))
+            ->orderBy($this->sortField, $this->sortDirection);
 
         return view('livewire.admin.unduhan.unduhan-kelola', [
             'kategoriList'  => $kategoriList,
-            'unduhanList'   => $query->paginate(10),
+            'unduhanList'   => $query->paginate($this->perPage),
             'totalDokumen'  => Unduhan::count(),
             'totalPublik'   => Unduhan::where('status_publik', true)->count(),
+            'totalPrivat'   => Unduhan::where('status_publik', false)->count(),
             'totalHits'     => Unduhan::sum('jumlah_unduhan'),
         ]);
     }

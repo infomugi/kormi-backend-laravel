@@ -35,6 +35,6 @@ class BeritaDetail extends Component
         return view('livewire.publik.media.berita-detail', [
             'berita' => $berita,
             'beritaTerkait' => $beritaTerkait,
-        ])->title($berita->judul . ' - KORMI Kabupaten Bandung');
+        ])->layout('components.layouts.app', ['title' => $berita->judul . ' - KORMI Kabupaten Bandung']);
     }
 }

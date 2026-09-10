@@ -20,10 +20,18 @@ class GaleriKelola extends Component
 
     public string $mode = 'tabel'; // 'tabel', 'form_foto', 'form_album'
     public string $tabAktif = 'foto'; // 'foto' atau 'album'
+    public string $tampilanMode = 'grid'; // 'grid' atau 'tabel'
     public string $cari = '';
     public string $albumDipilih = 'Semua';
+    public string $sortField = 'urutan';
+    public string $sortDirection = 'asc';
+    public int $perPage = 12;
 
-    // Form Foto
+    // Bulk selection
+    public array $selectedFoto = [];
+    public bool $pilihSemua = false;
+
+    // Form Foto Tunggal
     public bool $tampilkanModalFoto = false;
     public ?string $editFotoId = null;
     public string $album_id = '';
@@ -33,6 +41,12 @@ class GaleriKelola extends Component
     public string $tipe_grid = 'normal';
     public int $urutan_foto = 1;
     public $uploadFoto = null; // file upload sementara
+
+    // Form Upload Bulk Foto ke Album
+    public string $bulk_album_id = '';
+    public array $uploadBulkFoto = []; // array of UploadedFile
+    public string $bulk_judul_prefix = '';
+    public string $bulk_deskripsi = '';
 
     // Form Album
     public bool $tampilkanModalAlbum = false;
@@ -44,19 +58,30 @@ class GaleriKelola extends Component
     public string $lokasi = '';
     public bool $status_tampil = true;
     public $uploadSampul = null; // file upload sementara
+    public array $uploadAlbumBulkFoto = []; // upload foto sekaligus saat buat/edit album
 
     protected function rulesFoto(): array
     {
         $rules = [
             'album_id'   => 'required|exists:kormi_galeri_album,id',
             'judul_foto' => 'required|min:3|max:150',
-            'tipe_grid'  => 'required|in:normal,col-span-2 row-span-2,col-span-1 row-span-2,col-span-2 row-span-1',
+            'tipe_grid'  => 'required|in:normal,col-span-2,col-span-2 row-span-2,col-span-1 row-span-2,col-span-2 row-span-1',
             'urutan_foto'=> 'required|integer',
         ];
 
         $rules['uploadFoto'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
 
         return $rules;
+    }
+
+    protected function rulesBulkFoto(): array
+    {
+        return [
+            'bulk_album_id'      => 'required|exists:kormi_galeri_album,id',
+            'uploadBulkFoto'     => 'required|array|min:1',
+            'uploadBulkFoto.*'   => 'image|mimes:jpg,jpeg,png,webp|max:10240',
+            'bulk_judul_prefix'  => 'nullable|max:100',
+        ];
     }
 
     protected function rulesAlbum(): array
@@ -67,6 +92,7 @@ class GaleriKelola extends Component
         ];
 
         $rules['uploadSampul'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
+        $rules['uploadAlbumBulkFoto.*'] = 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240';
 
         return $rules;
     }
@@ -78,6 +104,15 @@ class GaleriKelola extends Component
         'uploadFoto.image'       => 'File harus berupa gambar.',
         'uploadFoto.mimes'       => 'Format gambar harus jpg, jpeg, png, atau webp.',
         'uploadFoto.max'         => 'Ukuran gambar maksimal 10 MB.',
+        'bulk_album_id.required' => 'Album tujuan wajib dipilih.',
+        'uploadBulkFoto.required'=> 'Pilih minimal 1 file foto untuk diunggah.',
+        'uploadBulkFoto.min'     => 'Pilih minimal 1 file foto.',
+        'uploadBulkFoto.*.image' => 'Setiap berkas harus berupa gambar.',
+        'uploadBulkFoto.*.mimes' => 'Format gambar harus jpg, jpeg, png, atau webp.',
+        'uploadBulkFoto.*.max'   => 'Ukuran setiap foto maksimal 10 MB.',
+        'uploadAlbumBulkFoto.*.image' => 'File foto harus berupa gambar.',
+        'uploadAlbumBulkFoto.*.mimes' => 'Format gambar harus jpg, jpeg, png, atau webp.',
+        'uploadAlbumBulkFoto.*.max'   => 'Ukuran setiap foto maksimal 10 MB.',
         'judul_album.required'   => 'Judul album wajib diisi.',
         'uploadSampul.required'  => 'Sampul album wajib diunggah.',
         'uploadSampul.image'     => 'Sampul harus berupa gambar.',
@@ -96,7 +131,153 @@ class GaleriKelola extends Component
 
     public function updatedCari(): void        { $this->resetPage(); }
     public function updatedAlbumDipilih(): void { $this->resetPage(); }
-    public function updatedTabAktif(): void     { $this->resetPage(); }
+    public function updatedTabAktif(): void     { $this->resetPage(); $this->resetSelection(); }
+    public function updatedPerPage(): void      { $this->resetPage(); }
+
+    public function sortBy(string $field): void
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function updatedPilihSemua(bool $value): void
+    {
+        if ($value) {
+            $query = GaleriFoto::query()
+                ->when($this->albumDipilih !== 'Semua', fn($q) => $q->where('album_id', $this->albumDipilih))
+                ->when($this->cari, fn($q) => $q->where(fn($sub) => $sub->where('judul_foto', 'like', "%{$this->cari}%")->orWhere('deskripsi', 'like', "%{$this->cari}%")));
+            $this->selectedFoto = $query->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        } else {
+            $this->selectedFoto = [];
+        }
+    }
+
+    public function resetSelection(): void
+    {
+        $this->selectedFoto = [];
+        $this->pilihSemua = false;
+    }
+
+    public function bulkDeleteFoto(): void
+    {
+        if (empty($this->selectedFoto)) return;
+
+        $count = count($this->selectedFoto);
+        $fotos = GaleriFoto::whereIn('id', $this->selectedFoto)->get();
+        $storage = app(StorageService::class);
+
+        foreach ($fotos as $foto) {
+            $storage->hapusFile($foto->gambar_url);
+            $foto->delete();
+        }
+
+        $this->resetSelection();
+        session()->flash('pesan', "{$count} foto berhasil dihapus dari galeri!");
+    }
+
+    public function setFilterAlbum(string $albumId): void
+    {
+        $this->albumDipilih = $albumId;
+        $this->resetPage();
+    }
+
+    public function resetSemuaFilter(): void
+    {
+        $this->cari = '';
+        $this->albumDipilih = 'Semua';
+        $this->sortField = 'urutan';
+        $this->sortDirection = 'asc';
+        $this->resetPage();
+    }
+
+    // ==========================================
+    // BULK UPLOAD FOTO ACTIONS
+    // ==========================================
+    public function bukaFormBulkFoto(?string $albumId = null): void
+    {
+        $this->resetBulkFoto();
+        if ($albumId && $albumId !== 'Semua') {
+            $this->bulk_album_id = $albumId;
+        } else {
+            $firstAlbum = GaleriAlbum::first();
+            if ($firstAlbum) {
+                $this->bulk_album_id = $firstAlbum->id;
+            }
+        }
+        $this->mode = 'form_bulk_foto';
+        $this->resetErrorBag();
+    }
+
+    public function simpanBulkFoto(): void
+    {
+        $this->validate($this->rulesBulkFoto());
+
+        /** @var StorageService $storage */
+        $storage = app(StorageService::class);
+        $album = GaleriAlbum::findOrFail($this->bulk_album_id);
+
+        $maxUrutan = (int) GaleriFoto::where('album_id', $this->bulk_album_id)->max('urutan');
+        $uploadedCount = 0;
+
+        foreach ($this->uploadBulkFoto as $index => $file) {
+            $pathGambar = $storage->uploadGambar($file, 'galeri/foto');
+            
+            // Format judul: jika user memasukkan prefix judul, tambahkan nomor (contoh: Dokumentasi FORKAB 01)
+            // Jika kosong, gunakan nama file asli yang dibersihkan
+            if (!empty(trim($this->bulk_judul_prefix))) {
+                $judul = trim($this->bulk_judul_prefix) . ' ' . str_pad((string)($index + 1), 2, '0', STR_PAD_LEFT);
+            } else {
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $judul = Str::headline(str_replace(['_', '-'], ' ', $originalName));
+            }
+
+            GaleriFoto::create([
+                'id'         => (string) Str::uuid(),
+                'album_id'   => $this->bulk_album_id,
+                'judul_foto' => $judul,
+                'gambar_url' => $pathGambar,
+                'deskripsi'  => $this->bulk_deskripsi,
+                'tipe_grid'  => 'normal',
+                'urutan'     => $maxUrutan + $index + 1,
+            ]);
+
+            $uploadedCount++;
+        }
+
+        $this->setFilterAlbum($this->bulk_album_id);
+        $this->tabAktif = 'foto';
+        session()->flash('pesan', "Berhasil mengunggah {$uploadedCount} foto ke album \"{$album->judul_album}\"!");
+        $this->kembaliKeTabel();
+    }
+
+    public function resetBulkFoto(): void
+    {
+        $this->bulk_album_id     = '';
+        $this->uploadBulkFoto    = [];
+        $this->bulk_judul_prefix = '';
+        $this->bulk_deskripsi    = '';
+    }
+
+    public function hapusFileBulkUpload(int $index): void
+    {
+        if (isset($this->uploadBulkFoto[$index])) {
+            unset($this->uploadBulkFoto[$index]);
+            $this->uploadBulkFoto = array_values($this->uploadBulkFoto);
+        }
+    }
+
+    public function hapusFileAlbumBulkUpload(int $index): void
+    {
+        if (isset($this->uploadAlbumBulkFoto[$index])) {
+            unset($this->uploadAlbumBulkFoto[$index]);
+            $this->uploadAlbumBulkFoto = array_values($this->uploadAlbumBulkFoto);
+        }
+    }
 
     public function kembaliKeTabel(): void
     {
@@ -104,6 +285,7 @@ class GaleriKelola extends Component
         $this->tampilkanModalFoto  = false;
         $this->tampilkanModalAlbum = false;
         $this->resetFoto();
+        $this->resetBulkFoto();
         $this->resetAlbum();
     }
 
@@ -265,9 +447,10 @@ class GaleriKelola extends Component
                 'lokasi'         => $this->lokasi,
                 'status_tampil'  => $this->status_tampil,
             ]);
+            $albumId = $album->id;
             session()->flash('pesan', 'Album galeri berhasil diperbarui!');
         } else {
-            GaleriAlbum::create([
+            $album = GaleriAlbum::create([
                 'id'           => (string) Str::uuid(),
                 'judul_album'  => $this->judul_album,
                 'slug'         => $slug,
@@ -277,9 +460,35 @@ class GaleriKelola extends Component
                 'lokasi'       => $this->lokasi,
                 'status_tampil'=> $this->status_tampil,
             ]);
+            $albumId = $album->id;
             session()->flash('pesan', 'Album baru berhasil dibuat!');
         }
 
+        // Jika ada foto tambahan yang diunggah secara bulk di dalam form album
+        if (!empty($this->uploadAlbumBulkFoto)) {
+            $maxUrutan = (int) GaleriFoto::where('album_id', $albumId)->max('urutan');
+            $bulkCount = 0;
+            foreach ($this->uploadAlbumBulkFoto as $idx => $photoFile) {
+                $fotoPath = $storage->uploadGambar($photoFile, 'galeri/foto');
+                $photoName = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $cleanJudul = Str::headline(str_replace(['_', '-'], ' ', $photoName));
+
+                GaleriFoto::create([
+                    'id'         => (string) Str::uuid(),
+                    'album_id'   => $albumId,
+                    'judul_foto' => $cleanJudul,
+                    'gambar_url' => $fotoPath,
+                    'deskripsi'  => $this->deskripsi_album,
+                    'tipe_grid'  => 'normal',
+                    'urutan'     => $maxUrutan + $idx + 1,
+                ]);
+                $bulkCount++;
+            }
+            session()->flash('pesan', "Album tersimpan & {$bulkCount} foto berhasil diunggah ke dalam album!");
+        }
+
+        $this->setFilterAlbum($albumId);
+        $this->tabAktif = 'foto';
         $this->kembaliKeTabel();
     }
 
@@ -311,6 +520,7 @@ class GaleriKelola extends Component
         $this->lokasi         = '';
         $this->status_tampil  = true;
         $this->uploadSampul   = null;
+        $this->uploadAlbumBulkFoto = [];
     }
 
     public function render()
@@ -320,7 +530,7 @@ class GaleriKelola extends Component
         $queryFoto = GaleriFoto::with('album')
             ->when($this->albumDipilih !== 'Semua', fn($q) => $q->where('album_id', $this->albumDipilih))
             ->when($this->cari, fn($q) => $q->where(fn($sub) => $sub->where('judul_foto', 'like', "%{$this->cari}%")->orWhere('deskripsi', 'like', "%{$this->cari}%")))
-            ->orderBy('urutan');
+            ->orderBy($this->sortField, $this->sortDirection);
 
         $queryAlbum = GaleriAlbum::withCount('foto')
             ->when($this->cari, fn($q) => $q->where(fn($sub) => $sub->where('judul_album', 'like', "%{$this->cari}%")->orWhere('lokasi', 'like', "%{$this->cari}%")))
@@ -328,7 +538,7 @@ class GaleriKelola extends Component
 
         return view('livewire.admin.galeri.galeri-kelola', [
             'albumList'   => $albumList,
-            'fotoList'    => $queryFoto->paginate(12, ['*'], 'fotoPage'),
+            'fotoList'    => $queryFoto->paginate($this->perPage, ['*'], 'fotoPage'),
             'daftarAlbum' => $queryAlbum->paginate(8, ['*'], 'albumPage'),
             'totalFoto'   => GaleriFoto::count(),
             'totalAlbum'  => GaleriAlbum::count(),

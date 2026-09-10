@@ -1,6 +1,13 @@
 import '../css/app.css';
 import './bootstrap';
 import { createIcons, icons } from 'lucide';
+import flatpickr from 'flatpickr';
+import { Indonesian } from 'flatpickr/dist/l10n/id.js';
+import { compressImageClientSide } from './image-compressor';
+
+window.flatpickr = flatpickr;
+flatpickr.localize(Indonesian);
+window.compressImageClientSide = compressImageClientSide;
 
 window.createLucideIcons = () => {
     try {
@@ -48,5 +55,3 @@ document.addEventListener('livewire:initialized', () => {
         });
     });
 });
-
-

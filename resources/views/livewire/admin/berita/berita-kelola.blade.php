@@ -56,468 +56,451 @@
                 </div>
             </div>
 
-            <!-- 2. KPI METRIC STATS -->
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-                <!-- Total Berita -->
-                <div 
+            <!-- 2. KPI METRIC STATS (6 Cards Symmetric Grid with Animated Shimmer Placeholder) -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+                <x-table.stats-card
+                    title="Total Berita"
+                    :value="number_format($totalBerita)"
+                    unit="Post"
+                    subtitle="Semua artikel warta"
+                    icon="newspaper"
+                    color="indigo"
+                    :active="$kategoriDipilih === 'Semua' && $statusDipilih === 'Semua' && $unggulanDipilih === 'Semua'"
+                    loading-target="resetSemuaFilter, setFilterKategori, setFilterStatus, setFilterUnggulan"
                     wire:click="resetSemuaFilter"
-                    class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer group"
-                >
-                    <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Berita</span>
-                        <div class="w-9 h-9 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <i data-lucide="newspaper" class="w-4 h-4"></i>
-                        </div>
-                    </div>
-                    <p class="text-2xl font-black text-slate-900 mt-2">{{ number_format($totalBerita) }} <span class="text-xs font-bold text-slate-400">Post</span></p>
-                    <p class="text-[10px] text-slate-400 mt-1">Klik untuk lihat semua</p>
-                </div>
+                />
 
-                <!-- Terbit (Live) -->
-                <div 
+                <x-table.stats-card
+                    title="Terbit (Live)"
+                    :value="number_format($totalPublished)"
+                    unit="Live"
+                    subtitle="Tayang di portal"
+                    icon="check-circle"
+                    color="emerald"
+                    :active="$statusDipilih === 'published'"
+                    :pulse="true"
+                    loading-target="setFilterStatus"
                     wire:click="setFilterStatus('published')"
-                    class="bg-white rounded-3xl p-4 sm:p-5 border {{ $statusDipilih === 'published' ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-slate-200/80' }} shadow-xs hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group"
-                >
-                    <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Terbit (Live)</span>
-                        <div class="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform relative">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 absolute top-1.5 right-1.5 animate-pulse"></span>
-                            <i data-lucide="check-circle" class="w-4 h-4"></i>
-                        </div>
-                    </div>
-                    <p class="text-2xl font-black text-emerald-600 mt-2">{{ number_format($totalPublished) }} <span class="text-xs font-bold text-slate-400">Live</span></p>
-                    <p class="text-[10px] text-slate-400 mt-1">Tayang di portal</p>
-                </div>
+                />
 
-                <!-- Draf Disimpan -->
-                <div 
+                <x-table.stats-card
+                    title="Draf Disimpan"
+                    :value="number_format($totalDraft)"
+                    unit="Draf"
+                    subtitle="Belum publikasi"
+                    icon="file-edit"
+                    color="amber"
+                    :active="$statusDipilih === 'draft'"
+                    loading-target="setFilterStatus"
                     wire:click="setFilterStatus('draft')"
-                    class="bg-white rounded-3xl p-4 sm:p-5 border {{ $statusDipilih === 'draft' ? 'border-amber-500 ring-2 ring-amber-500/20' : 'border-slate-200/80' }} shadow-xs hover:border-amber-300 hover:shadow-md transition-all cursor-pointer group"
-                >
-                    <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Draf Disimpan</span>
-                        <div class="w-9 h-9 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <i data-lucide="file-edit" class="w-4 h-4"></i>
-                        </div>
-                    </div>
-                    <p class="text-2xl font-black text-amber-600 mt-2">{{ number_format($totalDraft) }} <span class="text-xs font-bold text-slate-400">Draf</span></p>
-                    <p class="text-[10px] text-slate-400 mt-1">Belum dipublikasikan</p>
-                </div>
+                />
 
-                <!-- Berita Utama / Headline -->
-                <div 
+                <x-table.stats-card
+                    title="Headline Utama"
+                    :value="number_format($totalUnggulan)"
+                    unit="Hero"
+                    subtitle="Sorotan beranda"
+                    icon="star"
+                    color="amber"
+                    :active="$unggulanDipilih === '1'"
+                    loading-target="setFilterUnggulan"
                     wire:click="setFilterUnggulan('1')"
-                    class="bg-white rounded-3xl p-4 sm:p-5 border {{ $unggulanDipilih === '1' ? 'border-amber-500 ring-2 ring-amber-500/20' : 'border-slate-200/80' }} shadow-xs hover:border-amber-300 hover:shadow-md transition-all cursor-pointer group"
-                >
-                    <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Headline Utama</span>
-                        <div class="w-9 h-9 rounded-2xl bg-amber-100/70 text-amber-700 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <i data-lucide="star" class="w-4 h-4 fill-amber-500 text-amber-500"></i>
-                        </div>
-                    </div>
-                    <p class="text-2xl font-black text-slate-900 mt-2">{{ number_format($totalUnggulan) }} <span class="text-xs font-bold text-slate-400">Hero</span></p>
-                    <p class="text-[10px] text-slate-400 mt-1">Sorotan beranda publik</p>
-                </div>
+                />
 
-                <!-- Total Pembaca & Avg -->
-                <div class="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/80 shadow-xs col-span-2 lg:col-span-1">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Pembaca</span>
-                        <div class="w-9 h-9 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center">
-                            <i data-lucide="eye" class="w-4 h-4"></i>
-                        </div>
-                    </div>
-                    <p class="text-2xl font-black text-slate-900 mt-2">{{ number_format($totalViews) }} <span class="text-xs font-bold text-slate-400">Views</span></p>
-                    <p class="text-[10px] text-slate-400 mt-1">Rata-rata: ~{{ number_format($rataRataViews) }}/post</p>
-                </div>
+                <x-table.stats-card
+                    title="Kategori Aktif"
+                    :value="number_format($kategoriList->count())"
+                    unit="Topik"
+                    subtitle="Klasifikasi konten"
+                    icon="tag"
+                    color="slate"
+                    loading-target="bukaModalTambahKategori"
+                    wire:click="bukaModalTambahKategori"
+                />
+
+                <x-table.stats-card
+                    title="Total Pembaca"
+                    :value="number_format($totalViews)"
+                    unit="Views"
+                    subtitle="~" . number_format($rataRataViews) . "/post rata-rata"
+                    icon="eye"
+                    color="cyan"
+                    loading-target="cari, urutkan, setFilterKategori"
+                />
             </div>
 
             <!-- 3. FILTER & SEARCH TOOLBAR -->
-            <div class="bg-white border border-slate-200/80 p-4 rounded-3xl shadow-xs space-y-3">
-                <!-- Row 1: Category Filter Scroll -->
-                <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-                    <button 
-                        type="button"
-                        wire:click="setFilterKategori('Semua')" 
-                        class="px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 {{ $kategoriDipilih === 'Semua' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80' }}"
-                    >
-                        <span>Semua Kategori</span>
-                        <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $kategoriDipilih === 'Semua' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600' }}">{{ $totalBerita }}</span>
-                    </button>
-
-                    @foreach($kategoriList as $k)
+            <x-table.filter-bar search-placeholder="Cari judul artikel, ringkasan, isi konten..." search-model="cari">
+                <x-slot:top>
+                    <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none w-full">
                         <button 
                             type="button"
-                            wire:click="setFilterKategori('{{ $k->id }}')" 
-                            class="px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-2 {{ $kategoriDipilih === $k->id ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80' }}"
+                            wire:click="setFilterKategori('Semua')" 
+                            class="px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 {{ $kategoriDipilih === 'Semua' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80' }}"
                         >
-                            <span class="w-2 h-2 rounded-full shrink-0" style="background-color: {{ $k->kode_warna_hex ?: '#4f46e5' }}"></span>
-                            <span>{{ $k->nama_kategori }}</span>
-                            <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $kategoriDipilih === $k->id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600' }}">{{ $k->berita_count }}</span>
+                            <span>Semua Kategori</span>
+                            <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $kategoriDipilih === 'Semua' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600' }}">{{ $totalBerita }}</span>
                         </button>
-                    @endforeach
-                </div>
 
-                <!-- Row 2: Search, Status, Sort, View Toggle -->
-                <div class="flex flex-col lg:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-100">
-                    <!-- Left: Search Box -->
-                    <div class="relative w-full lg:w-96">
-                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                        <input 
-                            type="text" 
-                            wire:model.live.debounce.300ms="cari" 
-                            placeholder="Cari judul artikel, ringkasan, isi konten..." 
-                            class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl text-xs font-bold focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-slate-400 placeholder:font-normal"
+                        @foreach($kategoriList as $k)
+                            <button 
+                                type="button"
+                                wire:click="setFilterKategori('{{ $k->id }}')" 
+                                class="px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap shrink-0 transition-all cursor-pointer flex items-center gap-2 {{ $kategoriDipilih === $k->id ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80' }}"
+                            >
+                                <span class="w-2 h-2 rounded-full shrink-0" style="background-color: {{ $k->kode_warna_hex ?: '#4f46e5' }}"></span>
+                                <span>{{ $k->nama_kategori }}</span>
+                                <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $kategoriDipilih === $k->id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600' }}">{{ $k->berita_count }}</span>
+                            </button>
+                        @endforeach
+                    </div>
+                </x-slot:top>
+
+                <x-slot:actions>
+                    <!-- Status Filter -->
+                    <select wire:model.live="statusDipilih" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
+                        <option value="Semua">Semua Status</option>
+                        <option value="published">Status: Published</option>
+                        <option value="draft">Status: Draft</option>
+                        <option value="archived">Status: Archived</option>
+                    </select>
+
+                    <!-- Featured Filter -->
+                    <select wire:model.live="unggulanDipilih" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
+                        <option value="Semua">Semua Sorotan</option>
+                        <option value="1">⭐ Berita Utama</option>
+                        <option value="0">Berita Standar</option>
+                    </select>
+
+                    <!-- Sort By -->
+                    <select wire:model.live="urutkan" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
+                        <option value="terbaru">Urutan: Terbaru</option>
+                        <option value="terlama">Urutan: Terlama</option>
+                        <option value="terpopuler">Urutan: Terbanyak Dilihat</option>
+                        <option value="judul_asc">Judul: A - Z</option>
+                    </select>
+
+                    <!-- Per Page -->
+                    <select wire:model.live="perPage" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
+                        <option value="10">10 / hal</option>
+                        <option value="25">25 / hal</option>
+                        <option value="50">50 / hal</option>
+                    </select>
+
+                    <!-- View Switcher with localStorage persistence -->
+                    <div 
+                        x-data="{
+                            mode: localStorage.getItem('kormi_datatable_view') || @js($tampilanMode),
+                            setMode(val) {
+                                this.mode = val;
+                                localStorage.setItem('kormi_datatable_view', val);
+                                $wire.set('tampilanMode', val);
+                            }
+                        }"
+                        x-init="
+                            if (localStorage.getItem('kormi_datatable_view') && localStorage.getItem('kormi_datatable_view') !== @js($tampilanMode)) {
+                                $wire.set('tampilanMode', localStorage.getItem('kormi_datatable_view'));
+                            }
+                        "
+                        class="flex items-center p-1 bg-slate-100 rounded-2xl border border-slate-200 shrink-0"
+                    >
+                        <button 
+                            type="button" 
+                            @click="setMode('tabel')" 
+                            :class="mode === 'tabel' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-400 hover:text-slate-700'"
+                            class="p-1.5 rounded-xl transition-all cursor-pointer"
+                            title="Tampilan Tabel Data"
                         >
-                        @if($cari)
-                            <button 
-                                type="button" 
-                                wire:click="$set('cari', '')" 
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 rounded-md cursor-pointer"
-                            >
-                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                            </button>
-                        @endif
+                            <i data-lucide="list" class="w-4 h-4"></i>
+                        </button>
+                        <button 
+                            type="button" 
+                            @click="setMode('grid')" 
+                            :class="mode === 'grid' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-400 hover:text-slate-700'"
+                            class="p-1.5 rounded-xl transition-all cursor-pointer"
+                            title="Tampilan Kartu / Grid"
+                        >
+                            <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                        </button>
                     </div>
-
-                    <!-- Right Controls -->
-                    <div class="flex items-center gap-2.5 w-full lg:w-auto flex-wrap justify-end">
-                        <!-- Status Filter -->
-                        <select wire:model.live="statusDipilih" class="px-3 py-2 bg-slate-50 border border-slate-200 text-slate-700 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="Semua">Semua Status</option>
-                            <option value="published">Status: Published</option>
-                            <option value="draft">Status: Draft</option>
-                            <option value="archived">Status: Archived</option>
-                        </select>
-
-                        <!-- Featured Filter -->
-                        <select wire:model.live="unggulanDipilih" class="px-3 py-2 bg-slate-50 border border-slate-200 text-slate-700 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="Semua">Semua Sorotan</option>
-                            <option value="1">⭐ Berita Utama</option>
-                            <option value="0">Berita Standar</option>
-                        </select>
-
-                        <!-- Sort By -->
-                        <select wire:model.live="urutkan" class="px-3 py-2 bg-slate-50 border border-slate-200 text-slate-700 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="terbaru">Urutan: Terbaru</option>
-                            <option value="terlama">Urutan: Terlama</option>
-                            <option value="terpopuler">Urutan: Terbanyak Dilihat</option>
-                            <option value="judul_asc">Judul: A - Z</option>
-                        </select>
-
-                        <!-- Per Page -->
-                        <select wire:model.live="perPage" class="px-3 py-2 bg-slate-50 border border-slate-200 text-slate-700 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="10">10 / hal</option>
-                            <option value="25">25 / hal</option>
-                            <option value="50">50 / hal</option>
-                        </select>
-
-                        <!-- View Switcher -->
-                        <div class="flex items-center p-1 bg-slate-100 rounded-2xl border border-slate-200 shrink-0">
-                            <button 
-                                type="button" 
-                                wire:click="$set('tampilanMode', 'tabel')" 
-                                class="p-1.5 rounded-xl transition-all cursor-pointer {{ $tampilanMode === 'tabel' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-400 hover:text-slate-700' }}"
-                                title="Tampilan Tabel Data"
-                            >
-                                <i data-lucide="list" class="w-4 h-4"></i>
-                            </button>
-                            <button 
-                                type="button" 
-                                wire:click="$set('tampilanMode', 'grid')" 
-                                class="p-1.5 rounded-xl transition-all cursor-pointer {{ $tampilanMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-400 hover:text-slate-700' }}"
-                                title="Tampilan Kartu / Grid"
-                            >
-                                <i data-lucide="layout-grid" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                </x-slot:actions>
+            </x-table.filter-bar>
 
             <!-- 4. FLOATING BULK ACTIONS BAR (When items selected) -->
-            @if(count($selectedBerita) > 0)
-                <div class="p-3.5 sm:p-4 bg-slate-900 text-white rounded-2xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200">
-                    <div class="flex items-center gap-3">
-                        <span class="w-6 h-6 rounded-full bg-indigo-500 text-white font-black text-xs flex items-center justify-center shrink-0">
-                            {{ count($selectedBerita) }}
-                        </span>
-                        <span class="text-xs font-bold text-slate-200">Artikel dipilih</span>
-                    </div>
+            <x-table.bulk-bar :count="count($selectedBerita)" label="artikel dipilih" reset-action="resetSelection">
+                <button 
+                    type="button" 
+                    wire:click="bulkPublish" 
+                    class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                >
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <span>Terbitkan</span>
+                </button>
 
-                    <div class="flex items-center gap-2 flex-wrap justify-end">
-                        <button 
-                            type="button" 
-                            wire:click="bulkPublish" 
-                            class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
-                        >
-                            <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                            <span>Terbitkan</span>
-                        </button>
+                <button 
+                    type="button" 
+                    wire:click="bulkDraft" 
+                    class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                >
+                    <i data-lucide="file-edit" class="w-3.5 h-3.5"></i>
+                    <span>Jadikan Draf</span>
+                </button>
 
-                        <button 
-                            type="button" 
-                            wire:click="bulkDraft" 
-                            class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
-                        >
-                            <i data-lucide="file-edit" class="w-3.5 h-3.5"></i>
-                            <span>Jadikan Draf</span>
-                        </button>
+                <button 
+                    type="button" 
+                    wire:click="bulkToggleUnggulan(true)" 
+                    class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                >
+                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                    <span>Jadikan Utama</span>
+                </button>
 
-                        <button 
-                            type="button" 
-                            wire:click="bulkToggleUnggulan(true)" 
-                            class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
-                        >
-                            <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
-                            <span>Jadikan Utama</span>
-                        </button>
-
-                        <button 
-                            type="button" 
-                            wire:click="bulkDelete" 
-                            wire:confirm="Yakin ingin menghapus {{ count($selectedBerita) }} artikel terpilih secara permanen?"
-                            class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
-                        >
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                            <span>Hapus Terpilih</span>
-                        </button>
-
-                        <button 
-                            type="button" 
-                            wire:click="resetSelection" 
-                            class="p-1.5 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
-                            title="Batalkan Pilihan"
-                        >
-                            <i data-lucide="x" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-            @endif
+                <button 
+                    type="button" 
+                    wire:click="bulkDelete" 
+                    wire:confirm="Yakin ingin menghapus {{ count($selectedBerita) }} artikel terpilih secara permanen?"
+                    class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                >
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    <span>Hapus Terpilih</span>
+                </button>
+            </x-table.bulk-bar>
 
             <!-- 5. DATA PRESENTATION: TABLE OR GRID -->
             @if($tampilanMode === 'tabel')
                 <!-- TABLE VIEW -->
-                <div class="bg-white border border-slate-200/80 rounded-3xl shadow-xs overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs text-slate-600">
-                            <thead class="bg-slate-50 text-[10px] uppercase font-black tracking-wider text-slate-400 border-b border-slate-200/80">
-                                <tr>
-                                    <th class="w-12 px-5 py-4 text-center">
+                <x-table.card>
+                    <x-table.table loading-target="cari, statusDipilih, unggulanDipilih, kategoriDipilih, urutkan, perPage, gotoPage, nextPage, previousPage">
+                        <x-table.thead>
+                            <tr>
+                                <x-table.th align="center" class="w-12 !px-4">
+                                    <input 
+                                        type="checkbox" 
+                                        wire:model.live="pilihSemua" 
+                                        class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                    >
+                                </x-table.th>
+                                <x-table.th 
+                                    sortable 
+                                    sort-field="judul" 
+                                    :current-sort="$sortField" 
+                                    :current-direction="$sortDirection"
+                                >
+                                    Berita & Ringkasan
+                                </x-table.th>
+                                <x-table.th>Kategori</x-table.th>
+                                <x-table.th 
+                                    sortable 
+                                    sort-field="status_publikasi" 
+                                    :current-sort="$sortField" 
+                                    :current-direction="$sortDirection"
+                                >
+                                    Status & Sorotan
+                                </x-table.th>
+                                <x-table.th 
+                                    sortable 
+                                    sort-field="jumlah_dilihat" 
+                                    :current-sort="$sortField" 
+                                    :current-direction="$sortDirection"
+                                >
+                                    Statistik
+                                </x-table.th>
+                                <x-table.th 
+                                    sortable 
+                                    sort-field="tanggal_publikasi" 
+                                    :current-sort="$sortField" 
+                                    :current-direction="$sortDirection"
+                                >
+                                    Tanggal Rilis
+                                </x-table.th>
+                                <x-table.th align="right">Aksi</x-table.th>
+                            </tr>
+                        </x-table.thead>
+                        <x-table.tbody>
+                            @forelse($beritaList as $b)
+                                <x-table.tr wire:key="row-berita-{{ $b->id }}" :selected="in_array($b->id, $selectedBerita)">
+                                    <!-- Checkbox -->
+                                    <x-table.td align="center" class="!px-3.5 w-10">
                                         <input 
                                             type="checkbox" 
-                                            wire:model.live="pilihSemua" 
+                                            wire:model.live="selectedBerita" 
+                                            value="{{ $b->id }}" 
                                             class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                                         >
-                                    </th>
-                                    <th class="px-6 py-4">Berita & Ringkasan</th>
-                                    <th class="px-6 py-4">Kategori</th>
-                                    <th class="px-6 py-4">Status & Sorotan</th>
-                                    <th class="px-6 py-4">Statistik</th>
-                                    <th class="px-6 py-4">Tanggal Rilis</th>
-                                    <th class="px-6 py-4 text-right">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100 font-medium">
-                                @forelse($beritaList as $b)
-                                    <tr wire:key="row-berita-{{ $b->id }}" class="hover:bg-slate-50/80 transition-colors {{ in_array($b->id, $selectedBerita) ? 'bg-indigo-50/30' : '' }}">
-                                        <!-- Checkbox -->
-                                        <td class="px-5 py-4 text-center">
-                                            <input 
-                                                type="checkbox" 
-                                                wire:model.live="selectedBerita" 
-                                                value="{{ $b->id }}" 
-                                                class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                                            >
-                                        </td>
+                                    </x-table.td>
 
-                                        <!-- Thumbnail & Title -->
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-start gap-4 max-w-xl">
-                                                <div class="relative shrink-0 group">
-                                                    <img 
-                                                        src="{{ $b->gambar_url }}" 
-                                                        class="w-20 h-16 rounded-2xl object-cover border border-slate-200/80 shadow-2xs group-hover:scale-105 transition-transform" 
-                                                        alt="{{ $b->judul }}"
-                                                        onerror="this.src='https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=400'"
-                                                    >
-                                                    @if($b->status_unggulan)
-                                                        <span class="absolute -top-1.5 -left-1.5 w-5 h-5 bg-amber-400 text-slate-900 rounded-full flex items-center justify-center text-[10px] shadow-xs" title="Berita Utama">⭐</span>
-                                                    @endif
-                                                </div>
-
-                                                <div class="space-y-1">
-                                                    <a 
-                                                        href="javascript:void(0)" 
-                                                        wire:click="bukaFormEdit('{{ $b->id }}')" 
-                                                        class="font-black text-slate-900 text-xs sm:text-sm hover:text-indigo-600 line-clamp-1 leading-snug transition-colors cursor-pointer"
-                                                    >
-                                                        {{ $b->judul }}
-                                                    </a>
-                                                    <p class="text-[11px] text-slate-500 line-clamp-1 font-normal">{{ $b->ringkasan }}</p>
-                                                    <div class="flex items-center gap-2 text-[10px] text-slate-400 pt-0.5">
-                                                        <span class="font-bold text-slate-600">{{ $b->penulis->nama_lengkap ?? 'Redaksi KORMI' }}</span>
-                                                        <span>•</span>
-                                                        <span class="flex items-center gap-1">
-                                                            <i data-lucide="clock" class="w-3 h-3"></i>
-                                                            <span>~{{ $b->estimasi_menit_baca }} mnt baca</span>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-
-                                        <!-- Category Badge -->
-                                        <td class="px-6 py-4">
-                                            <span 
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-2xs"
-                                                style="background-color: {{ $b->kategori->kode_warna_hex ? $b->kategori->kode_warna_hex.'15' : '#4f46e515' }}; color: {{ $b->kategori->kode_warna_hex ?: '#4f46e5' }}; border-color: {{ $b->kategori->kode_warna_hex ? $b->kategori->kode_warna_hex.'30' : '#4f46e530' }};"
-                                            >
-                                                <span class="w-1.5 h-1.5 rounded-full" style="background-color: {{ $b->kategori->kode_warna_hex ?: '#4f46e5' }}"></span>
-                                                <span>{{ $b->kategori->nama_kategori ?? 'Umum' }}</span>
-                                            </span>
-                                        </td>
-
-                                        <!-- Status & Featured Toggle -->
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center gap-2">
-                                                @php
-                                                    $statusStyle = match($b->status_publikasi) {
-                                                        'published' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                                        'draft'     => 'bg-amber-50 text-amber-700 border-amber-200',
-                                                        'archived'  => 'bg-slate-100 text-slate-700 border-slate-200',
-                                                        default     => 'bg-slate-100 text-slate-700 border-slate-200'
-                                                    };
-                                                @endphp
-
-                                                <button 
-                                                    type="button" 
-                                                    wire:click="toggleStatus('{{ $b->id }}')" 
-                                                    class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border {{ $statusStyle }} hover:scale-105 transition-all cursor-pointer"
-                                                    title="Klik untuk ubah status (Published / Draft / Archived)"
+                                    <!-- Thumbnail & Title -->
+                                    <x-table.td>
+                                        <div class="flex items-center gap-3 max-w-lg">
+                                            <div class="relative shrink-0 group">
+                                                <img 
+                                                    src="{{ $b->gambar_url }}" 
+                                                    class="w-14 h-11 sm:w-16 sm:h-12 rounded-xl object-cover border border-slate-200/80 shadow-2xs group-hover:scale-105 transition-transform" 
+                                                    alt="{{ $b->judul }}"
+                                                    onerror="this.src='https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=300'"
                                                 >
-                                                    {{ $b->status_publikasi }}
-                                                </button>
-                                                
-                                                <button 
-                                                    type="button" 
-                                                    wire:key="star-btn-{{ $b->id }}"
-                                                    wire:click="toggleUnggulan('{{ $b->id }}')" 
-                                                    class="p-1.5 rounded-xl transition-all hover:scale-125 cursor-pointer {{ $b->status_unggulan ? 'text-amber-500 bg-amber-50' : 'text-slate-300 hover:text-amber-400 hover:bg-slate-100' }}" 
-                                                    title="{{ $b->status_unggulan ? 'Hapus dari Berita Utama' : 'Jadikan Berita Utama (Headline)' }}"
-                                                >
-                                                    <i data-lucide="star" class="w-4 h-4 {{ $b->status_unggulan ? 'fill-amber-400 text-amber-500' : '' }}"></i>
-                                                </button>
+                                                @if($b->status_unggulan)
+                                                    <span class="absolute -top-1 -left-1 w-4 h-4 bg-amber-400 text-slate-900 rounded-full flex items-center justify-center text-[9px] shadow-xs" title="Berita Utama">⭐</span>
+                                                @endif
                                             </div>
-                                        </td>
 
-                                        <!-- Views -->
-                                        <td class="px-6 py-4 font-black text-slate-800">
-                                            <div class="flex items-center gap-1.5 text-xs">
-                                                <i data-lucide="eye" class="w-3.5 h-3.5 text-slate-400"></i>
-                                                <span>{{ number_format($b->jumlah_dilihat) }}</span>
-                                            </div>
-                                        </td>
-
-                                        <!-- Publish Date -->
-                                        <td class="px-6 py-4 text-slate-500 text-[11px] font-semibold">
-                                            @if($b->tanggal_publikasi)
-                                                <p class="font-bold text-slate-700">{{ \Carbon\Carbon::parse($b->tanggal_publikasi)->format('d M Y') }}</p>
-                                                <p class="text-[10px] text-slate-400">{{ \Carbon\Carbon::parse($b->tanggal_publikasi)->diffForHumans() }}</p>
-                                            @else
-                                                <span class="text-slate-400 italic">Belum dijadwalkan</span>
-                                            @endif
-                                        </td>
-
-                                        <!-- Actions -->
-                                        <td class="px-6 py-4 text-right">
-                                            <div class="flex items-center justify-end gap-1">
-                                                <!-- Quick Preview Modal -->
-                                                <button 
-                                                    type="button" 
-                                                    wire:click="bukaModalPratinjau('{{ $b->id }}')" 
-                                                    class="p-2 rounded-xl text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 transition-colors cursor-pointer" 
-                                                    title="Pratinjau Cepat"
-                                                >
-                                                    <i data-lucide="eye" class="w-4 h-4"></i>
-                                                </button>
-
-                                                <!-- View Live on Portal -->
+                                            <div class="min-w-0 space-y-0.5">
                                                 <a 
-                                                    href="{{ route('berita.detail', $b->slug) }}" 
-                                                    target="_blank" 
-                                                    class="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors cursor-pointer" 
-                                                    title="Buka Halaman Publik"
-                                                >
-                                                    <i data-lucide="external-link" class="w-4 h-4"></i>
-                                                </a>
-
-                                                <!-- Duplicate -->
-                                                <button 
-                                                    type="button" 
-                                                    wire:click="duplikatBerita('{{ $b->id }}')" 
-                                                    class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer" 
-                                                    title="Duplikasi Berita"
-                                                >
-                                                    <i data-lucide="copy" class="w-4 h-4"></i>
-                                                </button>
-
-                                                <!-- Edit Button -->
-                                                <button 
-                                                    type="button" 
+                                                    href="javascript:void(0)" 
                                                     wire:click="bukaFormEdit('{{ $b->id }}')" 
-                                                    class="p-2 rounded-xl text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-colors cursor-pointer font-bold" 
-                                                    title="Edit Berita"
+                                                    class="font-black text-slate-900 text-xs hover:text-indigo-600 line-clamp-1 leading-tight transition-colors cursor-pointer"
+                                                    title="{{ $b->judul }}"
                                                 >
-                                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
-                                                </button>
-
-                                                <!-- Delete Button -->
-                                                <button 
-                                                    type="button" 
-                                                    wire:click="konfirmasiHapus('{{ $b->id }}')" 
-                                                    class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer" 
-                                                    title="Hapus Berita"
-                                                >
-                                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="7" class="px-6 py-16 text-center text-slate-400">
-                                            <div class="max-w-md mx-auto space-y-3">
-                                                <div class="w-14 h-14 rounded-3xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto shadow-2xs">
-                                                    <i data-lucide="newspaper" class="w-7 h-7"></i>
+                                                    {{ $b->judul }}
+                                                </a>
+                                                <p class="text-[11px] text-slate-400 line-clamp-1 font-normal leading-normal">{{ $b->ringkasan }}</p>
+                                                <div class="flex items-center gap-2 text-[10px] text-slate-400">
+                                                    <span class="font-bold text-slate-600 truncate max-w-[120px]">{{ $b->penulis->nama_lengkap ?? 'Redaksi' }}</span>
+                                                    <span>•</span>
+                                                    <span class="flex items-center gap-1">
+                                                        <i data-lucide="clock" class="w-3 h-3 text-slate-300"></i>
+                                                        <span>{{ $b->estimasi_menit_baca }} mnt</span>
+                                                    </span>
                                                 </div>
-                                                <h3 class="text-sm font-black text-slate-800">Tidak ada artikel berita ditemukan</h3>
-                                                <p class="text-xs text-slate-400 font-medium">Coba sesuaikan kata kunci pencarian atau reset filter untuk menampilkan data berita lainnya.</p>
-                                                <button 
-                                                    type="button" 
-                                                    wire:click="resetSemuaFilter" 
-                                                    class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
-                                                >
-                                                    Reset Semua Filter
-                                                </button>
                                             </div>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                                        </div>
+                                    </x-table.td>
+
+                                    <!-- Category Badge -->
+                                    <x-table.td>
+                                        <span 
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-2xs whitespace-nowrap"
+                                            style="background-color: {{ $b->kategori->kode_warna_hex ? $b->kategori->kode_warna_hex.'15' : '#4f46e515' }}; color: {{ $b->kategori->kode_warna_hex ?: '#4f46e5' }}; border-color: {{ $b->kategori->kode_warna_hex ? $b->kategori->kode_warna_hex.'30' : '#4f46e530' }};"
+                                        >
+                                            <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: {{ $b->kategori->kode_warna_hex ?: '#4f46e5' }}"></span>
+                                            <span>{{ $b->kategori->nama_kategori ?? 'Umum' }}</span>
+                                        </span>
+                                    </x-table.td>
+
+                                    <!-- Status & Featured Toggle -->
+                                    <x-table.td>
+                                        <div class="flex items-center gap-1.5">
+                                            @php
+                                                $statusStyle = match($b->status_publikasi) {
+                                                    'published' => 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
+                                                    'draft'     => 'bg-amber-50 text-amber-700 border-amber-200/80',
+                                                    'archived'  => 'bg-slate-100 text-slate-700 border-slate-200',
+                                                    default     => 'bg-slate-100 text-slate-700 border-slate-200'
+                                                };
+                                            @endphp
+
+                                            <button 
+                                                type="button" 
+                                                wire:click="toggleStatus('{{ $b->id }}')" 
+                                                class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border {{ $statusStyle }} hover:scale-105 transition-all cursor-pointer whitespace-nowrap"
+                                                title="Ubah status"
+                                            >
+                                                {{ $b->status_publikasi }}
+                                            </button>
+                                            
+                                            <button 
+                                                type="button" 
+                                                wire:key="star-btn-{{ $b->id }}"
+                                                wire:click="toggleUnggulan('{{ $b->id }}')" 
+                                                class="p-1 rounded-lg transition-all hover:scale-110 cursor-pointer {{ $b->status_unggulan ? 'text-amber-500 bg-amber-50' : 'text-slate-300 hover:text-amber-400 hover:bg-slate-100' }}" 
+                                                title="{{ $b->status_unggulan ? 'Hapus dari Berita Utama' : 'Jadikan Berita Utama' }}"
+                                            >
+                                                <i data-lucide="star" class="w-3.5 h-3.5 {{ $b->status_unggulan ? 'fill-amber-400 text-amber-500' : '' }}"></i>
+                                            </button>
+                                        </div>
+                                    </x-table.td>
+
+                                    <!-- Views -->
+                                    <x-table.td class="font-extrabold text-slate-800">
+                                        <div class="inline-flex items-center gap-1.5 text-xs text-slate-700">
+                                            <i data-lucide="eye" class="w-3.5 h-3.5 text-slate-400"></i>
+                                            <span>{{ number_format($b->jumlah_dilihat) }}</span>
+                                        </div>
+                                    </x-table.td>
+
+                                    <!-- Publish Date -->
+                                    <x-table.td class="text-slate-500 text-xs font-semibold whitespace-nowrap">
+                                        @if($b->tanggal_publikasi)
+                                            <p class="font-bold text-slate-800 text-xs">{{ \Carbon\Carbon::parse($b->tanggal_publikasi)->format('d M Y') }}</p>
+                                            <p class="text-[10px] text-slate-400">{{ \Carbon\Carbon::parse($b->tanggal_publikasi)->diffForHumans() }}</p>
+                                        @else
+                                            <span class="text-slate-400 italic text-[11px]">Draf belum terbit</span>
+                                        @endif
+                                    </x-table.td>
+
+                                    <!-- Actions -->
+                                    <x-table.td align="right">
+                                        <div class="flex items-center justify-end gap-1">
+                                            <!-- Quick Preview Modal -->
+                                            <x-table.action-btn 
+                                                size="sm"
+                                                variant="info" 
+                                                icon="eye" 
+                                                loading-target="bukaModalPratinjau('{{ $b->id }}')"
+                                                wire:click="bukaModalPratinjau('{{ $b->id }}')" 
+                                                title="Pratinjau Cepat" 
+                                            />
+
+                                            <!-- View Live on Portal -->
+                                            <x-table.action-btn 
+                                                size="sm"
+                                                variant="default" 
+                                                icon="external-link" 
+                                                href="{{ route('berita.detail', $b->slug) }}" 
+                                                target="_blank" 
+                                                title="Buka Halaman Publik" 
+                                            />
+
+                                            <!-- Duplicate -->
+                                            <x-table.action-btn 
+                                                size="sm"
+                                                variant="default" 
+                                                icon="copy" 
+                                                loading-target="duplikatBerita('{{ $b->id }}')"
+                                                wire:click="duplikatBerita('{{ $b->id }}')" 
+                                                title="Duplikasi Berita" 
+                                            />
+
+                                            <!-- Edit Button -->
+                                            <x-table.action-btn 
+                                                size="sm"
+                                                variant="indigo" 
+                                                icon="edit-3" 
+                                                loading-target="bukaFormEdit('{{ $b->id }}')"
+                                                wire:click="bukaFormEdit('{{ $b->id }}')" 
+                                                title="Edit Berita" 
+                                            />
+
+                                            <!-- Delete Button -->
+                                            <x-table.action-btn 
+                                                size="sm"
+                                                variant="danger" 
+                                                icon="trash-2" 
+                                                loading-target="konfirmasiHapus('{{ $b->id }}')"
+                                                wire:click="konfirmasiHapus('{{ $b->id }}')" 
+                                                title="Hapus Berita" 
+                                            />
+                                        </div>
+                                    </x-table.td>
+                                </x-table.tr>
+                            @empty
+                                <x-table.empty 
+                                    colspan="7" 
+                                    icon="newspaper" 
+                                    title="Tidak ada artikel berita ditemukan" 
+                                    description="Coba sesuaikan kata kunci pencarian atau reset filter untuk menampilkan data berita lainnya."
+                                    reset-action="resetSemuaFilter"
+                                    reset-text="Reset Semua Filter"
+                                />
+                            @endforelse
+                        </x-table.tbody>
+                    </x-table.table>
 
                     <!-- Pagination -->
-                    <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <span class="text-xs text-slate-500 font-medium">
-                            Menampilkan <span class="font-bold text-slate-800">{{ $beritaList->firstItem() ?? 0 }}</span> - <span class="font-bold text-slate-800">{{ $beritaList->lastItem() ?? 0 }}</span> dari total <span class="font-bold text-slate-800">{{ $beritaList->total() }}</span> artikel
-                        </span>
-                        <div>
-                            {{ $beritaList->links() }}
-                        </div>
+                    <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+                        {{ $beritaList->links() }}
                     </div>
-                </div>
+                </x-table.card>
 
             @else
                 <!-- GRID / CARDS VIEW -->
@@ -654,14 +637,9 @@
                 </div>
 
                 <!-- Pagination for Grid -->
-                <div class="p-4 bg-white border border-slate-200/80 rounded-3xl shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <span class="text-xs text-slate-500 font-medium">
-                        Menampilkan <span class="font-bold text-slate-800">{{ $beritaList->firstItem() ?? 0 }}</span> - <span class="font-bold text-slate-800">{{ $beritaList->lastItem() ?? 0 }}</span> dari total <span class="font-bold text-slate-800">{{ $beritaList->total() }}</span> artikel
-                    </span>
-                    <div>
-                        {{ $beritaList->links() }}
-                    </div>
-                </div>
+                <x-table.card padding="p-4">
+                    {{ $beritaList->links() }}
+                </x-table.card>
             @endif
 
         </div>

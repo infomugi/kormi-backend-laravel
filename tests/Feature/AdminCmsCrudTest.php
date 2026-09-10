@@ -60,8 +60,14 @@ class AdminCmsCrudTest extends TestCase
         $this->assertNotNull($berita);
 
         Livewire::test(BeritaKelola::class)
-            ->call('bukaModalEdit', $berita->id)
+            ->set('beritaId', $berita->id)
             ->set('judul', 'Berita Uji Coba KORMI 2026 Updated')
+            ->set('slug', 'berita-uji-coba-kormi-2026-updated')
+            ->set('kategori_id', $kategori->id)
+            ->set('ringkasan', 'Ringkasan berita uji coba')
+            ->set('isi_konten', 'Konten detail uji coba berita kormi')
+            ->set('gambar_utama', 'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=800')
+            ->set('status_publikasi', 'published')
             ->call('simpan')
             ->assertHasNoErrors();
 

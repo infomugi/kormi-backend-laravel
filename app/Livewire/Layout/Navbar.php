@@ -39,7 +39,7 @@ class Navbar extends Component
                 ['name' => 'Galeri', 'link' => route('galeri'), 'external' => false]
             ]],
             ['name' => 'Unduhan', 'link' => route('unduhan'), 'external' => false],
-            ['name' => 'Hubungi Kami', 'link' => '#footer', 'external' => false]
+            ['name' => 'Hubungi Kami', 'link' => route('kontak'), 'external' => false]
         ];
 
         return view('livewire.layout.navbar', ['menuItems' => $menuItems]);

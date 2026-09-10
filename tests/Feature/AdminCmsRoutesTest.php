@@ -50,11 +50,27 @@ class AdminCmsRoutesTest extends TestCase
             '/admin/sdi',
             '/admin/apmo',
             '/admin/pengguna',
+            '/admin/sejarah',
+            '/admin/visi-misi',
+            '/admin/pengurus',
+            '/admin/kordik',
+            '/admin/proker',
+            '/admin/event',
+            '/admin/pengaturan',
         ];
 
         foreach ($routes as $route) {
             $response = $this->actingAs($admin)->get($route);
             $response->assertStatus(200);
         }
+    }
+
+    public function test_api_v1_endpoints(): void
+    {
+        $this->get('/api/v1/pengaturan')->assertStatus(200);
+        $this->get('/api/v1/berita')->assertStatus(200);
+        $this->get('/api/v1/inorga')->assertStatus(200);
+        $this->get('/api/v1/event')->assertStatus(200);
+        $this->get('/api/v1/sapras')->assertStatus(200);
     }
 }
