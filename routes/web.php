@@ -137,19 +137,17 @@ Route::prefix('admin')->group(function () {
             return back()->withInput()->withErrors(['email' => 'Akun Anda sedang dinonaktifkan. Silakan hubungi Sekretariat KORMI.']);
         }
 
-        if (Auth::attempt(['email' => $email, 'password' => $password], $remember)) {
-            try {
-                $user->forceFill(['terakhir_masuk' => now()])->saveQuietly();
-            } catch (\Throwable $t) {}
-
-            request()->session()->regenerate();
-            return redirect()->intended(route('admin.dashboard'));
+        if (!\Illuminate\Support\Facades\Hash::check($password, $user->kata_sandi)) {
+            return back()->withInput()->withErrors(['kata_sandi' => 'Kata sandi yang Anda masukkan salah. Silakan periksa kembali.']);
         }
 
-        return back()->withInput()->withErrors([
-            'kata_sandi' => 'Kata sandi yang Anda masukkan salah. Silakan periksa kembali.',
-            'email' => 'Email atau kata sandi tidak cocok.',
-        ]);
+        Auth::login($user, $remember);
+        try {
+            $user->forceFill(['terakhir_masuk' => now()])->saveQuietly();
+        } catch (\Throwable $t) {}
+
+        request()->session()->regenerate();
+        return redirect()->intended(route('admin.dashboard'));
     })->name('admin.masuk.post');
     
     Route::match(['get', 'post'], '/keluar', function () {

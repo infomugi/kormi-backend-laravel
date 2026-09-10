@@ -84,24 +84,26 @@ class Masuk extends Component
                 return;
             }
 
-            // Attempt authentication
-            if (Auth::attempt(['email' => $email, 'password' => $password], $this->ingat_saya)) {
-                // Update terakhir_masuk if column exists
-                try {
-                    $user->forceFill(['terakhir_masuk' => now()])->saveQuietly();
-                } catch (\Throwable $t) {
-                    // Ignore if column is not present
-                }
-
-                session()->regenerate();
-                return $this->redirect(route('admin.dashboard'), navigate: false);
+            // Verify password using Hash
+            if (!\Illuminate\Support\Facades\Hash::check($password, $user->kata_sandi)) {
+                $this->addError('kata_sandi', 'Kata sandi yang Anda masukkan salah. Silakan periksa kembali.');
+                return;
             }
 
-            // Password mismatch
-            $this->addError('kata_sandi', 'Kata sandi yang Anda masukkan salah. Silakan periksa kembali.');
-            $this->addError('email', 'Email atau kata sandi tidak cocok.');
+            // Log in user
+            Auth::login($user, $this->ingat_saya);
+
+            // Update terakhir_masuk if column exists
+            try {
+                $user->forceFill(['terakhir_masuk' => now()])->saveQuietly();
+            } catch (\Throwable $t) {
+                // Ignore if column is not present
+            }
+
+            session()->regenerate();
+            return $this->redirectIntended(default: route('admin.dashboard'), navigate: false);
         } catch (\Throwable $e) {
-            $this->addError('email', 'Gagal memproses autentikasi. Silakan coba beberapa saat lagi.');
+            $this->addError('email', 'Gagal memproses autentikasi: ' . $e->getMessage());
         }
     }
 

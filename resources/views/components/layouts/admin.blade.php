@@ -11,7 +11,7 @@
     <!-- Google Fonts Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    @vite(['resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     <style>
         body {
@@ -216,7 +216,7 @@
                         <p class="text-xs font-bold text-slate-900 truncate leading-tight">
                             {{ auth()->user()?->nama_lengkap ?? 'Administrator' }}</p>
                         <p class="text-[10px] text-slate-400 capitalize truncate">
-                            {{ auth()->user()?->peran ?? 'Super Admin' }}</p>
+                            {{ auth()->user()?->peran?->nama_peran ?? 'Super Administrator' }}</p>
                     </div>
                 </div>
 
