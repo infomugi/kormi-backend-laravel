@@ -67,14 +67,12 @@ class Daftar extends Component
                 'email' => strtolower(trim($this->email)),
                 'nomor_telepon' => trim($this->nomor_telepon),
                 'kata_sandi' => Hash::make($this->kata_sandi),
-                'status_aktif' => true,
-                'terakhir_masuk' => now(),
+                'status_aktif' => false,
+                'terakhir_masuk' => null,
             ]);
 
-            Auth::login($pengguna, true);
-            session()->regenerate();
-
-            return $this->redirect(route('admin.dashboard'), navigate: false);
+            session()->flash('status', 'Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan (approval) dari Administrator KORMI sebelum dapat digunakan untuk masuk.');
+            return $this->redirect(route('login'), navigate: false);
         } catch (\Throwable $e) {
             $this->addError('email', 'Gagal mendaftarkan akun baru: ' . $e->getMessage());
         }

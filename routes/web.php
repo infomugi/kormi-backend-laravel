@@ -39,6 +39,7 @@ use App\Livewire\Admin\Sapras\SaprasKelola;
 use App\Livewire\Admin\Sdi\SdiKelola;
 use App\Livewire\Admin\Apmo\ApmoKelola;
 use App\Livewire\Admin\Pengguna\PenggunaKelola;
+use App\Livewire\Admin\Pengguna\PeranKelola;
 use App\Livewire\Admin\Pengaturan\PengaturanKelola;
 use App\Livewire\Admin\Organisasi\SejarahKelola;
 use App\Livewire\Admin\Organisasi\VisiMisiKelola;
@@ -155,7 +156,7 @@ Route::prefix('admin')->group(function () {
         }
 
         if (isset($user->status_aktif) && !$user->status_aktif) {
-            return back()->withInput()->withErrors(['email' => 'Akun Anda sedang dinonaktifkan. Silakan hubungi Sekretariat KORMI.']);
+            return back()->withInput()->withErrors(['email' => 'Akun Anda belum disetujui oleh Administrator KORMI atau sedang dinonaktifkan. Silakan hubungi pengelola CMS.']);
         }
 
         if (!\Illuminate\Support\Facades\Hash::check($password, $user->kata_sandi)) {
@@ -189,29 +190,46 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::middleware('auth')->group(function () {
+        // Semua role terautentikasi dapat mengakses Dashboard
         Route::get('/', Dashboard::class)->name('admin.dashboard');
         Route::get('/dashboard', Dashboard::class);
-        Route::get('/berita', BeritaKelola::class)->name('admin.berita');
-        Route::get('/berita/tambah', BeritaForm::class)->name('admin.berita.tambah');
-        Route::get('/berita/{id}/edit', BeritaForm::class)->name('admin.berita.edit');
-        Route::get('/galeri', GaleriKelola::class)->name('admin.galeri');
-        Route::get('/unduhan', UnduhanKelola::class)->name('admin.unduhan');
-        Route::get('/inorga', InorgaKelola::class)->name('admin.inorga');
-        Route::get('/event', EventKelola::class)->name('admin.event');
-        Route::get('/duta', DutaKelola::class)->name('admin.duta');
-        Route::get('/klasemen', KlasemenKelola::class)->name('admin.klasemen');
-        Route::get('/sapras', SaprasKelola::class)->name('admin.sapras');
-        Route::get('/sdi', SdiKelola::class)->name('admin.sdi');
-        Route::get('/apmo', ApmoKelola::class)->name('admin.apmo');
-        Route::get('/pengguna', PenggunaKelola::class)->name('admin.pengguna');
-        Route::get('/users', PenggunaKelola::class);
 
-        // Modul Baru: Organisasi & Pengaturan
-        Route::get('/pengaturan', PengaturanKelola::class)->name('admin.pengaturan');
-        Route::get('/sejarah', SejarahKelola::class)->name('admin.sejarah');
-        Route::get('/visi-misi', VisiMisiKelola::class)->name('admin.visimisi');
-        Route::get('/pengurus', PengurusKelola::class)->name('admin.pengurus');
-        Route::get('/kordik', KordikKelola::class)->name('admin.kordik');
-        Route::get('/proker', ProkerKelola::class)->name('admin.proker');
+        // 1. Modul Publikasi Media & Dokumentasi (Super Admin, Editor Berita)
+        Route::middleware('peran:super-admin,editor-berita')->group(function () {
+            Route::get('/berita', BeritaKelola::class)->name('admin.berita');
+            Route::get('/berita/tambah', BeritaForm::class)->name('admin.berita.tambah');
+            Route::get('/berita/{id}/edit', BeritaForm::class)->name('admin.berita.edit');
+            Route::get('/galeri', GaleriKelola::class)->name('admin.galeri');
+            Route::get('/unduhan', UnduhanKelola::class)->name('admin.unduhan');
+        });
+
+        // 2. Modul Wilayah, Duta, Venue, & Kordik (Super Admin, Admin KORCAM)
+        Route::middleware('peran:super-admin,admin-korcam')->group(function () {
+            Route::get('/duta', DutaKelola::class)->name('admin.duta');
+            Route::get('/kordik', KordikKelola::class)->name('admin.kordik');
+            Route::get('/sapras', SaprasKelola::class)->name('admin.sapras');
+        });
+
+        // 3. Modul Induk Organisasi, Event, & Klasemen (Super Admin, Admin INORGA)
+        Route::middleware('peran:super-admin,admin-inorga')->group(function () {
+            Route::get('/inorga', InorgaKelola::class)->name('admin.inorga');
+            Route::get('/event', EventKelola::class)->name('admin.event');
+            Route::get('/klasemen', KlasemenKelola::class)->name('admin.klasemen');
+        });
+
+        // 4. Modul Khusus Super Administrator (Pengguna, Organisasi, APMO, SDI, Pengaturan)
+        Route::middleware('peran:super-admin')->group(function () {
+            Route::get('/sdi', SdiKelola::class)->name('admin.sdi');
+            Route::get('/apmo', ApmoKelola::class)->name('admin.apmo');
+            Route::get('/pengguna', PenggunaKelola::class)->name('admin.pengguna');
+            Route::get('/users', PenggunaKelola::class);
+            Route::get('/peran', PeranKelola::class)->name('admin.peran');
+            Route::get('/roles', PeranKelola::class);
+            Route::get('/pengaturan', PengaturanKelola::class)->name('admin.pengaturan');
+            Route::get('/sejarah', SejarahKelola::class)->name('admin.sejarah');
+            Route::get('/visi-misi', VisiMisiKelola::class)->name('admin.visimisi');
+            Route::get('/pengurus', PengurusKelola::class)->name('admin.pengurus');
+            Route::get('/proker', ProkerKelola::class)->name('admin.proker');
+        });
     });
 });

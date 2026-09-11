@@ -46,7 +46,7 @@ return new class extends Migration
 
         Schema::create('kormi_linimasa_sejarah', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('tahun', 10);
+            $table->string('tahun', 30);
             $table->string('judul', 200);
             $table->text('deskripsi');
             $table->string('gambar_url', 255)->nullable();

@@ -27,14 +27,18 @@ use App\Models\KategoriUnduhan;
 use App\Models\KomisiInorga;
 use App\Models\Kecamatan;
 use App\Models\Pengguna;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class AdminCmsCrudTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed();
         $admin = Pengguna::first();
         if ($admin) {
             $this->actingAs($admin);

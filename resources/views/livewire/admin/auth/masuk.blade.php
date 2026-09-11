@@ -340,25 +340,6 @@
                 </button>
             </form>
 
-            <!-- Quick Auto-fill Admin Button for Ease of Testing -->
-            <div style="margin-top: 16px; padding: 12px; border-radius: 12px; background-color: #f8fafc; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 24px; height: 24px; border-radius: 6px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 12px;">
-                        ⚡
-                    </div>
-                    <span style="font-size: 12px; font-weight: 600; color: #64748b;">Akun Admin Demo</span>
-                </div>
-                <button 
-                    type="button" 
-                    wire:click="fillAdminCredentials"
-                    style="font-size: 11px; font-weight: 700; color: #047857; background: #d1fae5; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: background 0.15s;"
-                    onmouseover="this.style.background='#a7f3d0';"
-                    onmouseout="this.style.background='#d1fae5';"
-                >
-                    Isi Otomatis
-                </button>
-            </div>
-
             <!-- Don't have an account? Sign up -->
             <div style="text-align: center; margin-top: 24px; font-size: 13px; color: #64748b; font-weight: 500;">
                 <span>Belum memiliki akses akun?</span>

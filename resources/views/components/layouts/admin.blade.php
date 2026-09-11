@@ -98,6 +98,14 @@
             <!-- Navigation Links Stack -->
             <nav class="flex flex-col gap-1 p-3 flex-1">
 
+                @php
+                    $user = auth()->user();
+                    $isSuper = $user?->isSuperAdmin() ?? true;
+                    $isEditor = $isSuper || ($user?->isEditorBerita() ?? false);
+                    $isKorcam = $isSuper || ($user?->isAdminKorcam() ?? false);
+                    $isInorga = $isSuper || ($user?->isAdminInorga() ?? false);
+                @endphp
+
                 <!-- Category: UTAMA -->
                 <div x-show="sidebarExpanded && (!menuSearch || 'menu utama dashboard berita galeri publikasi unduhan'.includes(menuSearch.toLowerCase()))"
                     class="px-3 pt-3 pb-1 text-[10px] font-black uppercase tracking-widest text-emerald-400/70 flex items-center gap-2">
@@ -131,6 +139,7 @@
                     </div>
                 </div>
 
+                @if($isEditor)
                 <!-- 2. Berita & Artikel -->
                 <div x-show="!menuSearch || 'berita artikel publikasi kabar'.includes(menuSearch.toLowerCase())" class="relative group">
                     <a href="{{ route('admin.berita') }}" wire:navigate
@@ -205,14 +214,18 @@
                         Dokumen Unduhan
                     </div>
                 </div>
+                @endif
 
+                @if($isKorcam || $isInorga)
                 <!-- Category: KEOLAHRAGAAN -->
                 <div x-show="sidebarExpanded && (!menuSearch || 'keolahragaan duta inorga komisi klasemen medali sapras sarana sdi pelatihan apmo anugerah'.includes(menuSearch.toLowerCase()))"
                     class="px-3 pt-4 pb-1 text-[10px] font-black uppercase tracking-widest text-emerald-400/70 flex items-center gap-2">
                     <span>Keolahragaan & Data</span>
                     <div class="flex-1 h-px bg-white/[0.08]"></div>
                 </div>
+                @endif
 
+                @if($isKorcam)
                 <!-- 5. Duta Olahraga -->
                 <div x-show="!menuSearch || 'duta olahraga atlet pegiat peraih'.includes(menuSearch.toLowerCase())" class="relative group">
                     <a href="{{ route('admin.duta') }}" wire:navigate
@@ -238,6 +251,49 @@
                     </div>
                 </div>
 
+                <!-- 8. Sarana & Prasarana -->
+                <div x-show="!menuSearch || 'sarana prasarana sapras fasilitas venue lapangan gedung'.includes(menuSearch.toLowerCase())" class="relative group">
+                    <a href="{{ route('admin.sapras') }}" wire:navigate
+                        class="flex items-center rounded-xl font-bold text-sm transition-all duration-150 relative overflow-hidden {{ request()->routeIs('admin.sapras*') ? 'bg-white text-emerald-950 font-black shadow-lg shadow-black/25 ring-1 ring-white/80' : 'text-emerald-100/85 hover:text-white hover:bg-white/[0.08]' }}"
+                        :class="sidebarExpanded ? 'px-3 py-2.5 gap-3' : 'w-11 h-11 justify-center mx-auto'">
+                        @if(request()->routeIs('admin.sapras*'))
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-5 bg-lime-500 rounded-r-md"></div>
+                        @endif
+                        <div class="w-5 h-5 flex items-center justify-center shrink-0">
+                            <i data-lucide="map-pin"
+                                class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 {{ request()->routeIs('admin.sapras*') ? 'text-emerald-700' : 'text-emerald-300/90 group-hover:text-lime-300' }}"></i>
+                        </div>
+                        <span x-show="sidebarExpanded" class="truncate whitespace-nowrap">Sarana & Prasarana</span>
+                        @if(request()->routeIs('admin.sapras*'))
+                            <span x-show="sidebarExpanded" class="ml-auto flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                            </span>
+                        @endif
+                    </a>
+                    <div x-show="!sidebarExpanded"
+                        class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1 bg-slate-900/95 text-white text-xs font-bold rounded-lg shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap">
+                        Sarana & Prasarana
+                    </div>
+                </div>
+
+                <!-- Kordik Kecamatan -->
+                <div x-show="!menuSearch || 'kordik koordinator kecamatan'.includes(menuSearch.toLowerCase())" class="relative group">
+                    <a href="{{ route('admin.kordik') }}" wire:navigate
+                        class="flex items-center rounded-xl font-bold text-sm transition-all duration-150 relative overflow-hidden {{ request()->routeIs('admin.kordik*') ? 'bg-white text-emerald-950 font-black shadow-lg shadow-black/25 ring-1 ring-white/80' : 'text-emerald-100/85 hover:text-white hover:bg-white/[0.08]' }}"
+                        :class="sidebarExpanded ? 'px-3 py-2.5 gap-3' : 'w-11 h-11 justify-center mx-auto'">
+                        @if(request()->routeIs('admin.kordik*'))
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-5 bg-lime-500 rounded-r-md"></div>
+                        @endif
+                        <div class="w-5 h-5 flex items-center justify-center shrink-0">
+                            <i data-lucide="map-pin" class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 {{ request()->routeIs('admin.kordik*') ? 'text-emerald-700' : 'text-emerald-300/90 group-hover:text-lime-300' }}"></i>
+                        </div>
+                        <span x-show="sidebarExpanded" class="truncate whitespace-nowrap">Kordik Kecamatan</span>
+                    </a>
+                    <div x-show="!sidebarExpanded" class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1 bg-slate-900/95 text-white text-xs font-bold rounded-lg shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap">Kordik Kecamatan</div>
+                </div>
+                @endif
+
+                @if($isInorga)
                 <!-- 6. Inorga & Komisi -->
                 <div x-show="!menuSearch || 'inorga komisi induk organisasi olahraga tradisional petualangan kesehatan kebugaran'.includes(menuSearch.toLowerCase())" class="relative group">
                     <a href="{{ route('admin.inorga') }}" wire:navigate
@@ -312,32 +368,9 @@
                         Klasemen Medali
                     </div>
                 </div>
+                @endif
 
-                <!-- 8. Sarana & Prasarana -->
-                <div x-show="!menuSearch || 'sarana prasarana sapras fasilitas venue lapangan gedung'.includes(menuSearch.toLowerCase())" class="relative group">
-                    <a href="{{ route('admin.sapras') }}" wire:navigate
-                        class="flex items-center rounded-xl font-bold text-sm transition-all duration-150 relative overflow-hidden {{ request()->routeIs('admin.sapras*') ? 'bg-white text-emerald-950 font-black shadow-lg shadow-black/25 ring-1 ring-white/80' : 'text-emerald-100/85 hover:text-white hover:bg-white/[0.08]' }}"
-                        :class="sidebarExpanded ? 'px-3 py-2.5 gap-3' : 'w-11 h-11 justify-center mx-auto'">
-                        @if(request()->routeIs('admin.sapras*'))
-                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-5 bg-lime-500 rounded-r-md"></div>
-                        @endif
-                        <div class="w-5 h-5 flex items-center justify-center shrink-0">
-                            <i data-lucide="map-pin"
-                                class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 {{ request()->routeIs('admin.sapras*') ? 'text-emerald-700' : 'text-emerald-300/90 group-hover:text-lime-300' }}"></i>
-                        </div>
-                        <span x-show="sidebarExpanded" class="truncate whitespace-nowrap">Sarana & Prasarana</span>
-                        @if(request()->routeIs('admin.sapras*'))
-                            <span x-show="sidebarExpanded" class="ml-auto flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                            </span>
-                        @endif
-                    </a>
-                    <div x-show="!sidebarExpanded"
-                        class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1 bg-slate-900/95 text-white text-xs font-bold rounded-lg shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap">
-                        Sarana & Prasarana
-                    </div>
-                </div>
-
+                @if($isSuper)
                 <!-- 9. Pelatihan & Sertifikasi SDI -->
                 <div x-show="!menuSearch || 'pelatihan sertifikasi sdi instruktur juri wasit sumber daya'.includes(menuSearch.toLowerCase())" class="relative group">
                     <a href="{{ route('admin.sdi') }}" wire:navigate
@@ -396,7 +429,7 @@
                 </div>
 
                 <!-- 11. Kelola Pengguna -->
-                <div x-show="!menuSearch || 'pengguna user admin akun role peran'.includes(menuSearch.toLowerCase())" class="relative group">
+                <div x-show="!menuSearch || 'pengguna user admin akun'.includes(menuSearch.toLowerCase())" class="relative group">
                     <a href="{{ route('admin.pengguna') }}" wire:navigate
                         class="flex items-center rounded-xl font-bold text-sm transition-all duration-150 relative overflow-hidden {{ request()->routeIs('admin.pengguna*') ? 'bg-white text-emerald-950 font-black shadow-lg shadow-black/25 ring-1 ring-white/80' : 'text-emerald-100/85 hover:text-white hover:bg-white/[0.08]' }}"
                         :class="sidebarExpanded ? 'px-3 py-2.5 gap-3' : 'w-11 h-11 justify-center mx-auto'">
@@ -417,6 +450,31 @@
                     <div x-show="!sidebarExpanded"
                         class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1 bg-slate-900/95 text-white text-xs font-bold rounded-lg shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap">
                         Kelola Pengguna
+                    </div>
+                </div>
+
+                <!-- 12. Peran & Hak Akses -->
+                <div x-show="!menuSearch || 'peran role hak akses permission wewenang rbac'.includes(menuSearch.toLowerCase())" class="relative group">
+                    <a href="{{ route('admin.peran') }}" wire:navigate
+                        class="flex items-center rounded-xl font-bold text-sm transition-all duration-150 relative overflow-hidden {{ request()->routeIs('admin.peran*') ? 'bg-white text-emerald-950 font-black shadow-lg shadow-black/25 ring-1 ring-white/80' : 'text-emerald-100/85 hover:text-white hover:bg-white/[0.08]' }}"
+                        :class="sidebarExpanded ? 'px-3 py-2.5 gap-3' : 'w-11 h-11 justify-center mx-auto'">
+                        @if(request()->routeIs('admin.peran*'))
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-5 bg-lime-500 rounded-r-md"></div>
+                        @endif
+                        <div class="w-5 h-5 flex items-center justify-center shrink-0">
+                            <i data-lucide="shield-check"
+                                class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 {{ request()->routeIs('admin.peran*') ? 'text-emerald-700' : 'text-emerald-300/90 group-hover:text-lime-300' }}"></i>
+                        </div>
+                        <span x-show="sidebarExpanded" class="truncate whitespace-nowrap">Peran & Hak Akses</span>
+                        @if(request()->routeIs('admin.peran*'))
+                            <span x-show="sidebarExpanded" class="ml-auto flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                            </span>
+                        @endif
+                    </a>
+                    <div x-show="!sidebarExpanded"
+                        class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1 bg-slate-900/95 text-white text-xs font-bold rounded-lg shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap">
+                        Peran & Hak Akses
                     </div>
                 </div>
 
@@ -474,22 +532,6 @@
                     <div x-show="!sidebarExpanded" class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1 bg-slate-900/95 text-white text-xs font-bold rounded-lg shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap">Pengurus</div>
                 </div>
 
-                <!-- Kordik Kecamatan -->
-                <div x-show="!menuSearch || 'kordik koordinator kecamatan'.includes(menuSearch.toLowerCase())" class="relative group">
-                    <a href="{{ route('admin.kordik') }}" wire:navigate
-                        class="flex items-center rounded-xl font-bold text-sm transition-all duration-150 relative overflow-hidden {{ request()->routeIs('admin.kordik*') ? 'bg-white text-emerald-950 font-black shadow-lg shadow-black/25 ring-1 ring-white/80' : 'text-emerald-100/85 hover:text-white hover:bg-white/[0.08]' }}"
-                        :class="sidebarExpanded ? 'px-3 py-2.5 gap-3' : 'w-11 h-11 justify-center mx-auto'">
-                        @if(request()->routeIs('admin.kordik*'))
-                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-5 bg-lime-500 rounded-r-md"></div>
-                        @endif
-                        <div class="w-5 h-5 flex items-center justify-center shrink-0">
-                            <i data-lucide="map-pin" class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 {{ request()->routeIs('admin.kordik*') ? 'text-emerald-700' : 'text-emerald-300/90 group-hover:text-lime-300' }}"></i>
-                        </div>
-                        <span x-show="sidebarExpanded" class="truncate whitespace-nowrap">Kordik Kecamatan</span>
-                    </a>
-                    <div x-show="!sidebarExpanded" class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1 bg-slate-900/95 text-white text-xs font-bold rounded-lg shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap">Kordik Kecamatan</div>
-                </div>
-
                 <!-- Program Kerja -->
                 <div x-show="!menuSearch || 'program kerja proker kegiatan'.includes(menuSearch.toLowerCase())" class="relative group">
                     <a href="{{ route('admin.proker') }}" wire:navigate
@@ -527,6 +569,7 @@
                     </a>
                     <div x-show="!sidebarExpanded" class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1 bg-slate-900/95 text-white text-xs font-bold rounded-lg shadow-xl border border-white/10 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap">Pengaturan Situs</div>
                 </div>
+                @endif
 
             </nav>
         </div>
@@ -625,6 +668,8 @@
                 class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm {{ request()->routeIs('admin.dashboard') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="home" class="w-4 h-4 {{ request()->routeIs('admin.dashboard') ? 'text-emerald-700' : 'text-emerald-300' }}"></i> Dashboard
             </a>
+
+            @if($isEditor)
             <a href="{{ route('admin.berita') }}" wire:navigate @click="mobileMenuOpen = false"
                 class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm {{ request()->routeIs('admin.berita*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="newspaper" class="w-4 h-4 {{ request()->routeIs('admin.berita*') ? 'text-emerald-700' : 'text-emerald-300' }}"></i> Berita & Artikel
@@ -637,10 +682,24 @@
                 class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm {{ request()->routeIs('admin.unduhan*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="book-open" class="w-4 h-4 {{ request()->routeIs('admin.unduhan*') ? 'text-emerald-700' : 'text-emerald-300' }}"></i> Dokumen Unduhan
             </a>
+            @endif
+
+            @if($isKorcam)
             <a href="{{ route('admin.duta') }}" wire:navigate @click="mobileMenuOpen = false"
                 class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm {{ request()->routeIs('admin.duta*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="user-check" class="w-4 h-4 {{ request()->routeIs('admin.duta*') ? 'text-emerald-700' : 'text-emerald-300' }}"></i> Duta Olahraga
             </a>
+            <a href="{{ route('admin.sapras') }}" wire:navigate @click="mobileMenuOpen = false"
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm {{ request()->routeIs('admin.sapras*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
+                <i data-lucide="map-pin" class="w-4 h-4 {{ request()->routeIs('admin.sapras*') ? 'text-emerald-700' : 'text-emerald-300' }}"></i> Sarana & Prasarana
+            </a>
+            <a href="{{ route('admin.kordik') }}" wire:navigate @click="mobileMenuOpen = false"
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm {{ request()->routeIs('admin.kordik*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
+                <i data-lucide="network" class="w-4 h-4"></i> Kordik Kecamatan
+            </a>
+            @endif
+
+            @if($isInorga)
             <a href="{{ route('admin.inorga') }}" wire:navigate @click="mobileMenuOpen = false"
                 class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm {{ request()->routeIs('admin.inorga*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="pie-chart" class="w-4 h-4 {{ request()->routeIs('admin.inorga*') ? 'text-emerald-700' : 'text-emerald-300' }}"></i> Inorga & Komisi
@@ -653,10 +712,9 @@
                 class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm {{ request()->routeIs('admin.klasemen*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="trophy" class="w-4 h-4 {{ request()->routeIs('admin.klasemen*') ? 'text-emerald-700' : 'text-emerald-300' }}"></i> Klasemen Medali
             </a>
-            <a href="{{ route('admin.sapras') }}" wire:navigate @click="mobileMenuOpen = false"
-                class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm {{ request()->routeIs('admin.sapras*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
-                <i data-lucide="map-pin" class="w-4 h-4 {{ request()->routeIs('admin.sapras*') ? 'text-emerald-700' : 'text-emerald-300' }}"></i> Sarana & Prasarana
-            </a>
+            @endif
+
+            @if($isSuper)
             <a href="{{ route('admin.sdi') }}" wire:navigate @click="mobileMenuOpen = false"
                 class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm {{ request()->routeIs('admin.sdi*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="graduation-cap" class="w-4 h-4 {{ request()->routeIs('admin.sdi*') ? 'text-emerald-700' : 'text-emerald-300' }}"></i> Pelatihan SDI
@@ -668,6 +726,10 @@
             <a href="{{ route('admin.pengguna') }}" wire:navigate @click="mobileMenuOpen = false"
                 class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm {{ request()->routeIs('admin.pengguna*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="users" class="w-4 h-4 {{ request()->routeIs('admin.pengguna*') ? 'text-emerald-700' : 'text-emerald-300' }}"></i> Kelola Pengguna
+            </a>
+            <a href="{{ route('admin.peran') }}" wire:navigate @click="mobileMenuOpen = false"
+                class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm {{ request()->routeIs('admin.peran*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
+                <i data-lucide="shield-check" class="w-4 h-4 {{ request()->routeIs('admin.peran*') ? 'text-emerald-700' : 'text-emerald-300' }}"></i> Peran & Hak Akses
             </a>
             <div class="pt-2 border-t border-white/10 my-1">
                 <p class="px-4 text-[10px] font-black text-emerald-300/60 uppercase tracking-widest mb-1">Organisasi & Web</p>
@@ -684,10 +746,6 @@
                 class="flex items-center gap-3 px-4 py-2 rounded-xl font-bold text-sm {{ request()->routeIs('admin.pengurus*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="user-check" class="w-4 h-4"></i> Pengurus
             </a>
-            <a href="{{ route('admin.kordik') }}" wire:navigate @click="mobileMenuOpen = false"
-                class="flex items-center gap-3 px-4 py-2 rounded-xl font-bold text-sm {{ request()->routeIs('admin.kordik*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
-                <i data-lucide="network" class="w-4 h-4"></i> Kordik Kecamatan
-            </a>
             <a href="{{ route('admin.proker') }}" wire:navigate @click="mobileMenuOpen = false"
                 class="flex items-center gap-3 px-4 py-2 rounded-xl font-bold text-sm {{ request()->routeIs('admin.proker*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="check-square" class="w-4 h-4"></i> Program Kerja
@@ -696,6 +754,7 @@
                 class="flex items-center gap-3 px-4 py-2 rounded-xl font-bold text-sm {{ request()->routeIs('admin.pengaturan*') ? 'bg-white text-emerald-950 font-black shadow-md' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="settings" class="w-4 h-4"></i> Pengaturan Situs
             </a>
+            @endif
         </div>
 
         <!-- MAIN FULL WIDTH CONTENT CONTAINER -->

@@ -18,62 +18,259 @@
         </div>
     </div>
 
-    <!-- 2. QUICK ACTION PILLS (COLORFUL BADGES WITH PLUS ICON) -->
-    <div class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
-        <a href="{{ route('admin.berita') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="newspaper" class="w-4 h-4"></i>
-            <span>Tulis Berita +</span>
-        </a>
+    <!-- 2. EXECUTIVE QUICK HUB / SEMUA MENU SIDEBAR (COMPACT & ULTRA PREMIUM) -->
+    @php
+        $user = auth()->user();
+        $isSuper = $user?->isSuperAdmin() ?? false;
+        $isEditor = $isSuper || ($user?->isEditorBerita() ?? false) || ($user?->punyaAkses('berita') ?? false);
+        $isKorcam = $isSuper || ($user?->isAdminKorcam() ?? false) || ($user?->punyaAkses('duta') ?? false);
+        $isInorga = $isSuper || ($user?->isAdminInorga() ?? false) || ($user?->punyaAkses('inorga') ?? false);
+    @endphp
 
-        <a href="{{ route('admin.galeri') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="image" class="w-4 h-4"></i>
-            <span>Unggah Galeri +</span>
-        </a>
+    <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center shadow-sm shadow-emerald-600/30">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h2 class="text-xs sm:text-sm font-black text-slate-900 tracking-tight uppercase">Pusat Navigasi & Menu Portal</h2>
+                    <p class="text-[10px] font-semibold text-slate-400">Akses langsung ke seluruh modul aktif sistem KORMI</p>
+                </div>
+            </div>
+            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/60 hidden sm:inline-flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Semua Menu Sidebar</span>
+            </span>
+        </div>
 
-        <a href="{{ route('admin.unduhan') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="file-text" class="w-4 h-4"></i>
-            <span>Dokumen SK +</span>
-        </a>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+            
+            @if($isEditor)
+            <!-- 1. Berita & Publikasi -->
+            <a href="{{ route('admin.berita') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/90 border border-slate-200/70 hover:border-emerald-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-emerald-600/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="newspaper" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-emerald-950 truncate">Berita & Publikasi</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-emerald-700 truncate">Warta & Berita</span>
+                </div>
+            </a>
 
-        <a href="{{ route('admin.duta') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="user-check" class="w-4 h-4"></i>
-            <span>Duta Olahraga +</span>
-        </a>
+            <!-- 2. Galeri Dokumentasi -->
+            <a href="{{ route('admin.galeri') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-teal-50/90 border border-slate-200/70 hover:border-teal-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-teal-600/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="image" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-teal-950 truncate">Galeri Dokumentasi</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-teal-700 truncate">Dokumentasi Foto</span>
+                </div>
+            </a>
 
-        <a href="{{ route('admin.inorga') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-lime-600 hover:bg-lime-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="shapes" class="w-4 h-4"></i>
-            <span>Inorga & Komisi +</span>
-        </a>
+            <!-- 3. Dokumen Unduhan -->
+            <a href="{{ route('admin.unduhan') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-amber-50/90 border border-slate-200/70 hover:border-amber-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs shadow-amber-500/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="file-down" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-amber-950 truncate">Dokumen Unduhan</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-amber-700 truncate">Berkas & Regulasi</span>
+                </div>
+            </a>
+            @endif
 
-        <a href="{{ route('admin.klasemen') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="trophy" class="w-4 h-4"></i>
-            <span>Input Medali +</span>
-        </a>
+            @if($isKorcam)
+            <!-- 4. Duta Olahraga -->
+            <a href="{{ route('admin.duta') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-cyan-50/90 border border-slate-200/70 hover:border-cyan-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-cyan-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-cyan-600/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="user-check" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-cyan-950 truncate">Duta Olahraga</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-cyan-700 truncate">Kecamatan & Desa</span>
+                </div>
+            </a>
 
-        <a href="{{ route('admin.sapras') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="map-pin" class="w-4 h-4"></i>
-            <span>Fasilitas SAPRAS +</span>
-        </a>
+            <!-- 5. Kordik Kecamatan -->
+            <a href="{{ route('admin.kordik') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-sky-50/90 border border-slate-200/70 hover:border-sky-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-sky-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-sky-600/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="map-pin" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-sky-950 truncate">Kordik Kecamatan</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-sky-700 truncate">Koordinator Wilayah</span>
+                </div>
+            </a>
 
-        <a href="{{ route('admin.event') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="calendar" class="w-4 h-4"></i>
-            <span>Event & Jadwal +</span>
-        </a>
+            <!-- 6. Sarana & Prasarana -->
+            <a href="{{ route('admin.sapras') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/90 border border-slate-200/70 hover:border-emerald-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-xs shadow-emerald-700/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="building-2" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-emerald-950 truncate">Sarana & Prasarana</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-emerald-700 truncate">Venue & Fasilitas</span>
+                </div>
+            </a>
+            @endif
 
-        <a href="{{ route('admin.pengurus') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-teal-800 hover:bg-teal-900 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="user-check" class="w-4 h-4"></i>
-            <span>Pengurus +</span>
-        </a>
+            @if($isInorga)
+            <!-- 7. Inorga & Komisi -->
+            <a href="{{ route('admin.inorga') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-lime-50/90 border border-slate-200/70 hover:border-lime-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-lime-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-lime-600/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="boxes" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-lime-950 truncate">Inorga & Komisi</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-lime-700 truncate">Induk Olahraga</span>
+                </div>
+            </a>
 
-        <a href="{{ route('admin.proker') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-emerald-900 hover:bg-slate-900 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="clipboard-list" class="w-4 h-4"></i>
-            <span>Program Kerja +</span>
-        </a>
+            <!-- 8. Kelola Event -->
+            <a href="{{ route('admin.event') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-indigo-50/90 border border-slate-200/70 hover:border-indigo-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-indigo-600/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="calendar-days" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-indigo-950 truncate">Kelola Event</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-indigo-700 truncate">Jadwal & Agenda</span>
+                </div>
+            </a>
 
-        <a href="{{ route('admin.pengaturan') }}" wire:navigate class="px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all whitespace-nowrap cursor-pointer">
-            <i data-lucide="settings" class="w-4 h-4"></i>
-            <span>Pengaturan Situs</span>
-        </a>
+            <!-- 9. Klasemen Medali -->
+            <a href="{{ route('admin.klasemen') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-orange-50/90 border border-slate-200/70 hover:border-orange-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs shadow-orange-500/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="trophy" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-orange-950 truncate">Klasemen Medali</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-orange-700 truncate">Perolehan Medali</span>
+                </div>
+            </a>
+            @endif
+
+            @if($isSuper)
+            <!-- 10. Pelatihan & SDI -->
+            <a href="{{ route('admin.sdi') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-blue-50/90 border border-slate-200/70 hover:border-blue-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-blue-600/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="graduation-cap" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-blue-950 truncate">Pelatihan & SDI</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-blue-700 truncate">SDM & Sertifikasi</span>
+                </div>
+            </a>
+
+            <!-- 11. Anugerah APMO -->
+            <a href="{{ route('admin.apmo') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-amber-50/90 border border-slate-200/70 hover:border-amber-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-amber-600/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="award" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-amber-950 truncate">Anugerah APMO</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-amber-700 truncate">Apresiasi & Tokoh</span>
+                </div>
+            </a>
+
+            <!-- 12. Sejarah KORMI -->
+            <a href="{{ route('admin.sejarah') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/90 border border-slate-200/70 hover:border-emerald-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-emerald-800 text-white flex items-center justify-center shrink-0 shadow-xs shadow-emerald-800/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="clock" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-emerald-950 truncate">Linimasa Sejarah</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-emerald-700 truncate">Histori Organisasi</span>
+                </div>
+            </a>
+
+            <!-- 13. Visi & Misi -->
+            <a href="{{ route('admin.visimisi') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-teal-50/90 border border-slate-200/70 hover:border-teal-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-teal-700 text-white flex items-center justify-center shrink-0 shadow-xs shadow-teal-700/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="target" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-teal-950 truncate">Visi & Misi</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-teal-700 truncate">Arah Kebijakan</span>
+                </div>
+            </a>
+
+            <!-- 14. Pengurus KORMI -->
+            <a href="{{ route('admin.pengurus') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-violet-50/90 border border-slate-200/70 hover:border-violet-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-violet-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-violet-600/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="users" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-violet-950 truncate">Pengurus KORMI</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-violet-700 truncate">Struktur Pengurus</span>
+                </div>
+            </a>
+
+            <!-- 15. Program Kerja -->
+            <a href="{{ route('admin.proker') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-rose-50/90 border border-slate-200/70 hover:border-rose-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-rose-600/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="clipboard-list" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-rose-950 truncate">Program Kerja</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-rose-700 truncate">Rencana Kegiatan</span>
+                </div>
+            </a>
+
+            <!-- 16. Kelola Pengguna -->
+            <a href="{{ route('admin.pengguna') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-slate-100 border border-slate-200/70 hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-slate-700 text-white flex items-center justify-center shrink-0 shadow-xs shadow-slate-700/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="users-round" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-slate-950 truncate">Kelola Pengguna</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-slate-700 truncate">Akun & Operator</span>
+                </div>
+            </a>
+
+            <!-- 17. Peran & Akses -->
+            <a href="{{ route('admin.peran') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/90 border border-slate-200/70 hover:border-emerald-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-emerald-900 text-white flex items-center justify-center shrink-0 shadow-xs shadow-emerald-900/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="shield-check" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-emerald-950 truncate">Peran & Akses</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-emerald-700 truncate">Manajemen RBAC</span>
+                </div>
+            </a>
+
+            <!-- 18. Pengaturan Portal -->
+            <a href="{{ route('admin.pengaturan') }}" wire:navigate 
+                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-slate-100 border border-slate-200/70 hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
+                <div class="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center shrink-0 shadow-xs shadow-slate-800/25 group-hover:scale-105 transition-transform">
+                    <i data-lucide="settings" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="block text-xs font-black text-slate-900 group-hover:text-slate-950 truncate">Pengaturan</span>
+                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-slate-700 truncate">Konfigurasi Situs</span>
+                </div>
+            </a>
+            @endif
+
+        </div>
     </div>
 
     <!-- 3. MAIN DASHBOARD GRID (LEFT 2-COLUMNS CONTENT + RIGHT TO-DO & UPGRADE PRO SIDEBAR) -->

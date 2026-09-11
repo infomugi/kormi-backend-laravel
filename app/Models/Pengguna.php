@@ -48,6 +48,46 @@ class Pengguna extends Authenticatable
         return $this->belongsTo(Peran::class, 'peran_id');
     }
 
+    public function isSuperAdmin(): bool
+    {
+        $slug = $this->peran?->slug;
+        return $slug === 'super-admin' || $slug === 'superadmin' || $slug === 'admin';
+    }
+
+    public function isAdminKorcam(): bool
+    {
+        return $this->peran?->slug === 'admin-korcam';
+    }
+
+    public function isAdminInorga(): bool
+    {
+        return $this->peran?->slug === 'admin-inorga';
+    }
+
+    public function isEditorBerita(): bool
+    {
+        return $this->peran?->slug === 'editor-berita';
+    }
+
+    public function hasRole(string ...$roles): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        $userSlug = $this->peran?->slug;
+        return in_array($userSlug, $roles, true);
+    }
+
+    public function punyaAkses(string $modulKey): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        return $this->peran ? $this->peran->punyaAkses($modulKey) : false;
+    }
+
     public function getFotoProfilUrlAttribute(): ?string
     {
         if (empty($this->foto_profil)) {

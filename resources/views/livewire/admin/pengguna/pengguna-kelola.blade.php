@@ -44,14 +44,24 @@
                 color="blue"
             >
                 <x-slot:actions>
-                    <button 
-                        type="button" 
-                        wire:click="bukaFormTambah"
-                        class="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-md shadow-blue-600/20 hover:shadow-lg transition-all cursor-pointer active:scale-95 group"
-                    >
-                        <i data-lucide="user-plus" class="w-4 h-4 transition-transform group-hover:scale-110 duration-200"></i>
-                        <span>Tambah Pengguna Baru</span>
-                    </button>
+                    <div class="flex items-center gap-2.5">
+                        <a 
+                            href="{{ route('admin.peran') }}" 
+                            wire:navigate
+                            class="inline-flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs uppercase tracking-wider border border-emerald-200/80 transition-all cursor-pointer"
+                        >
+                            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+                            <span>Peran & Hak Akses</span>
+                        </a>
+                        <button 
+                            type="button" 
+                            wire:click="bukaFormTambah"
+                            class="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-md shadow-blue-600/20 hover:shadow-lg transition-all cursor-pointer active:scale-95 group"
+                        >
+                            <i data-lucide="user-plus" class="w-4 h-4 transition-transform group-hover:scale-110 duration-200"></i>
+                            <span>Tambah Pengguna Baru</span>
+                        </button>
+                    </div>
                 </x-slot:actions>
             </x-table.header>
 

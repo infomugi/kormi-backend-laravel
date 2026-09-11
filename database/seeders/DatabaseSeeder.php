@@ -24,20 +24,52 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Role & Super Admin
-        $peranAdmin = Peran::create([
-            'nama_peran' => 'Super Administrator',
-            'slug' => 'super-admin',
-            'deskripsi' => 'Pengelola sistem utama KORMI'
-        ]);
+        $peranSuperAdmin = Peran::updateOrCreate(
+            ['slug' => 'super-admin'],
+            [
+                'nama_peran' => 'Super Admin',
+                'deskripsi' => 'Pengelola sistem utama & seluruh hak akses modul KORMI',
+                'hak_akses' => ['*'],
+            ]
+        );
 
-        $admin = Pengguna::create([
-            'peran_id' => $peranAdmin->id,
-            'nama_lengkap' => 'Admin KORMI',
-            'email' => 'admin@kormibdg.id',
-            'kata_sandi' => bcrypt('password'),
-            'nomor_telepon' => '081234567890',
-            'status_aktif' => true,
-        ]);
+        $peranKorcam = Peran::updateOrCreate(
+            ['slug' => 'admin-korcam'],
+            [
+                'nama_peran' => 'Admin KORCAM',
+                'deskripsi' => 'Pengelola data wilayah kecamatan, kordik, duta desa, & venue sarana prasarana',
+                'hak_akses' => ['duta', 'kordik', 'sapras'],
+            ]
+        );
+
+        $peranInorga = Peran::updateOrCreate(
+            ['slug' => 'admin-inorga'],
+            [
+                'nama_peran' => 'Admin INORGA',
+                'deskripsi' => 'Pengelola induk organisasi, komisi rumpun olahraga, & klasemen kompetisi',
+                'hak_akses' => ['inorga', 'event', 'klasemen'],
+            ]
+        );
+
+        $peranEditor = Peran::updateOrCreate(
+            ['slug' => 'editor-berita'],
+            [
+                'nama_peran' => 'Editor Berita',
+                'deskripsi' => 'Pengelola publikasi warta, artikel liputan, & album dokumentasi galeri',
+                'hak_akses' => ['berita', 'galeri', 'unduhan'],
+            ]
+        );
+
+        $admin = Pengguna::updateOrCreate(
+            ['email' => 'admin@kormibdg.id'],
+            [
+                'peran_id' => $peranSuperAdmin->id,
+                'nama_lengkap' => 'Super Admin KORMI',
+                'kata_sandi' => bcrypt('admin@kormibdg.id'),
+                'nomor_telepon' => '081234567890',
+                'status_aktif' => true,
+            ]
+        );
 
         // 2. Pengaturan Situs
         $settings = [

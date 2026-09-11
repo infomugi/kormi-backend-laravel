@@ -33,13 +33,6 @@ class Masuk extends Component
         $this->showPassword = !$this->showPassword;
     }
 
-    public function fillAdminCredentials()
-    {
-        $this->email = 'admin@kormibdg.id';
-        $this->kata_sandi = 'password';
-        $this->resetErrorBag();
-    }
-
     public function directBypassLogin()
     {
         try {
@@ -80,7 +73,7 @@ class Masuk extends Component
 
             // Check if user account is active
             if (isset($user->status_aktif) && !$user->status_aktif) {
-                $this->addError('email', 'Akun Anda sedang dinonaktifkan. Silakan hubungi Sekretariat KORMI.');
+                $this->addError('email', 'Akun Anda belum disetujui oleh Administrator KORMI atau sedang dinonaktifkan. Silakan hubungi pengelola CMS.');
                 return;
             }
 
