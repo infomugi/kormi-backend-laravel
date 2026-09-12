@@ -72,7 +72,7 @@ class GaleriKelola extends Component
     protected function rulesFoto(): array
     {
         $rules = [
-            'album_id'   => 'required|exists:kormi_galeri_album,id',
+            'album_id'   => 'required|exists:media_galeri_album,id',
             'judul_foto' => 'required|min:3|max:150',
             'tipe_grid'  => 'required|in:normal,col-span-2,col-span-2 row-span-2,col-span-1 row-span-2,col-span-2 row-span-1',
             'urutan_foto'=> 'required|integer',
@@ -86,7 +86,7 @@ class GaleriKelola extends Component
     protected function rulesBulkFoto(): array
     {
         return [
-            'bulk_album_id'      => 'required|exists:kormi_galeri_album,id',
+            'bulk_album_id'      => 'required|exists:media_galeri_album,id',
             'uploadBulkFoto'     => 'required|array|min:1',
             'uploadBulkFoto.*'   => 'image|mimes:jpg,jpeg,png,webp|max:10240',
             'bulk_judul_prefix'  => 'nullable|max:100',

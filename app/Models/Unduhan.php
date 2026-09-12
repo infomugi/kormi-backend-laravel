@@ -11,7 +11,7 @@ class Unduhan extends ModelDasar
 
     const DELETED_AT = 'dihapus_pada';
 
-    protected $table = 'kormi_unduhan';
+    protected $table = 'media_unduhan';
 
     protected $casts = [
         'status_publik' => 'boolean',

@@ -8,6 +8,17 @@ class PengurusModel extends ModelDasar
 {
     protected $table = 'kormi_pengurus';
 
+    protected $fillable = [
+        'id',
+        'periode_id',
+        'nama_lengkap',
+        'jabatan',
+        'kategori_bidang',
+        'foto_url',
+        'urutan',
+        'status_tampil',
+    ];
+
     protected $casts = [
         'urutan' => 'integer',
         'status_tampil' => 'boolean',

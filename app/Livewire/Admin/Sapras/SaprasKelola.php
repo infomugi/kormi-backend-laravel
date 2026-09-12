@@ -50,7 +50,7 @@ class SaprasKelola extends Component
     protected function rules(): array
     {
         $rules = [
-            'kecamatan_id'           => 'required|exists:kormi_kecamatan,id',
+            'kecamatan_id'           => 'required|exists:ref_kecamatan,id',
             'nama_fasilitas'         => 'required|min:3|max:150',
             'kategori_fasilitas'     => 'required|string',
             'alamat_lengkap'         => 'required|min:5',

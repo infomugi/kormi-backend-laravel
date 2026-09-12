@@ -50,11 +50,11 @@ class BeritaForm extends Component
         $rules = [
             'judul'             => 'required|min:5|max:255',
             'slug'              => 'required|max:255',
-            'kategori_id'       => 'required|exists:kormi_kategori_berita,id',
+            'kategori_id'       => 'required|exists:media_kategori_berita,id',
             'ringkasan'         => 'required|max:500',
             'isi_konten'        => 'required|min:10',
             'status_publikasi'  => 'required|in:draft,published,archived',
-            'penulis_id'        => 'nullable|exists:kormi_pengguna,id',
+            'penulis_id'        => 'nullable|exists:sys_pengguna,id',
             'keterangan_gambar' => 'nullable|max:255',
             'tanggal_publikasi' => 'nullable|date',
         ];
@@ -345,7 +345,7 @@ class BeritaForm extends Component
     public function simpanKategoriBaru(): void
     {
         $this->validate([
-            'kategoriBaruNama' => 'required|min:3|max:100|unique:kormi_kategori_berita,nama_kategori',
+            'kategoriBaruNama' => 'required|min:3|max:100|unique:media_kategori_berita,nama_kategori',
             'kategoriBaruWarna' => 'required',
         ], [
             'kategoriBaruNama.required' => 'Nama kategori wajib diisi.',

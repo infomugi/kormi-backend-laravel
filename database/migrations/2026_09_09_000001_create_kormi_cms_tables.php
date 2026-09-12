@@ -8,19 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. PERAN & PENGGUNA
-        Schema::create('kormi_peran', function (Blueprint $table) {
+        // 1. SISTEM & OTENTIKASI (sys_*)
+        Schema::create('sys_peran', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('nama_peran', 50);
             $table->string('slug', 50)->unique();
             $table->string('deskripsi', 255)->nullable();
+            $table->json('hak_akses')->nullable();
             $table->timestamp('dibuat_pada')->useCurrent();
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
 
-        Schema::create('kormi_pengguna', function (Blueprint $table) {
+        Schema::create('sys_pengguna', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('peran_id')->constrained('kormi_peran')->restrictOnDelete();
+            $table->foreignUuid('peran_id')->constrained('sys_peran')->restrictOnDelete();
             $table->string('nama_lengkap', 100);
             $table->string('email', 100)->unique();
             $table->string('kata_sandi', 255);
@@ -34,12 +35,72 @@ return new class extends Migration
             $table->softDeletes('dihapus_pada');
         });
 
-        // 2. PENGATURAN SITUS & SEJARAH
-        Schema::create('kormi_pengaturan_situs', function (Blueprint $table) {
+        Schema::create('sys_pengaturan_situs', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('kunci_pengaturan', 100)->unique();
             $table->longText('nilai_pengaturan')->nullable();
             $table->string('kelompok', 50)->default('umum');
+            $table->timestamp('dibuat_pada')->useCurrent();
+            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
+        });
+
+        Schema::create('sys_log_aktivitas', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('pengguna_id')->nullable()->constrained('sys_pengguna')->nullOnDelete();
+            $table->string('jenis_aksi', 50);
+            $table->string('nama_tabel', 100);
+            $table->uuid('id_entitas')->nullable();
+            $table->json('data_lama')->nullable();
+            $table->json('data_baru')->nullable();
+            $table->string('alamat_ip', 45)->nullable();
+            $table->string('agen_pengguna', 255)->nullable();
+            $table->timestamp('dibuat_pada')->useCurrent();
+        });
+
+        // 2. REFERENSI WILAYAH (ref_*)
+        Schema::create('ref_kecamatan', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('nama_kecamatan', 100);
+            $table->string('slug', 100)->unique();
+            $table->string('alamat_kantor', 255)->nullable();
+            $table->string('nomor_telepon', 25)->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->timestamp('dibuat_pada')->useCurrent();
+            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
+        });
+
+        Schema::create('ref_desa_kelurahan', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('kecamatan_id')->constrained('ref_kecamatan')->cascadeOnDelete();
+            $table->string('nama_desa_kelurahan', 100);
+            $table->string('slug', 100);
+            $table->enum('jenis', ['desa', 'kelurahan'])->default('desa');
+            $table->timestamp('dibuat_pada')->useCurrent();
+            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
+            $table->unique(['kecamatan_id', 'slug']);
+        });
+
+        // 3. KELEMBAGAAN & STRUKTUR KORMI (kormi_*)
+        Schema::create('kormi_periode_kepengurusan', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('nama_periode', 50);
+            $table->year('tahun_mulai');
+            $table->year('tahun_selesai');
+            $table->boolean('status_aktif')->default(false);
+            $table->timestamp('dibuat_pada')->useCurrent();
+            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
+        });
+
+        Schema::create('kormi_pengurus', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('periode_id')->constrained('kormi_periode_kepengurusan')->cascadeOnDelete();
+            $table->string('nama_lengkap', 150);
+            $table->string('jabatan', 100);
+            $table->string('kategori_bidang', 100)->nullable();
+            $table->string('foto_url', 255)->nullable();
+            $table->integer('urutan')->default(0);
+            $table->boolean('status_tampil')->default(true);
             $table->timestamp('dibuat_pada')->useCurrent();
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
@@ -67,85 +128,6 @@ return new class extends Migration
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
 
-        // 3. WILAYAH (31 KECAMATAN & DESA)
-        Schema::create('kormi_kecamatan', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('nama_kecamatan', 100);
-            $table->string('slug', 100)->unique();
-            $table->string('alamat_kantor', 255)->nullable();
-            $table->string('nomor_telepon', 25)->nullable();
-            $table->decimal('latitude', 10, 8)->nullable();
-            $table->decimal('longitude', 11, 8)->nullable();
-            $table->timestamp('dibuat_pada')->useCurrent();
-            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
-        });
-
-        Schema::create('kormi_desa_kelurahan', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('kecamatan_id')->constrained('kormi_kecamatan')->cascadeOnDelete();
-            $table->string('nama_desa_kelurahan', 100);
-            $table->string('slug', 100);
-            $table->enum('jenis', ['desa', 'kelurahan'])->default('desa');
-            $table->timestamp('dibuat_pada')->useCurrent();
-            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
-            $table->unique(['kecamatan_id', 'slug']);
-        });
-
-        // 4. STRUKTUR PENGURUS, KORDIK, DUTA, PROKER
-        Schema::create('kormi_periode_kepengurusan', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('nama_periode', 50);
-            $table->year('tahun_mulai');
-            $table->year('tahun_selesai');
-            $table->boolean('status_aktif')->default(false);
-            $table->timestamp('dibuat_pada')->useCurrent();
-            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
-        });
-
-        Schema::create('kormi_pengurus', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('periode_id')->constrained('kormi_periode_kepengurusan')->cascadeOnDelete();
-            $table->string('nama_lengkap', 150);
-            $table->string('jabatan', 100);
-            $table->string('kategori_bidang', 100)->nullable();
-            $table->string('foto_url', 255)->nullable();
-            $table->integer('urutan')->default(0);
-            $table->boolean('status_tampil')->default(true);
-            $table->timestamp('dibuat_pada')->useCurrent();
-            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
-        });
-
-        Schema::create('kormi_kordik_pengurus', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('kecamatan_id')->constrained('kormi_kecamatan')->cascadeOnDelete();
-            $table->foreignUuid('periode_id')->constrained('kormi_periode_kepengurusan')->cascadeOnDelete();
-            $table->string('nama_ketua', 150);
-            $table->string('nama_sekretaris', 150)->nullable();
-            $table->string('nama_bendahara', 150)->nullable();
-            $table->string('nomor_telepon', 25)->nullable();
-            $table->string('nomor_sk', 100)->nullable();
-            $table->string('foto_ketua_url', 255)->nullable();
-            $table->boolean('status_aktif')->default(true);
-            $table->timestamp('dibuat_pada')->useCurrent();
-            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
-        });
-
-        Schema::create('kormi_duta_olahraga', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('kecamatan_id')->constrained('kormi_kecamatan')->restrictOnDelete();
-            $table->foreignUuid('desa_kelurahan_id')->nullable()->constrained('kormi_desa_kelurahan')->nullOnDelete();
-            $table->string('nama_lengkap', 150);
-            $table->integer('tahun_pemilihan')->default(2026);
-            $table->string('kategori_duta', 100)->default('Duta Olahraga Masyarakat');
-            $table->string('gelar_prestasi', 150)->nullable();
-            $table->text('deskripsi_prestasi')->nullable();
-            $table->string('akun_instagram', 100)->nullable();
-            $table->string('foto_url', 255)->nullable();
-            $table->boolean('status_unggulan')->default(false);
-            $table->timestamp('dibuat_pada')->useCurrent();
-            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
-        });
-
         Schema::create('kormi_program_kerja', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->integer('tahun_anggaran');
@@ -162,7 +144,22 @@ return new class extends Migration
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
 
-        // 5. INORGA & KOMISI
+        Schema::create('kormi_kordik_pengurus', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('kecamatan_id')->constrained('ref_kecamatan')->cascadeOnDelete();
+            $table->foreignUuid('periode_id')->constrained('kormi_periode_kepengurusan')->cascadeOnDelete();
+            $table->string('nama_ketua', 150);
+            $table->string('nama_sekretaris', 150)->nullable();
+            $table->string('nama_bendahara', 150)->nullable();
+            $table->string('nomor_telepon', 25)->nullable();
+            $table->string('nomor_sk', 100)->nullable();
+            $table->string('foto_ketua_url', 255)->nullable();
+            $table->boolean('status_aktif')->default(true);
+            $table->timestamp('dibuat_pada')->useCurrent();
+            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
+        });
+
+        // 4. KEOLAHRAGAAN, INORGA & APRESIASI (kormi_*)
         Schema::create('kormi_komisi_inorga', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('nama_komisi', 100);
@@ -195,76 +192,31 @@ return new class extends Migration
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
 
-        // 6. EVENT, CABANG, KLASEMEN, JADWAL
-        Schema::create('kormi_kategori_event', function (Blueprint $table) {
+        Schema::create('kormi_duta_olahraga', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('nama_kategori', 100);
-            $table->string('slug', 100)->unique();
+            $table->foreignUuid('kecamatan_id')->constrained('ref_kecamatan')->restrictOnDelete();
+            $table->foreignUuid('desa_kelurahan_id')->nullable()->constrained('ref_desa_kelurahan')->nullOnDelete();
+            $table->string('nama_lengkap', 150);
+            $table->enum('jenis_kelamin', ['L', 'P'])->default('L');
+            $table->string('tempat_lahir', 100)->nullable();
+            $table->date('tanggal_lahir')->nullable();
+            $table->string('nomor_telepon', 25)->nullable();
+            $table->string('email', 100)->nullable();
+            $table->text('alamat_domisili')->nullable();
+            $table->string('pekerjaan_profesi', 100)->nullable();
+            $table->string('pendidikan_terakhir', 50)->nullable();
+            $table->integer('tahun_pemilihan')->default(2026);
+            $table->string('kategori_duta', 100)->default('Duta Olahraga Masyarakat');
+            $table->string('gelar_prestasi', 150)->nullable();
+            $table->text('deskripsi_prestasi')->nullable();
+            $table->string('akun_instagram', 100)->nullable();
+            $table->string('foto_url', 255)->nullable();
+            $table->boolean('status_aktif')->default(true);
+            $table->boolean('status_unggulan')->default(false);
             $table->timestamp('dibuat_pada')->useCurrent();
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
 
-        Schema::create('kormi_event', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('kategori_event_id')->constrained('kormi_kategori_event')->restrictOnDelete();
-            $table->string('judul_event', 200);
-            $table->string('slug', 200)->unique();
-            $table->integer('tahun_edisi');
-            $table->string('lokasi_utama', 255);
-            $table->date('tanggal_mulai');
-            $table->date('tanggal_selesai');
-            $table->string('banner_url', 255)->nullable();
-            $table->string('logo_event_url', 255)->nullable();
-            $table->longText('deskripsi_lengkap')->nullable();
-            $table->string('tautan_eksternal', 255)->nullable();
-            $table->boolean('status_publikasi')->default(true);
-            $table->timestamp('dibuat_pada')->useCurrent();
-            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
-        });
-
-        Schema::create('kormi_event_cabang', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('event_id')->constrained('kormi_event')->cascadeOnDelete();
-            $table->foreignUuid('inorga_id')->nullable()->constrained('kormi_inorga')->nullOnDelete();
-            $table->string('nama_cabang', 150);
-            $table->string('kategori_peserta', 100)->nullable();
-            $table->string('aturan_juknis_url', 255)->nullable();
-            $table->string('ikon', 50)->default('award');
-            $table->string('kode_warna_hex', 20)->default('bg-amber-500');
-            $table->timestamp('dibuat_pada')->useCurrent();
-            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
-        });
-
-        Schema::create('kormi_event_klasemen_medali', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('event_id')->constrained('kormi_event')->cascadeOnDelete();
-            $table->foreignUuid('kecamatan_id')->constrained('kormi_kecamatan')->cascadeOnDelete();
-            $table->integer('jumlah_emas')->default(0);
-            $table->integer('jumlah_perak')->default(0);
-            $table->integer('jumlah_perunggu')->default(0);
-            $table->integer('total_medali')->default(0);
-            $table->integer('peringkat')->default(0);
-            $table->timestamp('dibuat_pada')->useCurrent();
-            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
-            $table->unique(['event_id', 'kecamatan_id']);
-        });
-
-        Schema::create('kormi_event_jadwal', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('event_id')->constrained('kormi_event')->cascadeOnDelete();
-            $table->string('fase_tahapan', 100);
-            $table->date('tanggal');
-            $table->time('jam_mulai')->nullable();
-            $table->time('jam_selesai')->nullable();
-            $table->string('nama_kegiatan', 200);
-            $table->string('tempat_arena', 150);
-            $table->enum('status_tahapan', ['selesai', 'berlangsung', 'akan_datang'])->default('akan_datang');
-            $table->string('keterangan', 255)->nullable();
-            $table->timestamp('dibuat_pada')->useCurrent();
-            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
-        });
-
-        // 7. APMO
         Schema::create('kormi_apmo_tahun', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->integer('tahun')->unique();
@@ -289,7 +241,6 @@ return new class extends Migration
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
 
-        // 8. SDI
         Schema::create('kormi_sdi_program', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('judul_program', 200);
@@ -320,7 +271,7 @@ return new class extends Migration
         Schema::create('kormi_sdi_peserta', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('jadwal_id')->constrained('kormi_sdi_jadwal')->cascadeOnDelete();
-            $table->foreignUuid('kecamatan_id')->nullable()->constrained('kormi_kecamatan')->nullOnDelete();
+            $table->foreignUuid('kecamatan_id')->nullable()->constrained('ref_kecamatan')->nullOnDelete();
             $table->string('nama_lengkap', 150);
             $table->string('nik', 20)->nullable();
             $table->string('nomor_telepon', 25);
@@ -332,10 +283,79 @@ return new class extends Migration
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
 
-        // 9. SAPRAS
-        Schema::create('kormi_sapras', function (Blueprint $table) {
+        // 5. EVENT & KOMPETISI (event_*)
+        Schema::create('event_kategori', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('kecamatan_id')->constrained('kormi_kecamatan')->restrictOnDelete();
+            $table->string('nama_kategori', 100);
+            $table->string('slug', 100)->unique();
+            $table->timestamp('dibuat_pada')->useCurrent();
+            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
+        });
+
+        Schema::create('event_kegiatan', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('kategori_event_id')->constrained('event_kategori')->restrictOnDelete();
+            $table->string('judul_event', 200);
+            $table->string('slug', 200)->unique();
+            $table->integer('tahun_edisi');
+            $table->string('lokasi_utama', 255);
+            $table->date('tanggal_mulai');
+            $table->date('tanggal_selesai');
+            $table->string('banner_url', 255)->nullable();
+            $table->string('logo_event_url', 255)->nullable();
+            $table->longText('deskripsi_lengkap')->nullable();
+            $table->string('tautan_eksternal', 255)->nullable();
+            $table->boolean('status_publikasi')->default(true);
+            $table->timestamp('dibuat_pada')->useCurrent();
+            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
+        });
+
+        Schema::create('event_cabang', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('event_id')->constrained('event_kegiatan')->cascadeOnDelete();
+            $table->foreignUuid('inorga_id')->nullable()->constrained('kormi_inorga')->nullOnDelete();
+            $table->string('nama_cabang', 150);
+            $table->string('kategori_peserta', 100)->nullable();
+            $table->string('aturan_juknis_url', 255)->nullable();
+            $table->string('ikon', 50)->default('award');
+            $table->string('kode_warna_hex', 20)->default('bg-amber-500');
+            $table->timestamp('dibuat_pada')->useCurrent();
+            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
+        });
+
+        Schema::create('event_klasemen_medali', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('event_id')->constrained('event_kegiatan')->cascadeOnDelete();
+            $table->foreignUuid('kecamatan_id')->constrained('ref_kecamatan')->cascadeOnDelete();
+            $table->integer('jumlah_emas')->default(0);
+            $table->integer('jumlah_perak')->default(0);
+            $table->integer('jumlah_perunggu')->default(0);
+            $table->integer('total_medali')->default(0);
+            $table->integer('peringkat')->default(0);
+            $table->timestamp('dibuat_pada')->useCurrent();
+            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
+            $table->unique(['event_id', 'kecamatan_id']);
+        });
+
+        Schema::create('event_jadwal', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('event_id')->constrained('event_kegiatan')->cascadeOnDelete();
+            $table->string('fase_tahapan', 100);
+            $table->date('tanggal');
+            $table->time('jam_mulai')->nullable();
+            $table->time('jam_selesai')->nullable();
+            $table->string('nama_kegiatan', 200);
+            $table->string('tempat_arena', 150);
+            $table->enum('status_tahapan', ['selesai', 'berlangsung', 'akan_datang'])->default('akan_datang');
+            $table->string('keterangan', 255)->nullable();
+            $table->timestamp('dibuat_pada')->useCurrent();
+            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
+        });
+
+        // 6. SARANA & PRASARANA (sarpras_*)
+        Schema::create('sarpras_fasilitas', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('kecamatan_id')->constrained('ref_kecamatan')->restrictOnDelete();
             $table->string('nama_fasilitas', 150);
             $table->string('kategori_fasilitas', 100);
             $table->text('alamat_lengkap');
@@ -351,8 +371,8 @@ return new class extends Migration
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
 
-        // 10. BERITA, GALERI & UNDUHAN
-        Schema::create('kormi_kategori_berita', function (Blueprint $table) {
+        // 7. PUBLIKASI & MEDIA (media_*)
+        Schema::create('media_kategori_berita', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('nama_kategori', 100);
             $table->string('slug', 100)->unique();
@@ -361,10 +381,10 @@ return new class extends Migration
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
 
-        Schema::create('kormi_berita', function (Blueprint $table) {
+        Schema::create('media_berita', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('kategori_id')->constrained('kormi_kategori_berita')->restrictOnDelete();
-            $table->foreignUuid('penulis_id')->constrained('kormi_pengguna')->restrictOnDelete();
+            $table->foreignUuid('kategori_id')->constrained('media_kategori_berita')->restrictOnDelete();
+            $table->foreignUuid('penulis_id')->constrained('sys_pengguna')->restrictOnDelete();
             $table->string('judul', 255);
             $table->string('slug', 255)->unique();
             $table->text('ringkasan');
@@ -380,7 +400,7 @@ return new class extends Migration
             $table->softDeletes('dihapus_pada');
         });
 
-        Schema::create('kormi_galeri_album', function (Blueprint $table) {
+        Schema::create('media_galeri_album', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('judul_album', 200);
             $table->string('slug', 200)->unique();
@@ -392,9 +412,9 @@ return new class extends Migration
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
 
-        Schema::create('kormi_galeri_foto', function (Blueprint $table) {
+        Schema::create('media_galeri_foto', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('album_id')->constrained('kormi_galeri_album')->cascadeOnDelete();
+            $table->foreignUuid('album_id')->constrained('media_galeri_album')->cascadeOnDelete();
             $table->string('judul_foto', 200);
             $table->string('gambar_url', 255);
             $table->text('keterangan_foto')->nullable();
@@ -404,7 +424,7 @@ return new class extends Migration
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
 
-        Schema::create('kormi_kategori_unduhan', function (Blueprint $table) {
+        Schema::create('media_kategori_unduhan', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('nama_kategori', 100);
             $table->string('slug', 100)->unique();
@@ -412,10 +432,10 @@ return new class extends Migration
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
 
-        Schema::create('kormi_unduhan', function (Blueprint $table) {
+        Schema::create('media_unduhan', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('kategori_id')->constrained('kormi_kategori_unduhan')->restrictOnDelete();
-            $table->foreignUuid('pengunggah_id')->constrained('kormi_pengguna')->restrictOnDelete();
+            $table->foreignUuid('kategori_id')->constrained('media_kategori_unduhan')->restrictOnDelete();
+            $table->foreignUuid('pengunggah_id')->constrained('sys_pengguna')->restrictOnDelete();
             $table->string('judul_dokumen', 255);
             $table->string('berkas_path', 255);
             $table->string('ekstensi_berkas', 10);
@@ -427,42 +447,27 @@ return new class extends Migration
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
             $table->softDeletes('dihapus_pada');
         });
-
-        // 11. AUDIT LOG
-        Schema::create('kormi_log_aktivitas', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('pengguna_id')->nullable()->constrained('kormi_pengguna')->nullOnDelete();
-            $table->string('jenis_aksi', 50);
-            $table->string('nama_tabel', 100);
-            $table->uuid('id_entitas')->nullable();
-            $table->json('data_lama')->nullable();
-            $table->json('data_baru')->nullable();
-            $table->string('alamat_ip', 45)->nullable();
-            $table->string('agen_pengguna', 255)->nullable();
-            $table->timestamp('dibuat_pada')->useCurrent();
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('kormi_log_aktivitas');
-        Schema::dropIfExists('kormi_unduhan');
-        Schema::dropIfExists('kormi_kategori_unduhan');
-        Schema::dropIfExists('kormi_galeri_foto');
-        Schema::dropIfExists('kormi_galeri_album');
-        Schema::dropIfExists('kormi_berita');
-        Schema::dropIfExists('kormi_kategori_berita');
-        Schema::dropIfExists('kormi_sapras');
+        Schema::dropIfExists('media_unduhan');
+        Schema::dropIfExists('media_kategori_unduhan');
+        Schema::dropIfExists('media_galeri_foto');
+        Schema::dropIfExists('media_galeri_album');
+        Schema::dropIfExists('media_berita');
+        Schema::dropIfExists('media_kategori_berita');
+        Schema::dropIfExists('sarpras_fasilitas');
         Schema::dropIfExists('kormi_sdi_peserta');
         Schema::dropIfExists('kormi_sdi_jadwal');
         Schema::dropIfExists('kormi_sdi_program');
         Schema::dropIfExists('kormi_apmo_penerima');
         Schema::dropIfExists('kormi_apmo_tahun');
-        Schema::dropIfExists('kormi_event_jadwal');
-        Schema::dropIfExists('kormi_event_klasemen_medali');
-        Schema::dropIfExists('kormi_event_cabang');
-        Schema::dropIfExists('kormi_event');
-        Schema::dropIfExists('kormi_kategori_event');
+        Schema::dropIfExists('event_jadwal');
+        Schema::dropIfExists('event_klasemen_medali');
+        Schema::dropIfExists('event_cabang');
+        Schema::dropIfExists('event_kegiatan');
+        Schema::dropIfExists('event_kategori');
         Schema::dropIfExists('kormi_inorga');
         Schema::dropIfExists('kormi_komisi_inorga');
         Schema::dropIfExists('kormi_program_kerja');
@@ -470,12 +475,13 @@ return new class extends Migration
         Schema::dropIfExists('kormi_kordik_pengurus');
         Schema::dropIfExists('kormi_pengurus');
         Schema::dropIfExists('kormi_periode_kepengurusan');
-        Schema::dropIfExists('kormi_desa_kelurahan');
-        Schema::dropIfExists('kormi_kecamatan');
+        Schema::dropIfExists('ref_desa_kelurahan');
+        Schema::dropIfExists('ref_kecamatan');
         Schema::dropIfExists('kormi_visi_misi');
         Schema::dropIfExists('kormi_linimasa_sejarah');
-        Schema::dropIfExists('kormi_pengaturan_situs');
-        Schema::dropIfExists('kormi_pengguna');
-        Schema::dropIfExists('kormi_peran');
+        Schema::dropIfExists('sys_log_aktivitas');
+        Schema::dropIfExists('sys_pengaturan_situs');
+        Schema::dropIfExists('sys_pengguna');
+        Schema::dropIfExists('sys_peran');
     }
 };

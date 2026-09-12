@@ -6,6 +6,20 @@ class ProgramKerja extends ModelDasar
 {
     protected $table = 'kormi_program_kerja';
 
+    protected $fillable = [
+        'id',
+        'tahun_anggaran',
+        'nama_bidang',
+        'nama_kegiatan',
+        'tujuan_kegiatan',
+        'target_sasaran',
+        'estimasi_anggaran',
+        'status_kegiatan',
+        'bulan_mulai',
+        'bulan_selesai',
+        'ikon',
+    ];
+
     protected $casts = [
         'tahun_anggaran' => 'integer',
         'estimasi_anggaran' => 'decimal:2',

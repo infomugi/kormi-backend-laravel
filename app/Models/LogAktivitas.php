@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LogAktivitas extends ModelDasar
 {
-    protected $table = 'kormi_log_aktivitas';
+    protected $table = 'sys_log_aktivitas';
 
     // Log hanya insert, tidak perlu updated_at
     const UPDATED_AT = null;

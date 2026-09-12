@@ -25,7 +25,7 @@ class Daftar extends Component
 
     protected $rules = [
         'nama_lengkap' => 'required|min:3|max:100',
-        'email' => 'required|email|unique:kormi_pengguna,email',
+        'email' => 'required|email|unique:sys_pengguna,email',
         'nomor_telepon' => 'nullable|min:9|max:15',
         'kata_sandi' => 'required|min:6|same:konfirmasi_kata_sandi',
         'konfirmasi_kata_sandi' => 'required',

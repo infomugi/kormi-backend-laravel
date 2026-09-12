@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class KategoriBerita extends ModelDasar
 {
-    protected $table = 'kormi_kategori_berita';
+    protected $table = 'media_kategori_berita';
 
     public function berita(): HasMany
     {

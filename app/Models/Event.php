@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Event extends ModelDasar
 {
-    protected $table = 'kormi_event';
+    protected $table = 'event_kegiatan';
 
     protected $casts = [
         'tanggal_mulai' => 'date',

@@ -8,6 +8,19 @@ class KordikPengurus extends ModelDasar
 {
     protected $table = 'kormi_kordik_pengurus';
 
+    protected $fillable = [
+        'id',
+        'kecamatan_id',
+        'periode_id',
+        'nama_ketua',
+        'nama_sekretaris',
+        'nama_bendahara',
+        'nomor_telepon',
+        'nomor_sk',
+        'foto_ketua_url',
+        'status_aktif',
+    ];
+
     protected $casts = [
         'status_aktif' => 'boolean',
     ];

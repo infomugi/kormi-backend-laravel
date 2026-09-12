@@ -21,7 +21,7 @@
         <!-- ========================================== -->
         <div wire:key="inorga-view-tabel" class="space-y-6">
 
-            <!-- 1. HEADER & PRIMARY ACTION (COMPACT PRO COMPONENT) -->
+            <!-- 1. HEADER & PRIMARY ACTION -->
             <x-table.header
                 title="Kelola Induk Organisasi Olahraga"
                 subtitle="Data Inorga terdaftar di bawah 3 Komisi Resmi KORMI: OTDA (Tradisional), OKK (Kebugaran), dan OPT (Petualangan)."
@@ -92,7 +92,7 @@
             </div>
 
             <!-- 3. FILTER & SEARCH TOOLBAR -->
-            <x-table.filter-bar search-placeholder="Cari singkatan, nama inorga, ketua..." search-model="cari">
+            <x-table.filter-bar search-placeholder="Cari singkatan, nama inorga, nomor SK, ketua, kontak..." search-model="cari">
                 <x-slot:top>
                     <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none w-full">
                         <button 
@@ -133,6 +133,7 @@
                         <option value="singkatan">Urutan: Singkatan (A-Z)</option>
                         <option value="nama_inorga">Urutan: Nama Inorga</option>
                         <option value="jumlah_klub_anggota">Urutan: Klub Terbanyak</option>
+                        <option value="tanggal_sk">Urutan: Tanggal SK</option>
                     </select>
 
                     <!-- Direction -->
@@ -209,6 +210,15 @@
 
                 <button 
                     type="button" 
+                    wire:click="bulkSetStatus('masa_tenggang')" 
+                    class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                >
+                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                    <span>Set Tenggang</span>
+                </button>
+
+                <button 
+                    type="button" 
                     wire:click="bulkDelete" 
                     wire:confirm="Yakin ingin menghapus {{ count($selectedInorga) }} Inorga terpilih secara permanen?"
                     class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
@@ -248,6 +258,7 @@
                                     Nama Lengkap Inorga
                                 </x-table.th>
                                 <x-table.th>Komisi Induk</x-table.th>
+                                <x-table.th>Legalitas / SK & Kontak</x-table.th>
                                 <x-table.th 
                                     align="center" 
                                     sortable 
@@ -274,39 +285,96 @@
                                         >
                                     </x-table.td>
 
-                                    <!-- Singkatan & Logo -->
+                                    <!-- Singkatan & Logo (With Inline Edit Singkatan) -->
                                     <x-table.td>
                                         <div class="flex items-center gap-3">
                                             @if($ino->logo_url)
                                                 <img 
                                                     src="{{ $ino->logo_url }}" 
                                                     alt="{{ $ino->singkatan }}" 
-                                                    class="w-9 h-9 rounded-xl object-contain bg-white border border-slate-200 p-1 shrink-0 shadow-2xs"
+                                                    class="w-9 h-9 rounded-xl object-contain bg-white border border-slate-200 p-1 shrink-0 shadow-2xs cursor-pointer"
+                                                    wire:click="bukaPratinjau('{{ $ino->id }}')"
                                                 >
                                             @else
-                                                <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center justify-center font-black text-xs shrink-0">
+                                                <div 
+                                                    wire:click="bukaPratinjau('{{ $ino->id }}')"
+                                                    class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center justify-center font-black text-xs shrink-0 cursor-pointer"
+                                                >
                                                     {{ substr($ino->singkatan, 0, 2) }}
                                                 </div>
                                             @endif
-                                            <span class="font-black text-slate-900 text-xs tracking-wider">
-                                                {{ $ino->singkatan }}
-                                            </span>
+                                            
+                                            <!-- Inline Editable Singkatan -->
+                                            <div 
+                                                x-data="{ 
+                                                    editing: false, 
+                                                    val: '{{ addslashes($ino->singkatan) }}',
+                                                    save() {
+                                                        if (this.val.trim() !== '' && this.val !== '{{ addslashes($ino->singkatan) }}') {
+                                                            $wire.updateFieldInline('{{ $ino->id }}', 'singkatan', this.val);
+                                                        }
+                                                        this.editing = false;
+                                                    }
+                                                }"
+                                                class="min-w-0"
+                                            >
+                                                <div x-show="!editing" @dblclick="editing = true; $nextTick(() => $refs.input.focus())" class="cursor-pointer group/inline flex items-center gap-1">
+                                                    <span class="font-black text-slate-900 text-xs tracking-wider group-hover/inline:text-amber-600">
+                                                        {{ $ino->singkatan }}
+                                                    </span>
+                                                    <i data-lucide="edit-2" class="w-3 h-3 text-slate-300 opacity-0 group-hover/inline:opacity-100 transition-opacity"></i>
+                                                </div>
+                                                <input 
+                                                    x-ref="input"
+                                                    x-show="editing" 
+                                                    x-model="val" 
+                                                    @keydown.enter="save()" 
+                                                    @keydown.escape="editing = false; val = '{{ addslashes($ino->singkatan) }}'" 
+                                                    @blur="save()"
+                                                    type="text" 
+                                                    class="px-1.5 py-0.5 bg-amber-50 border border-amber-300 rounded text-xs font-black text-slate-900 uppercase w-24 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                                >
+                                            </div>
                                         </div>
                                     </x-table.td>
 
-                                    <!-- Nama Lengkap Inorga & Ketua -->
+                                    <!-- Nama Lengkap Inorga & Ketua (With Inline Edit Nama Inorga) -->
                                     <x-table.td>
                                         <div class="min-w-0 max-w-md space-y-0.5">
-                                            <a 
-                                                href="javascript:void(0)" 
-                                                wire:click="bukaFormEdit('{{ $ino->id }}')" 
-                                                class="font-black text-slate-900 text-xs hover:text-amber-600 line-clamp-1 leading-tight transition-colors cursor-pointer"
+                                            <!-- Inline Editable Nama Inorga -->
+                                            <div 
+                                                x-data="{ 
+                                                    editing: false, 
+                                                    val: '{{ addslashes($ino->nama_inorga) }}',
+                                                    save() {
+                                                        if (this.val.trim() !== '' && this.val !== '{{ addslashes($ino->nama_inorga) }}') {
+                                                            $wire.updateFieldInline('{{ $ino->id }}', 'nama_inorga', this.val);
+                                                        }
+                                                        this.editing = false;
+                                                    }
+                                                }"
                                             >
-                                                {{ $ino->nama_inorga }}
-                                            </a>
+                                                <div x-show="!editing" @dblclick="editing = true; $nextTick(() => $refs.namaInput.focus())" class="cursor-pointer group/inline flex items-start gap-1">
+                                                    <span class="font-black text-slate-900 text-xs hover:text-amber-600 line-clamp-1 leading-tight transition-colors">
+                                                        {{ $ino->nama_inorga }}
+                                                    </span>
+                                                    <i data-lucide="edit-2" class="w-3 h-3 text-slate-300 opacity-0 group-hover/inline:opacity-100 transition-opacity shrink-0 mt-0.5"></i>
+                                                </div>
+                                                <input 
+                                                    x-ref="namaInput"
+                                                    x-show="editing" 
+                                                    x-model="val" 
+                                                    @keydown.enter="save()" 
+                                                    @keydown.escape="editing = false; val = '{{ addslashes($ino->nama_inorga) }}'" 
+                                                    @blur="save()"
+                                                    type="text" 
+                                                    class="w-full px-2 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                                >
+                                            </div>
+
                                             <div class="text-[11px] text-slate-400 font-medium flex items-center gap-2">
                                                 @if($ino->nama_ketua)
-                                                    <span>Ketua: {{ $ino->nama_ketua }}</span>
+                                                    <span class="truncate max-w-[140px]">Ketua: <strong class="text-slate-600">{{ $ino->nama_ketua }}</strong></span>
                                                     <span>•</span>
                                                 @endif
                                                 <span>Slug: {{ $ino->slug }}</span>
@@ -314,43 +382,101 @@
                                         </div>
                                     </x-table.td>
 
-                                    <!-- Komisi Induk -->
+                                    <!-- Komisi Induk (Inline Select) -->
                                     <x-table.td>
-                                        @php
-                                            $komisiSingkat = $ino->komisi->singkatan ?? '';
-                                            $komisiColor = match($komisiSingkat) {
+                                        <select 
+                                            wire:change="updateFieldInline('{{ $ino->id }}', 'komisi_id', $event.target.value)"
+                                            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full border cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500 {{ match($ino->komisi->singkatan ?? '') {
                                                 'OTDA' => 'bg-amber-50 text-amber-700 border-amber-200',
                                                 'OKK' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
                                                 'OPT' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
                                                 default => 'bg-slate-100 text-slate-700 border-slate-200'
-                                            };
-                                        @endphp
-                                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border {{ $komisiColor }}">
-                                            {{ $ino->komisi->singkatan ?? '-' }}
-                                        </span>
+                                            } }}"
+                                        >
+                                            @foreach($komisiList as $k)
+                                                <option value="{{ $k->id }}" {{ $ino->komisi_id === $k->id ? 'selected' : '' }}>
+                                                    {{ $k->singkatan }} - {{ $k->nama_komisi }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </x-table.td>
 
-                                    <!-- Jumlah Klub -->
-                                    <x-table.td align="center">
-                                        <span class="inline-flex items-center gap-1 font-black text-slate-800 bg-slate-100 px-3 py-1 rounded-xl text-xs">
-                                            <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400"></i>
-                                            {{ $ino->jumlah_klub_anggota }} Klub
-                                        </span>
+                                    <!-- Legalitas / SK & Kontak -->
+                                    <x-table.td>
+                                        <div class="text-xs space-y-0.5">
+                                            @if($ino->nomor_sk)
+                                                <div class="text-[11px] font-bold text-slate-700 flex items-center gap-1">
+                                                    <i data-lucide="file-text" class="w-3 h-3 text-amber-600 shrink-0"></i>
+                                                    <span class="truncate max-w-[160px]">{{ $ino->nomor_sk }}</span>
+                                                </div>
+                                            @else
+                                                <span class="text-[10px] text-slate-400 italic block">Tanpa Nomor SK</span>
+                                            @endif
+
+                                            <div class="text-[10px] text-slate-500 flex items-center gap-1.5">
+                                                @if($ino->nomor_telepon || $ino->kontak_person)
+                                                    <span class="text-slate-600 font-semibold">{{ $ino->nomor_telepon ?: $ino->kontak_person }}</span>
+                                                @endif
+                                                @if($ino->email)
+                                                    <span class="text-slate-400">• {{ $ino->email }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </x-table.td>
 
-                                    <!-- Status Keanggotaan -->
+                                    <!-- Jumlah Klub (Inline editable) -->
                                     <x-table.td align="center">
-                                        @php
-                                            $statusClass = match($ino->status_keanggotaan) {
+                                        <div 
+                                            x-data="{ 
+                                                editing: false, 
+                                                val: '{{ $ino->jumlah_klub_anggota }}',
+                                                save() {
+                                                    if (this.val !== '' && this.val != '{{ $ino->jumlah_klub_anggota }}') {
+                                                        $wire.updateFieldInline('{{ $ino->id }}', 'jumlah_klub_anggota', this.val);
+                                                    }
+                                                    this.editing = false;
+                                                }
+                                            }"
+                                        >
+                                            <span 
+                                                x-show="!editing" 
+                                                @dblclick="editing = true; $nextTick(() => $refs.klubInput.focus())"
+                                                class="inline-flex items-center gap-1 font-black text-slate-800 bg-slate-100 px-3 py-1 rounded-xl text-xs cursor-pointer hover:bg-amber-100 hover:text-amber-900 transition-colors"
+                                                title="Klik 2x untuk ubah jumlah klub"
+                                            >
+                                                <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400"></i>
+                                                {{ $ino->jumlah_klub_anggota }} Klub
+                                            </span>
+                                            <input 
+                                                x-ref="klubInput"
+                                                x-show="editing" 
+                                                x-model="val" 
+                                                @keydown.enter="save()" 
+                                                @keydown.escape="editing = false; val = '{{ $ino->jumlah_klub_anggota }}'" 
+                                                @blur="save()"
+                                                type="number" 
+                                                min="0"
+                                                class="w-16 px-1.5 py-0.5 bg-amber-50 border border-amber-300 rounded text-center text-xs font-black text-slate-900 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                            >
+                                        </div>
+                                    </x-table.td>
+
+                                    <!-- Status Keanggotaan (Inline Select) -->
+                                    <x-table.td align="center">
+                                        <select 
+                                            wire:change="updateFieldInline('{{ $ino->id }}', 'status_keanggotaan', $event.target.value)"
+                                            class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500 {{ match($ino->status_keanggotaan) {
                                                 'aktif' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
                                                 'verifikasi' => 'bg-blue-50 text-blue-700 border-blue-200',
                                                 'masa_tenggang' => 'bg-amber-50 text-amber-700 border-amber-200',
                                                 default => 'bg-rose-50 text-rose-700 border-rose-200'
-                                            };
-                                        @endphp
-                                        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border {{ $statusClass }}">
-                                            {{ str_replace('_', ' ', $ino->status_keanggotaan) }}
-                                        </span>
+                                            } }}"
+                                        >
+                                            <option value="aktif" {{ $ino->status_keanggotaan === 'aktif' ? 'selected' : '' }}>Aktif</option>
+                                            <option value="verifikasi" {{ $ino->status_keanggotaan === 'verifikasi' ? 'selected' : '' }}>Verifikasi</option>
+                                            <option value="masa_tenggang" {{ $ino->status_keanggotaan === 'masa_tenggang' ? 'selected' : '' }}>Masa Tenggang</option>
+                                            <option value="tidak_aktif" {{ $ino->status_keanggotaan === 'tidak_aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                                        </select>
                                     </x-table.td>
 
                                     <!-- Actions -->
@@ -358,20 +484,34 @@
                                         <div class="flex items-center justify-end gap-1">
                                             <x-table.action-btn 
                                                 size="sm"
+                                                variant="secondary" 
+                                                icon="eye" 
+                                                wire:click="bukaPratinjau('{{ $ino->id }}')" 
+                                                title="Lihat Profil Inorga" 
+                                            />
+
+                                            <x-table.action-btn 
+                                                size="sm"
                                                 variant="warning" 
                                                 icon="edit-3" 
                                                 loading-target="bukaFormEdit('{{ $ino->id }}')"
                                                 wire:click="bukaFormEdit('{{ $ino->id }}')" 
-                                                title="Edit Inorga" 
+                                                title="Edit Data Lengkap" 
+                                            />
+
+                                            <x-table.action-btn 
+                                                size="sm"
+                                                variant="secondary" 
+                                                icon="copy" 
+                                                wire:click="duplikatInorga('{{ $ino->id }}')" 
+                                                title="Duplikat Inorga" 
                                             />
 
                                             <x-table.action-btn 
                                                 size="sm"
                                                 variant="danger" 
                                                 icon="trash-2" 
-                                                loading-target="hapus('{{ $ino->id }}')"
-                                                wire:click="hapus('{{ $ino->id }}')" 
-                                                wire:confirm="Yakin ingin menghapus Inorga ini dari sistem CMS?" 
+                                                wire:click="konfirmasiHapus('{{ $ino->id }}')" 
                                                 title="Hapus Inorga" 
                                             />
                                         </div>
@@ -379,7 +519,7 @@
                                 </x-table.tr>
                             @empty
                                 <x-table.empty 
-                                    colspan="7" 
+                                    colspan="8" 
                                     icon="shapes" 
                                     title="Belum ada Inorga yang sesuai" 
                                     description="Silakan tambah Induk Organisasi Olahraga baru ke sistem."
@@ -400,7 +540,7 @@
                 <!-- GRID VIEW FOR INORGA -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     @forelse($inorgaList as $ino)
-                        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all p-5 flex flex-col justify-between group">
+                        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all p-5 flex flex-col justify-between group {{ in_array($ino->id, $selectedInorga) ? 'ring-2 ring-amber-500' : '' }}">
                             <div>
                                 <div class="flex items-start justify-between gap-3 mb-4">
                                     @php
@@ -422,17 +562,25 @@
                                         {{ $ino->komisi->singkatan ?? '-' }}
                                     </span>
 
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border {{ $statusClass }}">
-                                        {{ str_replace('_', ' ', $ino->status_keanggotaan) }}
-                                    </span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border {{ $statusClass }}">
+                                            {{ str_replace('_', ' ', $ino->status_keanggotaan) }}
+                                        </span>
+                                        <input 
+                                            type="checkbox" 
+                                            wire:model.live="selectedInorga" 
+                                            value="{{ $ino->id }}" 
+                                            class="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 cursor-pointer"
+                                        >
+                                    </div>
                                 </div>
 
-                                <div class="flex items-start gap-3.5">
+                                <div class="flex items-start gap-3.5 cursor-pointer" wire:click="bukaPratinjau('{{ $ino->id }}')">
                                     @if($ino->logo_url)
                                         <img 
                                             src="{{ $ino->logo_url }}" 
                                             alt="{{ $ino->singkatan }}" 
-                                            class="w-12 h-12 rounded-2xl object-contain bg-white border border-slate-200 p-1 shrink-0 shadow-2xs"
+                                            class="w-12 h-12 rounded-2xl object-contain bg-white border border-slate-200 p-1 shrink-0 shadow-2xs group-hover:scale-105 transition-transform"
                                         >
                                     @else
                                         <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center justify-center font-black text-sm shrink-0">
@@ -451,16 +599,22 @@
                                 </div>
 
                                 <div class="mt-4 pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-500">
+                                    @if($ino->nomor_sk)
+                                        <p class="flex items-center gap-1.5 text-[11px] text-amber-800 font-semibold">
+                                            <i data-lucide="file-text" class="w-3.5 h-3.5 text-amber-600 shrink-0"></i>
+                                            <span class="truncate">SK: {{ $ino->nomor_sk }}</span>
+                                        </p>
+                                    @endif
                                     @if($ino->nama_ketua)
                                         <p class="flex items-center gap-1.5">
                                             <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
                                             <span class="truncate">Ketua: <strong class="text-slate-700">{{ $ino->nama_ketua }}</strong></span>
                                         </p>
                                     @endif
-                                    @if($ino->kontak_person)
+                                    @if($ino->kontak_person || $ino->nomor_telepon)
                                         <p class="flex items-center gap-1.5">
                                             <i data-lucide="phone" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
-                                            <span class="truncate">{{ $ino->kontak_person }}</span>
+                                            <span class="truncate">{{ $ino->nomor_telepon ?: $ino->kontak_person }}</span>
                                         </p>
                                     @endif
                                 </div>
@@ -475,6 +629,14 @@
                                 <div class="flex items-center gap-1.5">
                                     <x-table.action-btn 
                                         size="sm"
+                                        variant="secondary" 
+                                        icon="eye" 
+                                        wire:click="bukaPratinjau('{{ $ino->id }}')" 
+                                        title="Pratinjau Inorga" 
+                                    />
+
+                                    <x-table.action-btn 
+                                        size="sm"
                                         variant="warning" 
                                         icon="edit-3" 
                                         loading-target="bukaFormEdit('{{ $ino->id }}')"
@@ -486,9 +648,7 @@
                                         size="sm"
                                         variant="danger" 
                                         icon="trash-2" 
-                                        loading-target="hapus('{{ $ino->id }}')"
-                                        wire:click="hapus('{{ $ino->id }}')" 
-                                        wire:confirm="Yakin ingin menghapus Inorga ini dari sistem CMS?" 
+                                        wire:click="konfirmasiHapus('{{ $ino->id }}')" 
                                         title="Hapus Inorga" 
                                     />
                                 </div>
@@ -520,8 +680,8 @@
         <div class="space-y-6 animate-in fade-in duration-150 max-w-7xl mx-auto">
             <!-- 1. FORM HEADER BANNER -->
             <x-form.header 
-                :title="$inorgaId ? 'Edit Data Kelembagaan Inorga' : 'Pendaftaran Induk Organisasi Baru'"
-                subtitle="Isi singkatan cabor, pilih komisi induk KORMI, nama ketua, dan unggah logo resmi."
+                :title="$inorgaId ? 'Edit Data Kelembagaan Inorga' : 'Pendaftaran Induk Organisasi Olahraga Baru'"
+                subtitle="Lengkapi identitas cabor, legalitas SK pengukuhan, komisi induk KORMI, kepengurusan, dan logo resmi."
                 :badge="$inorgaId ? 'Mode Edit Inorga' : 'Inorga Baru'"
                 icon="shapes"
             >
@@ -549,11 +709,13 @@
             <!-- 2. MAIN FORM CONTENT -->
             <form wire:submit.prevent="simpan" class="space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <!-- Left Column (8 cols): Data Organisasi -->
-                    <div class="lg:col-span-8 space-y-6">
+                    <!-- Left Column (7 cols): Data Organisasi & Legalitas -->
+                    <div class="lg:col-span-7 space-y-6">
+                        
+                        <!-- CARD 1: IDENTITAS ORGANISASI -->
                         <x-form.card 
-                            title="Informasi Induk Organisasi" 
-                            subtitle="Identitas cabor, komisi pengampu, dan status keanggotaan."
+                            title="Identitas Induk Organisasi" 
+                            subtitle="Singkatan cabor, nama resmi, dan komisi pengampu di KORMI."
                             icon="file-text"
                             size="default"
                         >
@@ -606,12 +768,41 @@
                                         name="jumlah_klub_anggota" 
                                         wire:model="jumlah_klub_anggota" 
                                         min="0"
+                                        icon="users"
+                                    />
+                                </x-form.field>
+                            </div>
+                        </x-form.card>
+
+                        <!-- CARD 2: LEGALITAS & KEPENGURUSAN -->
+                        <x-form.card 
+                            title="Legalitas SK & Kepengurusan" 
+                            subtitle="Nomor SK pengukuhan, tanggal legalitas, dan pimpinan organisasi."
+                            icon="award"
+                            size="default"
+                        >
+                            <!-- Nomor SK & Tanggal SK -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <x-form.field label="Nomor SK Pengukuhan / SK KORMI" name="nomor_sk">
+                                    <x-form.input 
+                                        name="nomor_sk" 
+                                        wire:model="nomor_sk" 
+                                        placeholder="Contoh: 012/SK-KORMI/2025"
+                                        icon="file-text"
+                                    />
+                                </x-form.field>
+
+                                <x-form.field label="Tanggal SK Pengukuhan" name="tanggal_sk">
+                                    <x-form.input 
+                                        type="date"
+                                        name="tanggal_sk" 
+                                        wire:model="tanggal_sk" 
                                     />
                                 </x-form.field>
                             </div>
 
+                            <!-- Nama Ketua & Kontak Person -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <!-- Nama Ketua -->
                                 <x-form.field label="Nama Ketua Pengurus" name="nama_ketua">
                                     <x-form.input 
                                         name="nama_ketua" 
@@ -621,31 +812,31 @@
                                     />
                                 </x-form.field>
 
-                                <!-- Kontak Person -->
-                                <x-form.field label="Kontak Person / Telepon" name="kontak_person">
+                                <x-form.field label="Nama Kontak Person (PIC)" name="kontak_person">
                                     <x-form.input 
                                         name="kontak_person" 
                                         wire:model="kontak_person" 
-                                        placeholder="0812xxxx / email..."
-                                        icon="phone"
+                                        placeholder="Nama sekretaris / PIC..."
+                                        icon="user-check"
                                     />
                                 </x-form.field>
                             </div>
 
-                            <!-- Deskripsi Kegiatan -->
-                            <x-form.field label="Deskripsi / Cakupan Olahraga (Opsional)" name="deskripsi_singkat">
+                            <!-- Deskripsi Cakupan Olahraga -->
+                            <x-form.field label="Deskripsi / Cakupan Olahraga & Kegiatan" name="deskripsi_kegiatan">
                                 <x-form.textarea 
-                                    name="deskripsi_singkat" 
-                                    wire:model="deskripsi_singkat" 
+                                    name="deskripsi_kegiatan" 
+                                    wire:model="deskripsi_kegiatan" 
                                     placeholder="Jelaskan cabang olahraga rekreasi, jenis permainan atau kegiatan binaan inorga ini..."
                                     rows="3"
                                 />
                             </x-form.field>
                         </x-form.card>
+
                     </div>
 
-                    <!-- Right Column (4 cols): Logo Upload & Guide -->
-                    <div class="lg:col-span-4 space-y-6">
+                    <!-- Right Column (5 cols): Logo Upload & Kontak Sekretariat -->
+                    <div class="lg:col-span-5 space-y-6">
                         <!-- Logo Upload -->
                         <x-form.card 
                             title="Logo Resmi Inorga" 
@@ -659,8 +850,47 @@
                                 name="uploadLogo"
                                 inputId="uploadLogoInorga"
                                 title="Klik atau seret logo ke sini"
-                                subtitle="PNG, JPG, WEBP (Maks. 5MB)"
+                                subtitle="PNG, JPG, WEBP, SVG (Maks. 5MB)"
+                                aspectRatio="h-44 sm:h-52"
                             />
+                        </x-form.card>
+
+                        <!-- Kontak & Sekretariat -->
+                        <x-form.card 
+                            title="Kontak & Sekretariat Resmi" 
+                            subtitle="Saluran komunikasi resmi dan lokasi sekretariat."
+                            icon="map-pin"
+                            size="default"
+                        >
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <x-form.field label="Nomor Telepon / WA Resmi" name="nomor_telepon">
+                                    <x-form.input 
+                                        name="nomor_telepon" 
+                                        wire:model="nomor_telepon" 
+                                        placeholder="0812xxxxxxx"
+                                        icon="phone"
+                                    />
+                                </x-form.field>
+
+                                <x-form.field label="Email Resmi Organisasi" name="email">
+                                    <x-form.input 
+                                        type="email"
+                                        name="email" 
+                                        wire:model="email" 
+                                        placeholder="sekretariat@inorga.id"
+                                        icon="mail"
+                                    />
+                                </x-form.field>
+                            </div>
+
+                            <x-form.field label="Alamat Lengkap Sekretariat" name="alamat_sekretariat">
+                                <x-form.textarea 
+                                    name="alamat_sekretariat" 
+                                    wire:model="alamat_sekretariat" 
+                                    placeholder="Jl. Raya Soreang No..., Komplek Olahraga..."
+                                    rows="2"
+                                />
+                            </x-form.field>
                         </x-form.card>
 
                         <!-- Guide Info Card -->
@@ -685,27 +915,181 @@
                 </div>
 
                 <!-- 3. STICKY ACTION BAR -->
-                <x-form.action-bar>
-                    <x-form.button 
-                        variant="secondary" 
-                        size="default" 
-                        icon="arrow-left" 
-                        wire:click="kembaliKeTabel"
-                    >
-                        Batal
-                    </x-form.button>
-
-                    <x-form.button 
-                        variant="warning" 
-                        size="default" 
-                        type="submit" 
-                        icon="check" 
-                        loading-target="simpan"
-                    >
-                        {{ $inorgaId ? 'Perbarui Inorga' : 'Simpan Inorga ke Database' }}
-                    </x-form.button>
-                </x-form.action-bar>
+                <x-form.action-bar 
+                    cancel-text="Batal & Kembali" 
+                    cancel-action="kembaliKeTabel" 
+                    :submit-text="$inorgaId ? 'Perbarui Inorga' : 'Simpan Inorga ke Database'" 
+                    loading-target="simpan" 
+                />
             </form>
+        </div>
+    @endif
+
+    <!-- ========================================================= -->
+    <!-- MODAL: PRATINJAU KARTU PROFIL INORGA LENGKAP              -->
+    <!-- ========================================================= -->
+    @if($tampilkanModalPratinjau && $pratinjauInorga)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+            <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+                <!-- Modal Header -->
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                            <i data-lucide="shapes" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-black text-slate-900">Profil Induk Organisasi Olahraga</h3>
+                            <p class="text-[10px] text-slate-400">{{ $pratinjauInorga->komisi->singkatan ?? '-' }} • {{ $pratinjauInorga->komisi->nama_komisi ?? '' }}</p>
+                        </div>
+                    </div>
+                    <button type="button" wire:click="tutupPratinjau" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 overflow-y-auto space-y-6">
+                    <div class="flex flex-col sm:flex-row items-center gap-5">
+                        <div class="w-24 h-24 rounded-2xl overflow-hidden bg-white shrink-0 border border-slate-200 p-2 shadow-xs flex items-center justify-center">
+                            @if($pratinjauInorga->logo_url)
+                                <img src="{{ $pratinjauInorga->logo_url }}" class="w-full h-full object-contain" alt="{{ $pratinjauInorga->singkatan }}">
+                            @else
+                                <div class="w-full h-full bg-amber-50 text-amber-800 font-black text-2xl flex items-center justify-center rounded-xl">
+                                    {{ substr($pratinjauInorga->singkatan, 0, 2) }}
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="space-y-1.5 text-center sm:text-left flex-1 min-w-0">
+                            <div class="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
+                                    {{ $pratinjauInorga->singkatan }}
+                                </span>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider {{ match($pratinjauInorga->status_keanggotaan) {
+                                    'aktif' => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+                                    'verifikasi' => 'bg-blue-50 text-blue-700 border border-blue-200',
+                                    'masa_tenggang' => 'bg-amber-50 text-amber-700 border border-amber-200',
+                                    default => 'bg-rose-50 text-rose-700 border border-rose-200'
+                                } }}">
+                                    {{ str_replace('_', ' ', $pratinjauInorga->status_keanggotaan) }}
+                                </span>
+                            </div>
+                            <h2 class="text-lg font-black text-slate-900 leading-snug">{{ $pratinjauInorga->nama_inorga }}</h2>
+                            <p class="text-xs font-bold text-slate-500 flex items-center justify-center sm:justify-start gap-1">
+                                <i data-lucide="layers" class="w-3.5 h-3.5 text-amber-600"></i>
+                                <span>Komisi {{ $pratinjauInorga->komisi->singkatan ?? '-' }} ({{ $pratinjauInorga->komisi->nama_komisi ?? '-' }})</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Detail Legalitas & Kontak Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Nomor SK</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauInorga->nomor_sk ?: '-' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Tanggal SK</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauInorga->tanggal_sk ? $pratinjauInorga->tanggal_sk->format('d/m/Y') : '-' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Jumlah Klub</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauInorga->jumlah_klub_anggota }} Klub</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Nama Ketua</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauInorga->nama_ketua ?: '-' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Kontak / WA</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauInorga->nomor_telepon ?: ($pratinjauInorga->kontak_person ?: '-') }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Email Resmi</span>
+                            <span class="font-bold text-slate-800 truncate block">{{ $pratinjauInorga->email ?: '-' }}</span>
+                        </div>
+                    </div>
+
+                    @if($pratinjauInorga->alamat_sekretariat)
+                        <div class="space-y-1">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Alamat Sekretariat:</span>
+                            <p class="text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200/60 font-medium">
+                                {{ $pratinjauInorga->alamat_sekretariat }}
+                            </p>
+                        </div>
+                    @endif
+
+                    @if($pratinjauInorga->deskripsi_kegiatan)
+                        <div class="space-y-1.5">
+                            <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Cakupan Olahraga & Kegiatan:</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed p-3.5 rounded-2xl bg-amber-50/50 border border-amber-100 whitespace-pre-line">
+                                {{ $pratinjauInorga->deskripsi_kegiatan }}
+                            </p>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                    <button 
+                        type="button" 
+                        wire:click="bukaFormEdit('{{ $pratinjauInorga->id }}')" 
+                        class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                        <span>Edit Data Inorga</span>
+                    </button>
+
+                    <button 
+                        type="button" 
+                        wire:click="tutupPratinjau" 
+                        class="px-5 py-2 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider hover:bg-slate-300 transition-colors cursor-pointer"
+                    >
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- ========================================================= -->
+    <!-- MODAL: KONFIRMASI HAPUS INORGA                            -->
+    <!-- ========================================================= -->
+    @if($tampilkanModalHapus)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+            <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100 p-6 sm:p-7 space-y-6 text-center">
+                <div class="w-14 h-14 rounded-3xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-sm">
+                    <i data-lucide="alert-triangle" class="w-7 h-7"></i>
+                </div>
+
+                <div class="space-y-2">
+                    <h3 class="text-lg font-black text-slate-900">Hapus Data Inorga?</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Apakah Anda yakin ingin menghapus data Inorga <br>
+                        <span class="font-bold text-slate-900 italic">"{{ $hapusNama }}"</span>?
+                    </p>
+                    <p class="text-[11px] text-rose-600 font-medium">Data dan berkas logo terkait akan dihapus secara permanen dari server.</p>
+                </div>
+
+                <div class="flex items-center justify-center gap-3 pt-2">
+                    <button 
+                        type="button" 
+                        wire:click="batalHapus" 
+                        class="px-6 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                        Batalkan
+                    </button>
+
+                    <button 
+                        type="button" 
+                        wire:click="prosesHapus" 
+                        class="px-6 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs uppercase tracking-wider shadow-md shadow-rose-600/20 transition-all cursor-pointer flex items-center gap-2"
+                    >
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Ya, Hapus Data</span>
+                    </button>
+                </div>
+            </div>
         </div>
     @endif
 

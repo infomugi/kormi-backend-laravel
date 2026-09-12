@@ -83,7 +83,7 @@ class DatabaseSeeder extends Seeder
             ['kunci_pengaturan' => 'youtube', 'nilai_pengaturan' => 'https://youtube.com/@kormikabbandung', 'kelompok' => 'sosial_media'],
         ];
         foreach ($settings as $s) {
-            DB::table('kormi_pengaturan_situs')->insert(array_merge($s, [
+            DB::table('sys_pengaturan_situs')->insert(array_merge($s, [
                 'id' => (string) Str::uuid(),
                 'dibuat_pada' => now(),
                 'diperbarui_pada' => now(),
@@ -477,7 +477,7 @@ class DatabaseSeeder extends Seeder
 
         // 10. Event, Cabang, Klasemen, Jadwal (FORKAB)
         $katEventId = (string) Str::uuid();
-        DB::table('kormi_kategori_event')->insert([
+        DB::table('event_kategori')->insert([
             'id' => $katEventId,
             'nama_kategori' => 'Multi Event Daerah',
             'slug' => 'multi-event-daerah',
@@ -486,7 +486,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $eventForkabId = (string) Str::uuid();
-        DB::table('kormi_event')->insert([
+        DB::table('event_kegiatan')->insert([
             'id' => $eventForkabId,
             'kategori_event_id' => $katEventId,
             'judul_event' => 'Festival Olahraga Rekreasi Masyarakat Kabupaten (FORKAB) 2026',
@@ -514,7 +514,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($caborList as $c) {
-            DB::table('kormi_event_cabang')->insert([
+            DB::table('event_cabang')->insert([
                 'id' => (string) Str::uuid(),
                 'event_id' => $eventForkabId,
                 'nama_cabang' => $c[0],
@@ -539,7 +539,7 @@ class DatabaseSeeder extends Seeder
 
         foreach ($klasemenForkab as $kl) {
             $kec = $kecamatanDbMap[$kl[0]] ?? Kecamatan::first();
-            DB::table('kormi_event_klasemen_medali')->insert([
+            DB::table('event_klasemen_medali')->insert([
                 'id' => (string) Str::uuid(),
                 'event_id' => $eventForkabId,
                 'kecamatan_id' => $kec->id,
@@ -562,7 +562,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($jadwalForkab as $j) {
-            DB::table('kormi_event_jadwal')->insert([
+            DB::table('event_jadwal')->insert([
                 'id' => (string) Str::uuid(),
                 'event_id' => $eventForkabId,
                 'fase_tahapan' => $j[0],
@@ -927,11 +927,11 @@ class DatabaseSeeder extends Seeder
         }
 
         // 17. Log Aktivitas
-        DB::table('kormi_log_aktivitas')->insert([
+        DB::table('sys_log_aktivitas')->insert([
             'id' => (string) Str::uuid(),
             'pengguna_id' => $admin->id,
             'jenis_aksi' => 'INITIAL_SEED',
-            'nama_tabel' => 'kormi_pengaturan_situs',
+            'nama_tabel' => 'sys_pengaturan_situs',
             'id_entitas' => $admin->id,
             'data_lama' => null,
             'data_baru' => json_encode(['status' => 'System initialized with full KORMI data']),

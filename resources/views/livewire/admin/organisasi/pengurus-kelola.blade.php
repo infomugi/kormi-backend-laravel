@@ -104,6 +104,7 @@
                         >
                             <i data-lucide="layers" class="w-3.5 h-3.5"></i>
                             <span>Semua Periode</span>
+                            <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ empty($filterPeriode) ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600' }}">{{ $totalPengurus }}</span>
                         </button>
 
                         @foreach($periodeList as $p)
@@ -158,7 +159,7 @@
                         <option value="50">50 / hal</option>
                     </select>
 
-                    <!-- View Switcher -->
+                    <!-- View Switcher with localStorage persistence -->
                     <div 
                         x-data="{
                             mode: localStorage.getItem('kormi_pengurus_view') || @js($tampilanMode),
@@ -254,23 +255,23 @@
                                     sort-field="jabatan" 
                                     :current-sort="$sortField" 
                                     :current-direction="$sortDirection"
-                                    class="w-60"
+                                    class="w-64"
                                 >
                                     Jabatan & Bidang Kerja
                                 </x-table.th>
                                 <x-table.th align="center" class="w-40">Periode</x-table.th>
                                 <x-table.th 
-                                    align="center"
+                                    align="center" 
                                     sortable 
                                     sort-field="urutan" 
                                     :current-sort="$sortField" 
                                     :current-direction="$sortDirection"
-                                    class="w-20"
+                                    class="w-24"
                                 >
                                     Urutan
                                 </x-table.th>
                                 <x-table.th 
-                                    align="center"
+                                    align="center" 
                                     sortable 
                                     sort-field="status_tampil" 
                                     :current-sort="$sortField" 
@@ -279,15 +280,15 @@
                                 >
                                     Status
                                 </x-table.th>
-                                <x-table.th align="center" class="w-28">Aksi</x-table.th>
+                                <x-table.th align="right" class="w-32">Aksi</x-table.th>
                             </tr>
                         </x-table.thead>
 
                         <x-table.tbody>
                             @forelse($pengurusList as $item)
-                                <x-table.tr :selected="in_array($item->id, $selectedPengurus)">
+                                <x-table.tr wire:key="row-pengurus-{{ $item->id }}" :selected="in_array($item->id, $selectedPengurus)">
                                     <!-- Checkbox -->
-                                    <x-table.td align="center" class="!px-4">
+                                    <x-table.td align="center" class="!px-3.5 w-10">
                                         <input 
                                             type="checkbox" 
                                             wire:model.live="selectedPengurus" 
@@ -296,42 +297,134 @@
                                         >
                                     </x-table.td>
 
-                                    <!-- Profil & Foto -->
+                                    <!-- Profil & Foto (With Inline Edit Nama) -->
                                     <x-table.td>
                                         <div class="flex items-center gap-3.5">
                                             @if($item->foto_url)
-                                                <div class="w-12 h-12 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 shadow-2xs">
+                                                <div 
+                                                    wire:click="bukaPratinjau('{{ $item->id }}')"
+                                                    class="w-12 h-12 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 shadow-2xs cursor-pointer hover:opacity-90 transition-opacity"
+                                                >
                                                     <img src="{{ app(\App\Services\StorageService::class)->getTemporaryUrl($item->foto_url) }}" class="w-full h-full object-cover" alt="{{ $item->nama_lengkap }}">
                                                 </div>
                                             @else
-                                                <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center shrink-0 font-black text-sm shadow-2xs">
+                                                <div 
+                                                    wire:click="bukaPratinjau('{{ $item->id }}')"
+                                                    class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center shrink-0 font-black text-sm shadow-2xs cursor-pointer hover:bg-blue-100 transition-colors"
+                                                >
                                                     {{ strtoupper(substr($item->nama_lengkap, 0, 2)) }}
                                                 </div>
                                             @endif
 
-                                            <div class="min-w-0">
-                                                <h3 class="font-black text-slate-900 text-sm group-hover:text-blue-600 transition-colors">
-                                                    {{ $item->nama_lengkap }}
-                                                </h3>
-                                                <p class="text-xs text-slate-500 mt-0.5">
+                                            <div class="min-w-0 max-w-md flex-1">
+                                                <!-- Inline Editable Nama Lengkap -->
+                                                <div 
+                                                    x-data="{ 
+                                                        editing: false, 
+                                                        val: '{{ addslashes($item->nama_lengkap) }}',
+                                                        save() {
+                                                            if (this.val.trim() !== '' && this.val !== '{{ addslashes($item->nama_lengkap) }}') {
+                                                                $wire.updateFieldInline('{{ $item->id }}', 'nama_lengkap', this.val);
+                                                            }
+                                                            this.editing = false;
+                                                        }
+                                                    }"
+                                                >
+                                                    <div x-show="!editing" @dblclick="editing = true; $nextTick(() => $refs.namaInput.focus())" class="cursor-pointer group/inline flex items-center gap-1.5">
+                                                        <h3 class="font-black text-slate-900 text-sm group-hover/inline:text-blue-600 transition-colors truncate">
+                                                            {{ $item->nama_lengkap }}
+                                                        </h3>
+                                                        <i data-lucide="edit-2" class="w-3 h-3 text-slate-300 opacity-0 group-hover/inline:opacity-100 transition-opacity shrink-0"></i>
+                                                    </div>
+                                                    <input 
+                                                        x-ref="namaInput"
+                                                        x-show="editing" 
+                                                        x-model="val" 
+                                                        @keydown.enter="save()" 
+                                                        @keydown.escape="editing = false; val = '{{ addslashes($item->nama_lengkap) }}'" 
+                                                        @blur="save()"
+                                                        type="text" 
+                                                        class="w-full px-2 py-0.5 bg-blue-50 border border-blue-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                    >
+                                                </div>
+
+                                                <p class="text-[11px] text-slate-400 mt-0.5">
                                                     ID: <span class="font-mono text-[10px]">{{ substr($item->id, 0, 8) }}</span>
                                                 </p>
                                             </div>
                                         </div>
                                     </x-table.td>
 
-                                    <!-- Jabatan & Bidang -->
+                                    <!-- Jabatan & Bidang (With Inline Edit Jabatan & Bidang) -->
                                     <x-table.td>
                                         <div class="space-y-1">
-                                            <span class="font-bold text-slate-900 text-xs block">
-                                                {{ $item->jabatan }}
-                                            </span>
-                                            @if($item->kategori_bidang)
-                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                                                    <i data-lucide="tag" class="w-2.5 h-2.5 text-slate-400"></i>
-                                                    <span>{{ $item->kategori_bidang }}</span>
-                                                </span>
-                                            @endif
+                                            <!-- Inline Edit Jabatan -->
+                                            <div 
+                                                x-data="{ 
+                                                    editing: false, 
+                                                    val: '{{ addslashes($item->jabatan) }}',
+                                                    save() {
+                                                        if (this.val.trim() !== '' && this.val !== '{{ addslashes($item->jabatan) }}') {
+                                                            $wire.updateFieldInline('{{ $item->id }}', 'jabatan', this.val);
+                                                        }
+                                                        this.editing = false;
+                                                    }
+                                                }"
+                                            >
+                                                <div x-show="!editing" @dblclick="editing = true; $nextTick(() => $refs.jabInput.focus())" class="cursor-pointer group/inline flex items-center gap-1">
+                                                    <span class="font-bold text-slate-900 text-xs block group-hover/inline:text-blue-600">
+                                                        {{ $item->jabatan }}
+                                                    </span>
+                                                    <i data-lucide="edit-2" class="w-2.5 h-2.5 text-slate-300 opacity-0 group-hover/inline:opacity-100 transition-opacity"></i>
+                                                </div>
+                                                <input 
+                                                    x-ref="jabInput"
+                                                    x-show="editing" 
+                                                    x-model="val" 
+                                                    @keydown.enter="save()" 
+                                                    @keydown.escape="editing = false; val = '{{ addslashes($item->jabatan) }}'" 
+                                                    @blur="save()"
+                                                    type="text" 
+                                                    class="w-full px-1.5 py-0.5 bg-blue-50 border border-blue-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                >
+                                            </div>
+
+                                            <!-- Inline Edit Kategori Bidang -->
+                                            <div 
+                                                x-data="{ 
+                                                    editing: false, 
+                                                    val: '{{ addslashes($item->kategori_bidang ?? '') }}',
+                                                    save() {
+                                                        if (this.val !== '{{ addslashes($item->kategori_bidang ?? '') }}') {
+                                                            $wire.updateFieldInline('{{ $item->id }}', 'kategori_bidang', this.val);
+                                                        }
+                                                        this.editing = false;
+                                                    }
+                                                }"
+                                            >
+                                                <div x-show="!editing" @dblclick="editing = true; $nextTick(() => $refs.bidInput.focus())" class="cursor-pointer group/inline inline-flex items-center gap-1">
+                                                    @if($item->kategori_bidang)
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                                            <i data-lucide="tag" class="w-2.5 h-2.5 text-slate-400"></i>
+                                                            <span>{{ $item->kategori_bidang }}</span>
+                                                        </span>
+                                                    @else
+                                                        <span class="text-[10px] text-slate-400 italic">+ Tambah Bidang</span>
+                                                    @endif
+                                                    <i data-lucide="edit-2" class="w-2.5 h-2.5 text-slate-300 opacity-0 group-hover/inline:opacity-100 transition-opacity"></i>
+                                                </div>
+                                                <input 
+                                                    x-ref="bidInput"
+                                                    x-show="editing" 
+                                                    x-model="val" 
+                                                    @keydown.enter="save()" 
+                                                    @keydown.escape="editing = false; val = '{{ addslashes($item->kategori_bidang ?? '') }}'" 
+                                                    @blur="save()"
+                                                    type="text" 
+                                                    placeholder="Nama Bidang..."
+                                                    class="w-full px-1.5 py-0.5 bg-blue-50 border border-blue-300 rounded text-[10px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                >
+                                            </div>
                                         </div>
                                     </x-table.td>
 
@@ -342,11 +435,40 @@
                                         </span>
                                     </x-table.td>
 
-                                    <!-- Urutan -->
+                                    <!-- Urutan (Inline Editable) -->
                                     <x-table.td align="center">
-                                        <span class="font-bold text-slate-600 text-xs bg-slate-100 px-2.5 py-1 rounded-xl">
-                                            #{{ $item->urutan }}
-                                        </span>
+                                        <div 
+                                            x-data="{ 
+                                                editing: false, 
+                                                val: '{{ $item->urutan }}',
+                                                save() {
+                                                    if (this.val !== '' && this.val != '{{ $item->urutan }}') {
+                                                        $wire.updateFieldInline('{{ $item->id }}', 'urutan', this.val);
+                                                    }
+                                                    this.editing = false;
+                                                }
+                                            }"
+                                        >
+                                            <span 
+                                                x-show="!editing" 
+                                                @dblclick="editing = true; $nextTick(() => $refs.urutInput.focus())"
+                                                class="font-bold text-slate-600 text-xs bg-slate-100 px-2.5 py-1 rounded-xl cursor-pointer hover:bg-blue-100 hover:text-blue-900 transition-colors"
+                                                title="Klik 2x untuk ubah nomor urut"
+                                            >
+                                                #{{ $item->urutan }}
+                                            </span>
+                                            <input 
+                                                x-ref="urutInput"
+                                                x-show="editing" 
+                                                x-model="val" 
+                                                @keydown.enter="save()" 
+                                                @keydown.escape="editing = false; val = '{{ $item->urutan }}'" 
+                                                @blur="save()"
+                                                type="number" 
+                                                min="0"
+                                                class="w-14 px-1 py-0.5 bg-blue-50 border border-blue-300 rounded text-center text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            >
+                                        </div>
                                     </x-table.td>
 
                                     <!-- Status Tampil -->
@@ -363,24 +485,38 @@
                                     </x-table.td>
 
                                     <!-- Actions -->
-                                    <x-table.td align="center">
-                                        <div class="flex items-center justify-center gap-1.5">
+                                    <x-table.td align="right">
+                                        <div class="flex items-center justify-end gap-1">
+                                            <x-table.action-btn 
+                                                size="sm"
+                                                variant="secondary" 
+                                                icon="eye" 
+                                                wire:click="bukaPratinjau('{{ $item->id }}')" 
+                                                title="Lihat Profil Pengurus" 
+                                            />
+
                                             <x-table.action-btn 
                                                 size="sm"
                                                 variant="primary" 
                                                 icon="edit-3" 
                                                 loading-target="bukaFormEdit('{{ $item->id }}')"
                                                 wire:click="bukaFormEdit('{{ $item->id }}')" 
-                                                title="Edit Pengurus" 
+                                                title="Edit Data Lengkap" 
+                                            />
+
+                                            <x-table.action-btn 
+                                                size="sm"
+                                                variant="secondary" 
+                                                icon="copy" 
+                                                wire:click="duplikatPengurus('{{ $item->id }}')" 
+                                                title="Duplikat Pengurus" 
                                             />
 
                                             <x-table.action-btn 
                                                 size="sm"
                                                 variant="danger" 
                                                 icon="trash-2" 
-                                                loading-target="hapus('{{ $item->id }}')"
-                                                wire:click="hapus('{{ $item->id }}')" 
-                                                wire:confirm="Yakin ingin menghapus data pengurus ini?" 
+                                                wire:click="konfirmasiHapus('{{ $item->id }}')" 
                                                 title="Hapus Pengurus" 
                                             />
                                         </div>
@@ -428,7 +564,7 @@
                                     </button>
                                 </div>
 
-                                <div class="text-center mb-4">
+                                <div class="text-center mb-4 cursor-pointer" wire:click="bukaPratinjau('{{ $item->id }}')">
                                     @if($item->foto_url)
                                         <div class="w-20 h-20 rounded-3xl overflow-hidden bg-slate-100 border-2 border-white shadow-md mx-auto mb-3">
                                             <img src="{{ app(\App\Services\StorageService::class)->getTemporaryUrl($item->foto_url) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="{{ $item->nama_lengkap }}">
@@ -457,12 +593,27 @@
                                 <span class="text-[10px] font-bold text-slate-400">Urutan: #{{ $item->urutan }}</span>
 
                                 <div class="flex items-center gap-1.5">
-                                    <button wire:click="bukaFormEdit('{{ $item->id }}')" title="Edit Pengurus" class="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-all cursor-pointer">
-                                        <i data-lucide="edit-3" class="w-4 h-4"></i>
-                                    </button>
-                                    <button wire:click="hapus('{{ $item->id }}')" wire:confirm="Yakin ingin menghapus pengurus ini?" title="Hapus Pengurus" class="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition-all cursor-pointer">
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                    </button>
+                                    <x-table.action-btn 
+                                        size="sm"
+                                        variant="secondary" 
+                                        icon="eye" 
+                                        wire:click="bukaPratinjau('{{ $item->id }}')" 
+                                        title="Pratinjau Pengurus" 
+                                    />
+                                    <x-table.action-btn 
+                                        size="sm"
+                                        variant="primary" 
+                                        icon="edit-3" 
+                                        wire:click="bukaFormEdit('{{ $item->id }}')" 
+                                        title="Edit Pengurus" 
+                                    />
+                                    <x-table.action-btn 
+                                        size="sm"
+                                        variant="danger" 
+                                        icon="trash-2" 
+                                        wire:click="konfirmasiHapus('{{ $item->id }}')" 
+                                        title="Hapus Pengurus" 
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -556,6 +707,7 @@
                                     wire:model="nama_lengkap" 
                                     placeholder="Contoh: Hj. Emma Dety Permanawati, S.Pd.I., M.M." 
                                     icon="user"
+                                    size="lg"
                                 />
                             </x-form.field>
 
@@ -643,25 +795,139 @@
                 </div>
 
                 <!-- 3. ACTION BAR -->
-                <x-form.action-bar>
-                    <x-form.button 
-                        type="button" 
-                        variant="secondary" 
-                        wire:click="kembaliKeTabel"
-                    >
-                        Batal
-                    </x-form.button>
-
-                    <x-form.button 
-                        type="submit" 
-                        variant="primary" 
-                        icon="save" 
-                        loading-target="simpan"
-                    >
-                        {{ $editId ? 'Perbarui Pengurus' : 'Simpan Pengurus' }}
-                    </x-form.button>
-                </x-form.action-bar>
+                <x-form.action-bar 
+                    cancel-text="Batal & Kembali" 
+                    cancel-action="kembaliKeTabel" 
+                    :submit-text="$editId ? 'Perbarui Pengurus' : 'Simpan Pengurus ke Database'" 
+                    loading-target="simpan" 
+                />
             </form>
+        </div>
+    @endif
+
+    <!-- ========================================================= -->
+    <!-- MODAL: PRATINJAU KARTU PROFIL PENGURUS LENGKAP            -->
+    <!-- ========================================================= -->
+    @if($tampilkanModalPratinjau && $pratinjauPengurus)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+            <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+                <!-- Modal Header -->
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                            <i data-lucide="user-check" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-black text-slate-900">Profil Pengurus KORMI</h3>
+                            <p class="text-[10px] text-slate-400">Periode {{ $pratinjauPengurus->periode?->nama_periode ?? '-' }} ({{ $pratinjauPengurus->periode?->tahun_mulai }}-{{ $pratinjauPengurus->periode?->tahun_selesai }})</p>
+                        </div>
+                    </div>
+                    <button type="button" wire:click="tutupPratinjau" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 overflow-y-auto space-y-5 text-center">
+                    <div class="relative w-28 h-28 mx-auto rounded-3xl overflow-hidden bg-slate-100 border-2 border-white shadow-lg">
+                        @if($pratinjauPengurus->foto_url)
+                            <img src="{{ app(\App\Services\StorageService::class)->getTemporaryUrl($pratinjauPengurus->foto_url) }}" class="w-full h-full object-cover" alt="{{ $pratinjauPengurus->nama_lengkap }}">
+                        @else
+                            <div class="w-full h-full bg-blue-50 text-blue-700 flex items-center justify-center font-black text-3xl">
+                                {{ strtoupper(substr($pratinjauPengurus->nama_lengkap, 0, 2)) }}
+                            </div>
+                        @endif
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-center gap-2 flex-wrap mb-1">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                                Urutan Hierarki: #{{ $pratinjauPengurus->urutan }}
+                            </span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider {{ $pratinjauPengurus->status_tampil ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
+                                {{ $pratinjauPengurus->status_tampil ? 'Publik' : 'Draft' }}
+                            </span>
+                        </div>
+                        <h2 class="text-lg font-black text-slate-900 leading-snug">{{ $pratinjauPengurus->nama_lengkap }}</h2>
+                        <p class="text-sm font-bold text-blue-600">{{ $pratinjauPengurus->jabatan }}</p>
+                        @if($pratinjauPengurus->kategori_bidang)
+                            <p class="text-xs text-slate-500 font-medium">{{ $pratinjauPengurus->kategori_bidang }}</p>
+                        @endif
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs text-left">
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Jabatan</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauPengurus->jabatan }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Masa Bakti</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauPengurus->periode?->nama_periode ?? '-' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                    <button 
+                        type="button" 
+                        wire:click="bukaFormEdit('{{ $pratinjauPengurus->id }}')" 
+                        class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                        <span>Edit Data Pengurus</span>
+                    </button>
+
+                    <button 
+                        type="button" 
+                        wire:click="tutupPratinjau" 
+                        class="px-5 py-2 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider hover:bg-slate-300 transition-colors cursor-pointer"
+                    >
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- ========================================================= -->
+    <!-- MODAL: KONFIRMASI HAPUS PENGURUS                          -->
+    <!-- ========================================================= -->
+    @if($tampilkanModalHapus)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+            <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100 p-6 sm:p-7 space-y-6 text-center">
+                <div class="w-14 h-14 rounded-3xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-sm">
+                    <i data-lucide="alert-triangle" class="w-7 h-7"></i>
+                </div>
+
+                <div class="space-y-2">
+                    <h3 class="text-lg font-black text-slate-900">Hapus Data Pengurus?</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Apakah Anda yakin ingin menghapus data pengurus <br>
+                        <span class="font-bold text-slate-900 italic">"{{ $hapusNama }}"</span>?
+                    </p>
+                    <p class="text-[11px] text-rose-600 font-medium">Data dan berkas pas foto terkait akan dihapus secara permanen dari server.</p>
+                </div>
+
+                <div class="flex items-center justify-center gap-3 pt-2">
+                    <button 
+                        type="button" 
+                        wire:click="batalHapus" 
+                        class="px-6 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                        Batalkan
+                    </button>
+
+                    <button 
+                        type="button" 
+                        wire:click="prosesHapus" 
+                        class="px-6 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs uppercase tracking-wider shadow-md shadow-rose-600/20 transition-all cursor-pointer flex items-center gap-2"
+                    >
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Ya, Hapus Data</span>
+                    </button>
+                </div>
+            </div>
         </div>
     @endif
 

@@ -4,7 +4,7 @@ namespace App\Models;
 
 class PengaturanSitus extends ModelDasar
 {
-    protected $table = 'kormi_pengaturan_situs';
+    protected $table = 'sys_pengaturan_situs';
 
     protected $guarded = ['id'];
 

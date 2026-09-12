@@ -23,8 +23,8 @@
 
             <!-- 1. HEADER & PRIMARY ACTION (COMPACT PRO COMPONENT) -->
             <x-table.header
-                title="Katalog Duta Olahraga Desa & Kecamatan"
-                subtitle="Data kader dan duta penggerak olahraga di 31 Kecamatan dan 280 Desa/Kelurahan se-Kabupaten Bandung."
+                title="Katalog & Kader Duta Olahraga Masyarakat"
+                subtitle="Data profil duta penggerak olahraga di 31 Kecamatan dan 280 Desa/Kelurahan se-Kabupaten Bandung."
                 badge="Pembinaan & Penggerak • Duta Olahraga"
                 icon="award"
                 color="indigo"
@@ -36,30 +36,30 @@
                         class="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs uppercase tracking-wider shadow-md shadow-indigo-600/20 hover:shadow-lg transition-all cursor-pointer active:scale-95 group"
                     >
                         <i data-lucide="user-plus" class="w-4 h-4"></i>
-                        <span>Tambah Duta</span>
+                        <span>Tambah Duta Baru</span>
                     </button>
                 </x-slot:actions>
             </x-table.header>
 
             <!-- 2. FULL-WIDTH KPI METRIC STATS -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 w-full">
                 <x-table.stats-card
-                    title="Total Duta Olahraga"
+                    title="Total Duta Terdata"
                     :value="number_format($totalDuta)"
-                    unit="Orang"
-                    subtitle="Kader pembina masyarakat"
+                    unit="Kader"
+                    subtitle="Duta olahraga masyarakat"
                     icon="award"
                     color="indigo"
-                    :active="$kecamatanDipilih === 'Semua' && $tahunDipilih === 'Semua'"
+                    :active="$kecamatanDipilih === 'Semua' && $tahunDipilih === 'Semua' && $unggulanDipilih === 'Semua'"
                     loading-target="resetSemuaFilter, kecamatanDipilih, tahunDipilih"
                     wire:click="resetSemuaFilter"
                 />
 
                 <x-table.stats-card
-                    title="Kecamatan Terwakili"
+                    title="Cakupan Kecamatan"
                     :value="number_format($totalKecamatanTerwakili)"
-                    unit="/ 31"
-                    subtitle="Cakupan wilayah aktif"
+                    unit="/ 31 Kec"
+                    subtitle="Wilayah telah memiliki kader"
                     icon="map-pin"
                     color="emerald"
                     :pulse="true"
@@ -68,12 +68,24 @@
                 />
 
                 <x-table.stats-card
-                    title="Duta Tahun Ini"
+                    title="Duta Unggulan (Top)"
+                    :value="number_format($dutaUnggulanCount)"
+                    unit="Tokoh"
+                    subtitle="Kader berprestasi utama"
+                    icon="star"
+                    color="amber"
+                    :active="$unggulanDipilih === 'ya'"
+                    loading-target="unggulanDipilih"
+                    wire:click="$set('unggulanDipilih', 'ya')"
+                />
+
+                <x-table.stats-card
+                    title="Edisi Tahun Ini"
                     :value="number_format($dutaTahunIni)"
-                    unit="Kader"
+                    unit="Orang"
                     subtitle="Pemilihan periode 2026"
                     icon="calendar"
-                    color="amber"
+                    color="indigo"
                     :active="$tahunDipilih == 2026"
                     loading-target="tahunDipilih"
                     wire:click="$set('tahunDipilih', '2026')"
@@ -82,7 +94,7 @@
 
             <!-- 3. FILTER & SEARCH TOOLBAR -->
             <x-table.filter-bar 
-                search-placeholder="Cari nama duta, prestasi, desa/kelurahan..." 
+                search-placeholder="Cari nama duta, profesi, gelar, instagram, desa/kecamatan..." 
                 search-model="cari"
             >
                 <x-slot:top>
@@ -117,6 +129,15 @@
                         <option value="Duta Pemuda & Kebugaran">Duta Pemuda & Kebugaran</option>
                         <option value="Duta Lansia Bugar">Duta Lansia Bugar</option>
                         <option value="Duta Pelajar Berprestasi">Duta Pelajar Berprestasi</option>
+                        <option value="Duta Senam & Kesehatan">Duta Senam & Kesehatan</option>
+                        <option value="Duta Olahraga Tradisional">Duta Olahraga Tradisional</option>
+                    </select>
+
+                    <!-- Filter Status Unggulan -->
+                    <select wire:model.live="unggulanDipilih" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
+                        <option value="Semua">Semua Sorotan</option>
+                        <option value="ya">⭐ Duta Unggulan</option>
+                        <option value="tidak">Duta Reguler</option>
                     </select>
 
                     <!-- Filter Tahun -->
@@ -131,7 +152,7 @@
                     <select wire:model.live="sortField" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
                         <option value="nama_lengkap">Urut: Nama Lengkap</option>
                         <option value="tahun_pemilihan">Urut: Tahun Pemilihan</option>
-                        <option value="created_at">Urut: Tanggal Didaftarkan</option>
+                        <option value="dibuat_pada">Urut: Tanggal Didaftarkan</option>
                     </select>
 
                     <!-- Direction -->
@@ -140,7 +161,6 @@
                         <option value="desc">Menurun (DESC)</option>
                     </select>
 
-                    <!-- Per Page -->
                     <!-- View Switcher with localStorage persistence -->
                     <div 
                         x-data="{
@@ -184,6 +204,24 @@
             <x-table.bulk-bar :count="count($selectedDuta)" label="duta dipilih" reset-action="resetSelection">
                 <button 
                     type="button" 
+                    wire:click="bulkToggleUnggulan(true)" 
+                    class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                >
+                    <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+                    <span>Set Duta Unggulan</span>
+                </button>
+
+                <button 
+                    type="button" 
+                    wire:click="bulkToggleAktif(true)" 
+                    class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                >
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                    <span>Set Aktif</span>
+                </button>
+
+                <button 
+                    type="button" 
                     wire:click="bulkDelete" 
                     wire:confirm="Yakin ingin menghapus {{ count($selectedDuta) }} data duta terpilih secara permanen?"
                     class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
@@ -197,7 +235,7 @@
             @if($tampilanMode === 'tabel')
                 <!-- FULL-WIDTH DATA TABLE -->
                 <x-table.card>
-                    <x-table.table loading-target="cari, kecamatanDipilih, tahunDipilih, kategoriDipilih, sortField, sortDirection, perPage, gotoPage, nextPage, previousPage">
+                    <x-table.table loading-target="cari, kecamatanDipilih, tahunDipilih, kategoriDipilih, statusDipilih, unggulanDipilih, sortField, sortDirection, perPage, gotoPage, nextPage, previousPage">
                         <x-table.thead>
                             <tr>
                                 <x-table.th align="center" class="w-12 !px-4">
@@ -213,9 +251,10 @@
                                     :current-sort="$sortField" 
                                     :current-direction="$sortDirection"
                                 >
-                                    Profil Duta Olahraga
+                                    Profil Duta & Gelar
                                 </x-table.th>
                                 <x-table.th>Wilayah Penugasan</x-table.th>
+                                <x-table.th>Kontak & Sosmed</x-table.th>
                                 <x-table.th>Kategori & Peran</x-table.th>
                                 <x-table.th 
                                     sortable 
@@ -226,6 +265,7 @@
                                 >
                                     Periode
                                 </x-table.th>
+                                <x-table.th align="center">Sorotan</x-table.th>
                                 <x-table.th align="right">Aksi</x-table.th>
                             </tr>
                         </x-table.thead>
@@ -242,10 +282,10 @@
                                         >
                                     </x-table.td>
 
-                                    <!-- Profil Duta -->
+                                    <!-- Profil Duta with Inline Edit -->
                                     <x-table.td>
                                         <div class="flex items-center gap-3.5 max-w-md">
-                                            <div class="relative shrink-0 group">
+                                            <div class="relative shrink-0 group cursor-pointer" wire:click="bukaPratinjau('{{ $d->id }}')">
                                                 @if($d->foto_url)
                                                     @php $tmpUrl = app(\App\Services\StorageService::class)->getTemporaryUrl($d->foto_url) @endphp
                                                     <img 
@@ -259,30 +299,39 @@
                                                         {{ strtoupper(substr($d->nama_lengkap, 0, 2)) }}
                                                     </div>
                                                 @endif
+                                                @if($d->status_unggulan)
+                                                    <span class="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 text-slate-900 rounded-full flex items-center justify-center text-[9px] shadow-xs" title="Duta Unggulan">⭐</span>
+                                                @endif
                                             </div>
-                                            <div class="min-w-0 space-y-0.5">
-                                                <a 
-                                                    href="javascript:void(0)" 
-                                                    wire:click="bukaFormEdit('{{ $d->id }}')" 
-                                                    class="font-black text-slate-900 text-xs sm:text-sm hover:text-indigo-600 line-clamp-1 leading-tight transition-colors cursor-pointer"
+
+                                            <div class="min-w-0 flex-1 space-y-0.5">
+                                                <x-table.editable-cell 
+                                                    :model-id="$d->id" 
+                                                    field="nama_lengkap" 
+                                                    :value="$d->nama_lengkap"
+                                                    placeholder="Nama lengkap duta..."
                                                 >
-                                                    {{ $d->nama_lengkap }}
-                                                </a>
+                                                    <span class="font-black text-slate-900 text-xs sm:text-sm hover:text-indigo-600 line-clamp-1 leading-tight transition-colors cursor-pointer block">
+                                                        {{ $d->nama_lengkap }}
+                                                    </span>
+                                                </x-table.editable-cell>
+
                                                 <div class="flex items-center gap-2 text-[11px] text-slate-400 font-medium">
-                                                    @if($d->kontak)
-                                                        <span class="flex items-center gap-1">
-                                                            <i data-lucide="phone" class="w-3 h-3 text-slate-400"></i>
-                                                            <span>{{ $d->kontak }}</span>
-                                                        </span>
+                                                    @if($d->gelar_prestasi)
+                                                        <span class="text-indigo-600 font-semibold truncate max-w-[180px]">{{ $d->gelar_prestasi }}</span>
                                                         <span>•</span>
                                                     @endif
-                                                    <span>ID: {{ substr($d->id, 0, 8) }}</span>
+                                                    <span class="text-slate-400">{{ $d->jenis_kelamin === 'P' ? 'Perempuan' : 'Laki-laki' }}</span>
+                                                    @if($d->pekerjaan_profesi)
+                                                        <span>•</span>
+                                                        <span class="truncate max-w-[120px]">{{ $d->pekerjaan_profesi }}</span>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
                                     </x-table.td>
 
-                                    <!-- Wilayah -->
+                                    <!-- Wilayah Penugasan -->
                                     <x-table.td>
                                         <div class="space-y-1">
                                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
@@ -292,6 +341,27 @@
                                             <p class="text-[11px] text-slate-500 font-bold pl-1">
                                                 {{ $d->desaKelurahan->nama_desa_kelurahan ? 'Desa ' . $d->desaKelurahan->nama_desa_kelurahan : 'Tingkat Kecamatan' }}
                                             </p>
+                                        </div>
+                                    </x-table.td>
+
+                                    <!-- Kontak & Sosmed -->
+                                    <x-table.td>
+                                        <div class="space-y-1 text-xs">
+                                            @if($d->nomor_telepon)
+                                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $d->nomor_telepon) }}" target="_blank" class="flex items-center gap-1.5 text-slate-700 hover:text-emerald-600 font-semibold transition-colors">
+                                                    <i data-lucide="phone" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                                    <span>{{ $d->nomor_telepon }}</span>
+                                                </a>
+                                            @else
+                                                <span class="text-slate-300 text-[11px] italic">Tanpa Nomor HP</span>
+                                            @endif
+
+                                            @if($d->akun_instagram)
+                                                <a href="https://instagram.com/{{ $d->akun_instagram }}" target="_blank" class="flex items-center gap-1 text-[11px] text-pink-600 hover:underline font-bold">
+                                                    <i data-lucide="instagram" class="w-3 h-3"></i>
+                                                    <span>@<span>{{ $d->akun_instagram }}</span></span>
+                                                </a>
+                                            @endif
                                         </div>
                                     </x-table.td>
 
@@ -310,25 +380,51 @@
                                         </span>
                                     </x-table.td>
 
+                                    <!-- Sorotan Unggulan -->
+                                    <x-table.td align="center">
+                                        <button 
+                                            type="button" 
+                                            wire:click="toggleUnggulan('{{ $d->id }}')" 
+                                            class="w-7 h-7 rounded-xl flex items-center justify-center transition-all cursor-pointer {{ $d->status_unggulan ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 'bg-slate-100 text-slate-300 hover:text-amber-500 hover:bg-amber-50' }}"
+                                            title="Toggle Duta Unggulan"
+                                        >
+                                            <i data-lucide="star" class="w-4 h-4 {{ $d->status_unggulan ? 'fill-current' : '' }}"></i>
+                                        </button>
+                                    </x-table.td>
+
                                     <!-- Actions -->
                                     <x-table.td align="right">
                                         <div class="flex items-center justify-end gap-1">
+                                            <x-table.action-btn 
+                                                size="sm"
+                                                variant="secondary" 
+                                                icon="eye" 
+                                                wire:click="bukaPratinjau('{{ $d->id }}')" 
+                                                title="Lihat Profil Lengkap" 
+                                            />
+
                                             <x-table.action-btn 
                                                 size="sm"
                                                 variant="indigo" 
                                                 icon="edit-3" 
                                                 loading-target="bukaFormEdit('{{ $d->id }}')"
                                                 wire:click="bukaFormEdit('{{ $d->id }}')" 
-                                                title="Edit Data Duta" 
+                                                title="Edit Biodata Lengkap" 
+                                            />
+
+                                            <x-table.action-btn 
+                                                size="sm"
+                                                variant="secondary" 
+                                                icon="copy" 
+                                                wire:click="duplikatDuta('{{ $d->id }}')" 
+                                                title="Duplikat Data" 
                                             />
 
                                             <x-table.action-btn 
                                                 size="sm"
                                                 variant="danger" 
                                                 icon="trash-2" 
-                                                loading-target="hapus('{{ $d->id }}')"
-                                                wire:click="hapus('{{ $d->id }}')" 
-                                                wire:confirm="Yakin ingin menghapus data duta olahraga ini?" 
+                                                wire:click="konfirmasiHapus('{{ $d->id }}')" 
                                                 title="Hapus Data Duta" 
                                             />
                                         </div>
@@ -336,7 +432,7 @@
                                 </x-table.tr>
                             @empty
                                 <x-table.empty 
-                                    colspan="6" 
+                                    colspan="8" 
                                     icon="award" 
                                     title="Belum ada data Duta Olahraga" 
                                     description="Silakan tambahkan data duta atau kader penggerak olahraga di wilayah Anda."
@@ -357,9 +453,9 @@
                 <!-- GRID PROFIL CARDS VIEW -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                     @forelse($dutaList as $d)
-                        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all p-5 flex flex-col justify-between group">
+                        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all p-5 flex flex-col justify-between group {{ in_array($d->id, $selectedDuta) ? 'ring-2 ring-indigo-500' : '' }}">
                             <div>
-                                <div class="relative h-44 rounded-2xl overflow-hidden bg-slate-100 mb-4 border border-slate-100">
+                                <div class="relative h-48 rounded-2xl overflow-hidden bg-slate-100 mb-4 border border-slate-100 cursor-pointer" wire:click="bukaPratinjau('{{ $d->id }}')">
                                     @if($d->foto_url)
                                         @php $tmpUrl = app(\App\Services\StorageService::class)->getTemporaryUrl($d->foto_url) @endphp
                                         <img 
@@ -374,10 +470,24 @@
                                         </div>
                                     @endif
 
-                                    <div class="absolute top-2.5 left-2.5">
+                                    <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5">
                                         <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-900/80 text-white backdrop-blur-xs shadow-xs">
                                             {{ $d->tahun_pemilihan }}
                                         </span>
+                                        @if($d->status_unggulan)
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-slate-900 shadow-xs flex items-center gap-1">
+                                                ⭐ Unggulan
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <div class="absolute top-2.5 right-2.5">
+                                        <input 
+                                            type="checkbox" 
+                                            wire:model.live="selectedDuta" 
+                                            value="{{ $d->id }}" 
+                                            class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer shadow-md"
+                                        >
                                     </div>
                                 </div>
 
@@ -386,18 +496,25 @@
                                         <i data-lucide="map-pin" class="w-3 h-3"></i>
                                         <span>Kec. {{ $d->kecamatan->nama_kecamatan ?? '-' }}</span>
                                     </span>
-                                    <h3 class="font-black text-slate-900 text-sm group-hover:text-indigo-600 transition-colors line-clamp-1 mt-1">{{ $d->nama_lengkap }}</h3>
+                                    <h3 class="font-black text-slate-900 text-sm group-hover:text-indigo-600 transition-colors line-clamp-1 mt-1 cursor-pointer" wire:click="bukaPratinjau('{{ $d->id }}')">{{ $d->nama_lengkap }}</h3>
                                     <p class="text-xs text-slate-500 font-medium line-clamp-1">{{ $d->desaKelurahan->nama_desa_kelurahan ? 'Desa ' . $d->desaKelurahan->nama_desa_kelurahan : 'Kader Kecamatan' }}</p>
                                     
-                                    @if($d->prestasi)
-                                        <p class="text-[11px] text-slate-400 line-clamp-2 mt-2 pt-2 border-t border-slate-100 italic">{{ $d->prestasi }}</p>
+                                    @if($d->gelar_prestasi || $d->prestasi)
+                                        <p class="text-[11px] text-slate-400 line-clamp-2 mt-2 pt-2 border-t border-slate-100 italic">{{ $d->gelar_prestasi ?: $d->prestasi }}</p>
                                     @endif
                                 </div>
                             </div>
 
                             <div class="flex items-center justify-between pt-4 mt-4 border-t border-slate-100 text-xs">
-                                <span class="text-[10px] font-bold text-slate-400 truncate max-w-[120px]">{{ $d->kontak ?: 'Tanpa Kontak' }}</span>
+                                <span class="text-[10px] font-bold text-slate-400 truncate max-w-[110px]">{{ $d->nomor_telepon ?: ($d->akun_instagram ? '@'.$d->akun_instagram : 'Tanpa Kontak') }}</span>
                                 <div class="flex items-center gap-1.5">
+                                    <x-table.action-btn 
+                                        size="sm"
+                                        variant="secondary" 
+                                        icon="eye" 
+                                        wire:click="bukaPratinjau('{{ $d->id }}')" 
+                                        title="Pratinjau Profil" 
+                                    />
                                     <x-table.action-btn 
                                         size="sm"
                                         variant="indigo" 
@@ -410,9 +527,7 @@
                                         size="sm"
                                         variant="danger" 
                                         icon="trash-2" 
-                                        loading-target="hapus('{{ $d->id }}')"
-                                        wire:click="hapus('{{ $d->id }}')" 
-                                        wire:confirm="Yakin ingin menghapus data duta olahraga ini?" 
+                                        wire:click="konfirmasiHapus('{{ $d->id }}')" 
                                         title="Hapus Duta" 
                                     />
                                 </div>
@@ -444,9 +559,9 @@
         <div class="space-y-6 animate-in fade-in duration-150 max-w-7xl mx-auto">
             <!-- 1. FORM HEADER BANNER -->
             <x-form.header 
-                :title="$dutaId ? 'Edit Biodata Duta Olahraga' : 'Registrasi Duta Olahraga Baru'"
-                subtitle="Lengkapi data profil kader duta penggerak, pilih wilayah penugasan, dan unggah pas foto resmi."
-                :badge="$dutaId ? 'Mode Edit Duta' : 'Duta Baru'"
+                :title="$dutaId ? 'Edit Biodata Lengkap Duta Olahraga' : 'Registrasi & Pendataan Duta Olahraga Baru'"
+                subtitle="Lengkapi data profil detail kader, penugasan wilayah, riwayat prestasi olahraga, dan pas foto resmi."
+                :badge="$dutaId ? 'Mode Edit Duta' : 'Pendaftaran Duta Baru'"
                 icon="award"
             >
                 <x-slot:actions>
@@ -473,25 +588,95 @@
             <!-- 2. MAIN FORM CONTENT -->
             <form wire:submit.prevent="simpan" class="space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <!-- Left Column (7 cols): Metadata -->
+                    
+                    <!-- Left Column (7 cols): Detailed Personal & Location Info -->
                     <div class="lg:col-span-7 space-y-6">
+                        
+                        <!-- CARD 1: IDENTITAS UTAMA -->
                         <x-form.card 
-                            title="Biodata & Informasi Wilayah" 
-                            subtitle="Identitas lengkap kader dan wilayah penugasan di Kabupaten Bandung."
+                            title="Identitas Kader Duta" 
+                            subtitle="Informasi personal dan kependudukan duta olahraga."
                             icon="user-check"
                             size="default"
                         >
-                            <!-- Nama Lengkap -->
-                            <x-form.field label="Nama Lengkap Beserta Gelar" name="nama_lengkap" :required="true">
-                                <x-form.input 
-                                    name="nama_lengkap" 
-                                    wire:model="nama_lengkap" 
-                                    placeholder="Contoh: Rian Hidayat, S.Pd." 
-                                    size="lg"
-                                    icon="user"
-                                />
-                            </x-form.field>
+                            <!-- Nama Lengkap & Jenis Kelamin -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div class="sm:col-span-2">
+                                    <x-form.field label="Nama Lengkap Beserta Gelar" name="nama_lengkap" :required="true">
+                                        <x-form.input 
+                                            name="nama_lengkap" 
+                                            wire:model="nama_lengkap" 
+                                            placeholder="Contoh: Rian Hidayat, S.Pd., M.Or." 
+                                            size="lg"
+                                            icon="user"
+                                        />
+                                    </x-form.field>
+                                </div>
 
+                                <div>
+                                    <x-form.field label="Jenis Kelamin" name="jenis_kelamin" :required="true">
+                                        <x-form.select name="jenis_kelamin" wire:model="jenis_kelamin">
+                                            <option value="L">Laki-laki</option>
+                                            <option value="P">Perempuan</option>
+                                        </x-form.select>
+                                    </x-form.field>
+                                </div>
+                            </div>
+
+                            <!-- Tempat & Tanggal Lahir -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <x-form.field label="Tempat Lahir (Kota/Kab)" name="tempat_lahir">
+                                    <x-form.input 
+                                        type="text"
+                                        name="tempat_lahir" 
+                                        wire:model="tempat_lahir" 
+                                        placeholder="Contoh: Bandung" 
+                                        icon="map-pin"
+                                    />
+                                </x-form.field>
+
+                                <x-form.field label="Tanggal Lahir" name="tanggal_lahir">
+                                    <x-form.input 
+                                        type="date"
+                                        name="tanggal_lahir" 
+                                        wire:model="tanggal_lahir" 
+                                    />
+                                </x-form.field>
+                            </div>
+
+                            <!-- Profesi & Pendidikan -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <x-form.field label="Profesi / Pekerjaan Saat Ini" name="pekerjaan_profesi">
+                                    <x-form.input 
+                                        type="text"
+                                        name="pekerjaan_profesi" 
+                                        wire:model="pekerjaan_profesi" 
+                                        placeholder="Contoh: Guru Olahraga / Atlet / Wiraswasta" 
+                                        icon="briefcase"
+                                    />
+                                </x-form.field>
+
+                                <x-form.field label="Pendidikan Terakhir" name="pendidikan_terakhir">
+                                    <x-form.select name="pendidikan_terakhir" wire:model="pendidikan_terakhir">
+                                        <option value="">-- Pilih Jenjang --</option>
+                                        <option value="SMA/SMK">SMA / SMK Sederajat</option>
+                                        <option value="Diploma (D3/D4)">Diploma (D3/D4)</option>
+                                        <option value="Sarjana (S1)">Sarjana (S1)</option>
+                                        <option value="Magister (S2)">Magister (S2)</option>
+                                        <option value="Doktor (S3)">Doktor (S3)</option>
+                                        <option value="Lainnya">Lainnya</option>
+                                    </x-form.select>
+                                </x-form.field>
+                            </div>
+                        </x-form.card>
+
+                        <!-- CARD 2: PENUGASAN & WILAYAH -->
+                        <x-form.card 
+                            title="Penugasan Wilayah & Klasifikasi" 
+                            subtitle="Kecamatan penempatan, kategori pembinaan, dan tahun pemilihan."
+                            icon="map"
+                            size="default"
+                        >
                             <!-- Wilayah Kecamatan & Desa -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <x-form.field label="Kecamatan Penugasan" name="kecamatan_id" :required="true">
@@ -502,9 +687,9 @@
                                     </x-form.select>
                                 </x-form.field>
 
-                                <x-form.field label="Desa / Kelurahan" name="desa_kelurahan_id">
+                                <x-form.field label="Desa / Kelurahan Penugasan" name="desa_kelurahan_id">
                                     <x-form.select name="desa_kelurahan_id" wire:model="desa_kelurahan_id">
-                                        <option value="">-- Tingkat Kecamatan --</option>
+                                        <option value="">-- Koordinator Tingkat Kecamatan --</option>
                                         @foreach($desaList as $d)
                                             <option value="{{ $d->id }}">{{ $d->nama_desa_kelurahan }}</option>
                                         @endforeach
@@ -520,6 +705,8 @@
                                         <option value="Duta Pemuda & Kebugaran">Duta Pemuda & Kebugaran</option>
                                         <option value="Duta Lansia Bugar">Duta Lansia Bugar</option>
                                         <option value="Duta Pelajar Berprestasi">Duta Pelajar Berprestasi</option>
+                                        <option value="Duta Senam & Kesehatan">Duta Senam & Kesehatan</option>
+                                        <option value="Duta Olahraga Tradisional">Duta Olahraga Tradisional</option>
                                     </x-form.select>
                                 </x-form.field>
 
@@ -535,31 +722,52 @@
                                 </x-form.field>
                             </div>
 
-                            <!-- Kontak & Telepon -->
-                            <x-form.field label="Nomor Telepon / WhatsApp (Opsional)" name="kontak">
-                                <x-form.input 
-                                    type="text"
-                                    name="kontak" 
-                                    wire:model="kontak" 
-                                    placeholder="Contoh: 081234567890" 
-                                    icon="phone"
-                                />
-                            </x-form.field>
-
-                            <!-- Prestasi / Catatan -->
-                            <x-form.field label="Catatan Prestasi & Pengalaman Organisasi (Opsional)" name="prestasi">
+                            <!-- Alamat Domisili -->
+                            <x-form.field label="Alamat Domisili Lengkap (Opsional)" name="alamat_domisili">
                                 <x-form.textarea 
-                                    name="prestasi" 
-                                    wire:model="prestasi" 
-                                    placeholder="Tuliskan jejak rekam, kejuaraan, atau kontribusi olahraga masyarakat..."
-                                    rows="3"
+                                    name="alamat_domisili" 
+                                    wire:model="alamat_domisili" 
+                                    placeholder="Jalan, RT/RW, Dusun, atau patokan alamat..."
+                                    rows="2"
                                 />
                             </x-form.field>
                         </x-form.card>
+
+                        <!-- CARD 3: PRESTASI & PENGALAMAN -->
+                        <x-form.card 
+                            title="Rekam Jejak & Prestasi Olahraga" 
+                            subtitle="Gelar penghargaan, lisensi keolahragaan, atau kontribusi pembinaan."
+                            icon="trophy"
+                            size="default"
+                        >
+                            <!-- Gelar Singkat Prestasi -->
+                            <x-form.field label="Gelar Prestasi Utama / Highlight" name="gelar_prestasi">
+                                <x-form.input 
+                                    type="text"
+                                    name="gelar_prestasi" 
+                                    wire:model="gelar_prestasi" 
+                                    placeholder="Contoh: Juara 1 Senam Bugar Jabar 2025 / Instruktur Berlisensi" 
+                                    icon="award"
+                                />
+                            </x-form.field>
+
+                            <!-- Deskripsi Lengkap -->
+                            <x-form.field label="Deskripsi Pengalaman & Riwayat Keolahragaan" name="deskripsi_prestasi">
+                                <x-form.textarea 
+                                    name="deskripsi_prestasi" 
+                                    wire:model="deskripsi_prestasi" 
+                                    placeholder="Tuliskan jejak rekam kejuaraan, sertifikasi kepelatihan, atau peran penggerak di masyarakat..."
+                                    rows="4"
+                                />
+                            </x-form.field>
+                        </x-form.card>
+
                     </div>
 
-                    <!-- Right Column (5 cols): Photo Upload -->
+                    <!-- Right Column (5 cols): Photo & Status Flags -->
                     <div class="lg:col-span-5 space-y-6">
+                        
+                        <!-- Pas Foto Profil -->
                         <x-form.card 
                             title="Pas Foto Resmi Duta" 
                             subtitle="Unggah foto profil formal kader duta olahraga."
@@ -578,6 +786,73 @@
                                 aspectRatio="h-72 sm:h-80"
                             />
                         </x-form.card>
+
+                        <!-- Kontak & Media Sosial -->
+                        <x-form.card 
+                            title="Kontak & Kanal Media Sosial" 
+                            subtitle="Akses komunikasi langsung dan publikasi kader."
+                            icon="phone"
+                            size="default"
+                        >
+                            <x-form.field label="Nomor WhatsApp / Telepon" name="nomor_telepon">
+                                <x-form.input 
+                                    type="text"
+                                    name="nomor_telepon" 
+                                    wire:model="nomor_telepon" 
+                                    placeholder="Contoh: 081234567890" 
+                                    icon="phone"
+                                />
+                            </x-form.field>
+
+                            <x-form.field label="Alamat Email (Opsional)" name="email">
+                                <x-form.input 
+                                    type="email"
+                                    name="email" 
+                                    wire:model="email" 
+                                    placeholder="Contoh: duta@kormibdg.id" 
+                                    icon="mail"
+                                />
+                            </x-form.field>
+
+                            <x-form.field label="Username Akun Instagram (Opsional)" name="akun_instagram">
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 font-bold text-xs">@</span>
+                                    <input 
+                                        type="text" 
+                                        wire:model="akun_instagram" 
+                                        placeholder="username_instagram" 
+                                        class="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-800 rounded-xl text-xs font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                                    >
+                                </div>
+                            </x-form.field>
+                        </x-form.card>
+
+                        <!-- Status Publikasi & Sorotan -->
+                        <x-form.card 
+                            title="Pengaturan Status & Sorotan" 
+                            subtitle="Tentukan visibilitas pada direktori publik."
+                            icon="sliders"
+                            size="default"
+                        >
+                            <div class="space-y-4">
+                                <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200/80 cursor-pointer hover:bg-slate-100/60 transition-colors">
+                                    <div class="space-y-0.5">
+                                        <p class="text-xs font-black text-slate-900">⭐ Duta Olahraga Unggulan</p>
+                                        <p class="text-[11px] text-slate-500">Tampilkan pada sorotan banner halaman utama.</p>
+                                    </div>
+                                    <input type="checkbox" wire:model="status_unggulan" class="w-5 h-5 rounded text-amber-500 focus:ring-amber-400 cursor-pointer">
+                                </label>
+
+                                <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200/80 cursor-pointer hover:bg-slate-100/60 transition-colors">
+                                    <div class="space-y-0.5">
+                                        <p class="text-xs font-black text-slate-900">Status Keaktifan Kader</p>
+                                        <p class="text-[11px] text-slate-500">Duta berstatus aktif dalam kegiatan.</p>
+                                    </div>
+                                    <input type="checkbox" wire:model="status_aktif" class="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                                </label>
+                            </div>
+                        </x-form.card>
+
                     </div>
                 </div>
 
@@ -589,6 +864,164 @@
                     loading-target="simpan" 
                 />
             </form>
+        </div>
+    @endif
+
+    <!-- ========================================================= -->
+    <!-- MODAL: PRATINJAU KARTU PROFIL DUTA LENGKAP               -->
+    <!-- ========================================================= -->
+    @if($tampilkanModalPratinjau && $pratinjauDuta)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+            <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+                <!-- Modal Header -->
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                            <i data-lucide="award" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-black text-slate-900">Profil Duta Olahraga Masyarakat</h3>
+                            <p class="text-[10px] text-slate-400">Kabupaten Bandung • Periode {{ $pratinjauDuta->tahun_pemilihan }}</p>
+                        </div>
+                    </div>
+                    <button type="button" wire:click="tutupPratinjau" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 overflow-y-auto space-y-6">
+                    <div class="flex flex-col sm:flex-row items-center gap-5">
+                        <div class="w-32 h-36 rounded-2xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200 shadow-sm relative">
+                            @if($pratinjauDuta->foto_url)
+                                @php $tmpUrl = app(\App\Services\StorageService::class)->getTemporaryUrl($pratinjauDuta->foto_url) @endphp
+                                <img src="{{ $tmpUrl }}" class="w-full h-full object-cover" alt="{{ $pratinjauDuta->nama_lengkap }}">
+                            @else
+                                <div class="w-full h-full bg-gradient-to-tr from-indigo-600 to-violet-500 text-white font-black text-3xl flex items-center justify-center">
+                                    {{ strtoupper(substr($pratinjauDuta->nama_lengkap, 0, 2)) }}
+                                </div>
+                            @endif
+                            @if($pratinjauDuta->status_unggulan)
+                                <span class="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-amber-400 text-slate-900 text-[9px] font-black shadow-xs">⭐ Top</span>
+                            @endif
+                        </div>
+
+                        <div class="space-y-1.5 text-center sm:text-left flex-1 min-w-0">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                {{ $pratinjauDuta->kategori_duta }}
+                            </span>
+                            <h2 class="text-xl font-black text-slate-900">{{ $pratinjauDuta->nama_lengkap }}</h2>
+                            <p class="text-xs font-bold text-slate-500 flex items-center justify-center sm:justify-start gap-1">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-indigo-600"></i>
+                                <span>Kecamatan {{ $pratinjauDuta->kecamatan->nama_kecamatan ?? '-' }}</span>
+                                <span>•</span>
+                                <span>{{ $pratinjauDuta->desaKelurahan->nama_desa_kelurahan ? 'Desa ' . $pratinjauDuta->desaKelurahan->nama_desa_kelurahan : 'Kader Kecamatan' }}</span>
+                            </p>
+                            @if($pratinjauDuta->gelar_prestasi)
+                                <p class="text-xs text-amber-600 font-bold italic">{{ $pratinjauDuta->gelar_prestasi }}</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Detail Data Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Jenis Kelamin</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauDuta->jenis_kelamin === 'P' ? 'Perempuan' : 'Laki-laki' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Pendidikan</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauDuta->pendidikan_terakhir ?: '-' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Profesi</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauDuta->pekerjaan_profesi ?: '-' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">WhatsApp</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauDuta->nomor_telepon ?: '-' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Instagram</span>
+                            <span class="font-bold text-pink-600">{{ $pratinjauDuta->akun_instagram ? '@'.$pratinjauDuta->akun_instagram : '-' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Status</span>
+                            <span class="font-bold {{ $pratinjauDuta->status_aktif ? 'text-emerald-600' : 'text-slate-400' }}">{{ $pratinjauDuta->status_aktif ? 'Aktif' : 'Non-Aktif' }}</span>
+                        </div>
+                    </div>
+
+                    @if($pratinjauDuta->deskripsi_prestasi || $pratinjauDuta->prestasi)
+                        <div class="space-y-1.5">
+                            <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Catatan Prestasi & Pengalaman:</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed p-3.5 rounded-2xl bg-indigo-50/50 border border-indigo-100 whitespace-pre-line">
+                                {{ $pratinjauDuta->deskripsi_prestasi ?: $pratinjauDuta->prestasi }}
+                            </p>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                    <button 
+                        type="button" 
+                        wire:click="bukaFormEdit('{{ $pratinjauDuta->id }}')" 
+                        class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                        <span>Edit Biodata</span>
+                    </button>
+
+                    <button 
+                        type="button" 
+                        wire:click="tutupPratinjau" 
+                        class="px-5 py-2 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider hover:bg-slate-300 transition-colors cursor-pointer"
+                    >
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- ========================================================= -->
+    <!-- MODAL: KONFIRMASI HAPUS DUTA                              -->
+    <!-- ========================================================= -->
+    @if($tampilkanModalHapus)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+            <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100 p-6 sm:p-7 space-y-6 text-center">
+                <div class="w-14 h-14 rounded-3xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-sm">
+                    <i data-lucide="alert-triangle" class="w-7 h-7"></i>
+                </div>
+
+                <div class="space-y-2">
+                    <h3 class="text-lg font-black text-slate-900">Hapus Data Duta Olahraga?</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Apakah Anda yakin ingin menghapus data duta <br>
+                        <span class="font-bold text-slate-900 italic">"{{ $hapusNama }}"</span>?
+                    </p>
+                    <p class="text-[11px] text-rose-600 font-medium">Data dan pas foto terkait akan dihapus secara permanen dari server.</p>
+                </div>
+
+                <div class="flex items-center justify-center gap-3 pt-2">
+                    <button 
+                        type="button" 
+                        wire:click="batalHapus" 
+                        class="px-6 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                        Batalkan
+                    </button>
+
+                    <button 
+                        type="button" 
+                        wire:click="prosesHapus" 
+                        class="px-6 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs uppercase tracking-wider shadow-md shadow-rose-600/20 transition-all cursor-pointer flex items-center gap-2"
+                    >
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Ya, Hapus Data</span>
+                    </button>
+                </div>
+            </div>
         </div>
     @endif
 

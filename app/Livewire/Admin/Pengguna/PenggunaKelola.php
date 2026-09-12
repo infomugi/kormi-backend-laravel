@@ -59,9 +59,9 @@ class PenggunaKelola extends Component
     {
         $rules = [
             'nama_lengkap' => 'required|min:3|max:100',
-            'email' => 'required|email|unique:kormi_pengguna,email,' . ($this->penggunaId ?? 'NULL') . ',id,dihapus_pada,NULL',
+            'email' => 'required|email|unique:sys_pengguna,email,' . ($this->penggunaId ?? 'NULL') . ',id,dihapus_pada,NULL',
             'nomor_telepon' => 'nullable|min:8|max:20',
-            'peran_id' => 'required|exists:kormi_peran,id',
+            'peran_id' => 'required|exists:sys_peran,id',
             'status_aktif' => 'boolean',
             'uploadFotoProfil' => 'nullable|image|max:5120',
         ];

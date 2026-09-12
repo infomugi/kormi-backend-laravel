@@ -32,7 +32,7 @@ class PeranKelola extends Component
     {
         return [
             'nama_peran' => 'required|string|max:50|min:3',
-            'slug' => 'required|string|max:50|regex:/^[a-z0-9\-]+$/|unique:kormi_peran,slug,' . ($this->peranId ?? 'NULL') . ',id',
+            'slug' => 'required|string|max:50|regex:/^[a-z0-9\-]+$/|unique:sys_peran,slug,' . ($this->peranId ?? 'NULL') . ',id',
             'deskripsi' => 'nullable|string|max:255',
             'hak_akses' => 'array',
         ];

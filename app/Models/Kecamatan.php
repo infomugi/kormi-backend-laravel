@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Kecamatan extends ModelDasar
 {
-    protected $table = 'kormi_kecamatan';
+    protected $table = 'ref_kecamatan';
 
     public function desaKelurahan(): HasMany
     {

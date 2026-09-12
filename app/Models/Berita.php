@@ -11,7 +11,7 @@ class Berita extends ModelDasar
 
     const DELETED_AT = 'dihapus_pada';
 
-    protected $table = 'kormi_berita';
+    protected $table = 'media_berita';
 
     protected $casts = [
         'status_unggulan' => 'boolean',

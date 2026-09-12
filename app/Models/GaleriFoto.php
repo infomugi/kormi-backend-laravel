@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GaleriFoto extends ModelDasar
 {
-    protected $table = 'kormi_galeri_foto';
+    protected $table = 'media_galeri_foto';
 
     protected $casts = [
         'urutan' => 'integer',

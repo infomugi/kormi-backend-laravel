@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('kormi_peran', function (Blueprint $table) {
-            $table->json('hak_akses')->nullable()->after('deskripsi');
-        });
+        // Handled directly in base migration (sys_peran.hak_akses)
+        if (!Schema::hasColumn('sys_peran', 'hak_akses')) {
+            Schema::table('sys_peran', function (Blueprint $table) {
+                $table->json('hak_akses')->nullable()->after('deskripsi');
+            });
+        }
     }
 
     /**
@@ -21,8 +24,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('kormi_peran', function (Blueprint $table) {
-            $table->dropColumn('hak_akses');
-        });
+        if (Schema::hasColumn('sys_peran', 'hak_akses')) {
+            Schema::table('sys_peran', function (Blueprint $table) {
+                $table->dropColumn('hak_akses');
+            });
+        }
     }
 };

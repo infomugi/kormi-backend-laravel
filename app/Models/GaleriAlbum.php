@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GaleriAlbum extends ModelDasar
 {
-    protected $table = 'kormi_galeri_album';
+    protected $table = 'media_galeri_album';
 
     protected $casts = [
         'tanggal_kegiatan' => 'date',

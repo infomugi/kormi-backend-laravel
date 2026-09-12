@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Sapras extends ModelDasar
 {
-    protected $table = 'kormi_sapras';
+    protected $table = 'sarpras_fasilitas';
 
     public function kecamatan(): BelongsTo
     {

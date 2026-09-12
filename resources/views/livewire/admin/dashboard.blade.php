@@ -1,666 +1,812 @@
-<div class="space-y-8">
+<div class="space-y-4 sm:space-y-5" x-data="{ activeTab: 'week' }">
     
-    <!-- 1. GREETING HEADER -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                <span>Good morning, {{ explode(' ', auth()->user()->nama_lengkap ?? 'Admin')[0] }}</span>
-                <span class="text-3xl sm:text-4xl">👋</span>
-            </h1>
-            <p class="text-xs sm:text-sm font-semibold text-slate-400 mt-1">Selamat datang di Panel Administrasi & Eksekutif Portal KORMI Kabupaten Bandung.</p>
-        </div>
-
+    <!-- ========================================================================= -->
+    <!-- 1. TOP HEADER / COMPACT EXECUTIVE BAR                                     -->
+    <!-- ========================================================================= -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/80 shadow-2xs">
         <div class="flex items-center gap-3">
-            <span class="px-4 py-2 rounded-full bg-white border border-slate-200/90 text-xs font-bold text-slate-700 shadow-2xs flex items-center gap-2">
-                <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
-                <span>{{ \Carbon\Carbon::now()->format('l, d F Y') }}</span>
-            </span>
-        </div>
-    </div>
-
-    <!-- 2. EXECUTIVE QUICK HUB / SEMUA MENU SIDEBAR (COMPACT & ULTRA PREMIUM) -->
-    @php
-        $user = auth()->user();
-        $isSuper = $user?->isSuperAdmin() ?? false;
-        $isEditor = $isSuper || ($user?->isEditorBerita() ?? false) || ($user?->punyaAkses('berita') ?? false);
-        $isKorcam = $isSuper || ($user?->isAdminKorcam() ?? false) || ($user?->punyaAkses('duta') ?? false);
-        $isInorga = $isSuper || ($user?->isAdminInorga() ?? false) || ($user?->punyaAkses('inorga') ?? false);
-    @endphp
-
-    <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-sm space-y-4">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-            <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center shadow-sm shadow-emerald-600/30">
-                    <i data-lucide="layout-grid" class="w-4 h-4"></i>
-                </div>
-                <div>
-                    <h2 class="text-xs sm:text-sm font-black text-slate-900 tracking-tight uppercase">Pusat Navigasi & Menu Portal</h2>
-                    <p class="text-[10px] font-semibold text-slate-400">Akses langsung ke seluruh modul aktif sistem KORMI</p>
-                </div>
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-black text-base shadow-sm shadow-emerald-600/20 shrink-0">
+                KB
             </div>
-            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/60 hidden sm:inline-flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Semua Menu Sidebar</span>
-            </span>
+            <div>
+                <h1 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                    <span>Dashboard KORMI Kabupaten Bandung</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-extrabold border border-emerald-200/60">CMS v2.6</span>
+                </h1>
+                <p class="text-[11px] sm:text-xs font-semibold text-slate-400">Pusat data terpadu olahraga rekreasi, inorga, program kerja, dan kejuaraan wilayah.</p>
+            </div>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
-            
-            @if($isEditor)
-            <!-- 1. Berita & Publikasi -->
-            <a href="{{ route('admin.berita') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/90 border border-slate-200/70 hover:border-emerald-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-emerald-600/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="newspaper" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-emerald-950 truncate">Berita & Publikasi</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-emerald-700 truncate">Warta & Berita</span>
-                </div>
+        <div class="flex items-center gap-2 flex-wrap">
+            <span class="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-600 flex items-center gap-1.5 shadow-2xs">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600"></i>
+                <span>{{ \Carbon\Carbon::now()->translatedFormat('l, d M Y') }}</span>
+            </span>
+            <a href="{{ route('admin.berita') }}" wire:navigate class="px-3.5 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white text-xs font-black shadow-2xs flex items-center gap-1.5 transition-all">
+                <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>Tulis Berita</span>
             </a>
-
-            <!-- 2. Galeri Dokumentasi -->
-            <a href="{{ route('admin.galeri') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-teal-50/90 border border-slate-200/70 hover:border-teal-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-teal-600/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="image" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-teal-950 truncate">Galeri Dokumentasi</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-teal-700 truncate">Dokumentasi Foto</span>
-                </div>
-            </a>
-
-            <!-- 3. Dokumen Unduhan -->
-            <a href="{{ route('admin.unduhan') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-amber-50/90 border border-slate-200/70 hover:border-amber-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs shadow-amber-500/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="file-down" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-amber-950 truncate">Dokumen Unduhan</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-amber-700 truncate">Berkas & Regulasi</span>
-                </div>
-            </a>
-            @endif
-
-            @if($isKorcam)
-            <!-- 4. Duta Olahraga -->
-            <a href="{{ route('admin.duta') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-cyan-50/90 border border-slate-200/70 hover:border-cyan-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-cyan-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-cyan-600/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="user-check" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-cyan-950 truncate">Duta Olahraga</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-cyan-700 truncate">Kecamatan & Desa</span>
-                </div>
-            </a>
-
-            <!-- 5. Kordik Kecamatan -->
-            <a href="{{ route('admin.kordik') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-sky-50/90 border border-slate-200/70 hover:border-sky-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-sky-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-sky-600/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="map-pin" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-sky-950 truncate">Kordik Kecamatan</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-sky-700 truncate">Koordinator Wilayah</span>
-                </div>
-            </a>
-
-            <!-- 6. Sarana & Prasarana -->
-            <a href="{{ route('admin.sapras') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/90 border border-slate-200/70 hover:border-emerald-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-xs shadow-emerald-700/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="building-2" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-emerald-950 truncate">Sarana & Prasarana</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-emerald-700 truncate">Venue & Fasilitas</span>
-                </div>
-            </a>
-            @endif
-
-            @if($isInorga)
-            <!-- 7. Inorga & Komisi -->
-            <a href="{{ route('admin.inorga') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-lime-50/90 border border-slate-200/70 hover:border-lime-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-lime-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-lime-600/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="boxes" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-lime-950 truncate">Inorga & Komisi</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-lime-700 truncate">Induk Olahraga</span>
-                </div>
-            </a>
-
-            <!-- 8. Kelola Event -->
-            <a href="{{ route('admin.event') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-indigo-50/90 border border-slate-200/70 hover:border-indigo-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-indigo-600/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="calendar-days" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-indigo-950 truncate">Kelola Event</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-indigo-700 truncate">Jadwal & Agenda</span>
-                </div>
-            </a>
-
-            <!-- 9. Klasemen Medali -->
-            <a href="{{ route('admin.klasemen') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-orange-50/90 border border-slate-200/70 hover:border-orange-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs shadow-orange-500/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="trophy" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-orange-950 truncate">Klasemen Medali</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-orange-700 truncate">Perolehan Medali</span>
-                </div>
-            </a>
-            @endif
-
-            @if($isSuper)
-            <!-- 10. Pelatihan & SDI -->
-            <a href="{{ route('admin.sdi') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-blue-50/90 border border-slate-200/70 hover:border-blue-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-blue-600/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="graduation-cap" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-blue-950 truncate">Pelatihan & SDI</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-blue-700 truncate">SDM & Sertifikasi</span>
-                </div>
-            </a>
-
-            <!-- 11. Anugerah APMO -->
-            <a href="{{ route('admin.apmo') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-amber-50/90 border border-slate-200/70 hover:border-amber-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-amber-600/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="award" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-amber-950 truncate">Anugerah APMO</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-amber-700 truncate">Apresiasi & Tokoh</span>
-                </div>
-            </a>
-
-            <!-- 12. Sejarah KORMI -->
-            <a href="{{ route('admin.sejarah') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/90 border border-slate-200/70 hover:border-emerald-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-emerald-800 text-white flex items-center justify-center shrink-0 shadow-xs shadow-emerald-800/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="clock" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-emerald-950 truncate">Linimasa Sejarah</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-emerald-700 truncate">Histori Organisasi</span>
-                </div>
-            </a>
-
-            <!-- 13. Visi & Misi -->
-            <a href="{{ route('admin.visimisi') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-teal-50/90 border border-slate-200/70 hover:border-teal-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-teal-700 text-white flex items-center justify-center shrink-0 shadow-xs shadow-teal-700/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="target" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-teal-950 truncate">Visi & Misi</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-teal-700 truncate">Arah Kebijakan</span>
-                </div>
-            </a>
-
-            <!-- 14. Pengurus KORMI -->
-            <a href="{{ route('admin.pengurus') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-violet-50/90 border border-slate-200/70 hover:border-violet-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-violet-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-violet-600/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="users" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-violet-950 truncate">Pengurus KORMI</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-violet-700 truncate">Struktur Pengurus</span>
-                </div>
-            </a>
-
-            <!-- 15. Program Kerja -->
-            <a href="{{ route('admin.proker') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-rose-50/90 border border-slate-200/70 hover:border-rose-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-xs shadow-rose-600/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="clipboard-list" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-rose-950 truncate">Program Kerja</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-rose-700 truncate">Rencana Kegiatan</span>
-                </div>
-            </a>
-
-            <!-- 16. Kelola Pengguna -->
-            <a href="{{ route('admin.pengguna') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-slate-100 border border-slate-200/70 hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-slate-700 text-white flex items-center justify-center shrink-0 shadow-xs shadow-slate-700/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="users-round" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-slate-950 truncate">Kelola Pengguna</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-slate-700 truncate">Akun & Operator</span>
-                </div>
-            </a>
-
-            <!-- 17. Peran & Akses -->
-            <a href="{{ route('admin.peran') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/90 border border-slate-200/70 hover:border-emerald-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-emerald-900 text-white flex items-center justify-center shrink-0 shadow-xs shadow-emerald-900/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="shield-check" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-emerald-950 truncate">Peran & Akses</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-emerald-700 truncate">Manajemen RBAC</span>
-                </div>
-            </a>
-
-            <!-- 18. Pengaturan Portal -->
-            <a href="{{ route('admin.pengaturan') }}" wire:navigate 
-                class="group relative flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50/70 hover:bg-slate-100 border border-slate-200/70 hover:border-slate-300 shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer overflow-hidden">
-                <div class="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center shrink-0 shadow-xs shadow-slate-800/25 group-hover:scale-105 transition-transform">
-                    <i data-lucide="settings" class="w-4.5 h-4.5"></i>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <span class="block text-xs font-black text-slate-900 group-hover:text-slate-950 truncate">Pengaturan</span>
-                    <span class="block text-[10px] font-semibold text-slate-400 group-hover:text-slate-700 truncate">Konfigurasi Situs</span>
-                </div>
-            </a>
-            @endif
-
         </div>
     </div>
 
-    <!-- 3. MAIN DASHBOARD GRID (LEFT 2-COLUMNS CONTENT + RIGHT TO-DO & UPGRADE PRO SIDEBAR) -->
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+    <!-- ========================================================================= -->
+    <!-- 2. COMPACT STATS STRIP (6 PILL METRICS)                                  -->
+    <!-- ========================================================================= -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <!-- Metric 1: Inorga -->
+        <a href="{{ route('admin.inorga') }}" wire:navigate class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-emerald-300 transition-all flex items-center gap-3 group">
+            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <i data-lucide="boxes" class="w-4.5 h-4.5"></i>
+            </div>
+            <div class="min-w-0">
+                <span class="text-base font-black text-slate-900 block leading-tight">{{ $totalInorga }}</span>
+                <span class="text-[10px] font-bold text-slate-400 truncate block">Inorga Aktif</span>
+            </div>
+        </a>
+
+        <!-- Metric 2: Duta Olahraga -->
+        <a href="{{ route('admin.duta') }}" wire:navigate class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-cyan-300 transition-all flex items-center gap-3 group">
+            <div class="w-9 h-9 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <i data-lucide="user-check" class="w-4.5 h-4.5"></i>
+            </div>
+            <div class="min-w-0">
+                <span class="text-base font-black text-slate-900 block leading-tight">{{ $totalDuta }}</span>
+                <span class="text-[10px] font-bold text-slate-400 truncate block">Duta Olahraga</span>
+            </div>
+        </a>
+
+        <!-- Metric 3: KORDIK Kecamatan -->
+        <a href="{{ route('admin.kordik') }}" wire:navigate class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-sky-300 transition-all flex items-center gap-3 group">
+            <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <i data-lucide="map-pin" class="w-4.5 h-4.5"></i>
+            </div>
+            <div class="min-w-0">
+                <span class="text-base font-black text-slate-900 block leading-tight">{{ $kordikAktif }}/31</span>
+                <span class="text-[10px] font-bold text-slate-400 truncate block">Kordik Cam</span>
+            </div>
+        </a>
+
+        <!-- Metric 4: Sarana & Venue -->
+        <a href="{{ route('admin.sapras') }}" wire:navigate class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-purple-300 transition-all flex items-center gap-3 group">
+            <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <i data-lucide="building-2" class="w-4.5 h-4.5"></i>
+            </div>
+            <div class="min-w-0">
+                <span class="text-base font-black text-slate-900 block leading-tight">{{ $totalSapras }}</span>
+                <span class="text-[10px] font-bold text-slate-400 truncate block">Sarana & Venue</span>
+            </div>
+        </a>
+
+        <!-- Metric 5: Total Berita -->
+        <a href="{{ route('admin.berita') }}" wire:navigate class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-amber-300 transition-all flex items-center gap-3 group">
+            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <i data-lucide="newspaper" class="w-4.5 h-4.5"></i>
+            </div>
+            <div class="min-w-0">
+                <span class="text-base font-black text-slate-900 block leading-tight">{{ $totalBerita }}</span>
+                <span class="text-[10px] font-bold text-slate-400 truncate block">Warta Berita</span>
+            </div>
+        </a>
+
+        <!-- Metric 6: Total Anggaran Proker -->
+        <a href="{{ route('admin.proker') }}" wire:navigate class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-indigo-300 transition-all flex items-center gap-3 group">
+            <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <i data-lucide="badge-dollar-sign" class="w-4.5 h-4.5"></i>
+            </div>
+            <div class="min-w-0">
+                <span class="text-base font-black text-slate-900 block leading-tight">Rp {{ number_format($totalAnggaran / 1000000, 0) }}M</span>
+                <span class="text-[10px] font-bold text-slate-400 truncate block">Pagu Proker</span>
+            </div>
+        </a>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 3. MAIN BENTO GRID (COMPACT STYLE)                                        -->
+    <!-- ========================================================================= -->
+    
+    <!-- UPPER ROW: 3 Bento Cards (Activity Bar Graph, Progress Statistics, Active Highlight Event) -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
         
-        <!-- LEFT 8-COLS: MAIN METRICS & CHARTS -->
-        <div class="xl:col-span-8 space-y-8">
-            
-            <!-- ROW A: TOP 2 SUMMARY CARDS -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <!-- Card 1: Most Issued Content / Berita Terpopuler -->
-                <div class="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between text-xs text-slate-400 font-semibold mb-3">
-                            <span class="flex items-center gap-1.5 text-slate-700 font-bold">
-                                <span>Publikasi Unggulan</span>
-                                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
-                            </span>
-                            <span>Minggu Ini</span>
-                        </div>
-
-                        <div class="flex items-start justify-between gap-4 mt-2">
-                            <div>
-                                <span class="px-2 py-0.5 rounded-md bg-cyan-100 text-cyan-800 text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1">
-                                    <i data-lucide="newspaper" class="w-3 h-3"></i> Berita Utama
-                                </span>
-                                <h3 class="text-sm sm:text-base font-extrabold text-slate-900 mt-2 line-clamp-2 leading-snug">
-                                    {{ $beritaTerbaru->first()->judul ?? 'Persiapan Menuju FORKAB 2026 Kabupaten Bandung' }}
-                                </h3>
-                                <span class="text-xs font-bold text-emerald-600 flex items-center gap-1 mt-2">
-                                    <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
-                                    <span>+18% pembaca baru</span>
-                                </span>
-                            </div>
-
-                            <div class="text-right shrink-0">
-                                <span class="text-3xl font-black text-slate-900 block leading-none">{{ $totalBerita }}</span>
-                                <span class="text-[10px] font-bold text-slate-400 block mt-1">Total Berita</span>
-                                
-                                <!-- Mini Sparkline Wave -->
-                                <div class="mt-3 flex items-center justify-end text-emerald-500">
-                                    <svg class="w-16 h-6 stroke-current" fill="none" viewBox="0 0 64 24" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2 18 L16 12 L30 16 L44 6 L62 10" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                        <a href="{{ route('admin.berita') }}" wire:navigate class="text-xs font-bold text-slate-700 hover:text-slate-950">Lihat semua artikel & berita</a>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+        <!-- CARD 1: ACTIVITY (Bar Graph with Highlighted Column & Dotted Target) -->
+        <div class="md:col-span-12 lg:col-span-4 bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between relative overflow-hidden">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-black text-slate-900 tracking-tight">Aktivitas Web & Pembaca</h2>
+                    <div class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200/70 text-[10px] font-bold text-slate-600">
+                        <i data-lucide="calendar-days" class="w-3 h-3 text-slate-400"></i>
+                        <span>7 Hari</span>
                     </div>
                 </div>
 
-                <!-- Card 2: Assignment / Progress Duta Olahraga -->
-                <div class="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between text-xs text-slate-400 font-semibold mb-3">
-                            <span class="flex items-center gap-1.5 text-slate-700 font-bold">
-                                <span>Partisipasi Duta Olahraga</span>
-                                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
-                            </span>
-                        </div>
-
-                        <div class="mt-2">
-                            <div class="flex items-baseline justify-between">
-                                <span class="text-2xl sm:text-3xl font-black text-slate-900">{{ $totalDuta }} Terdaftar</span>
-                                <span class="text-xs font-bold text-slate-400">{{ 280 - $totalDuta }} Desa tersisa</span>
-                            </div>
-
-                            <!-- Dual Color Progress Bar -->
-                            <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden mt-4 flex">
-                                <div class="bg-emerald-600 h-full rounded-full" style="width: {{ min(100, round(($totalDuta / 280) * 100)) }}%;"></div>
-                            </div>
-                            <span class="text-[11px] font-bold text-slate-400 block mt-2">Target 280 Desa/Kelurahan se-Kabupaten Bandung</span>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                        <a href="{{ route('admin.duta') }}" wire:navigate class="text-xs font-bold text-slate-700 hover:text-emerald-700 flex items-center gap-2">
-                            <i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i>
-                            <span>Kelola data duta olahraga</span>
-                        </a>
-                        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
-                    </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{{ number_format($totalViews, 0, ',', '.') }}</span>
+                    <span class="text-[11px] font-bold text-slate-400">Kunjungan</span>
                 </div>
-            </div>
-
-            <!-- ROW B: SEMI-DONUT GAUGE CHART & TOP INORGA/KONTINGEN LIST -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                
-                <!-- Semi-Donut Gauge (Col-Span 6) -->
-                <div class="md:col-span-6 bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="flex items-center gap-1.5 text-sm font-black text-slate-900">
-                            <span>Status Konten & Data</span>
-                            <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
-                        </span>
-                        <span class="text-xs font-bold text-slate-500 flex items-center gap-1 cursor-pointer">
-                            <span>By status</span>
-                            <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
-                        </span>
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row items-center gap-6 mt-6">
-                        <!-- Semi-donut Visual Arc -->
-                        <div class="relative w-44 h-28 flex items-end justify-center shrink-0">
-                            <svg class="w-44 h-44 -rotate-90 absolute top-0" viewBox="0 0 100 100">
-                                <!-- Background Arc -->
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-dasharray="125 250" stroke-linecap="round" />
-                                <!-- Emerald Green Section (Berita) -->
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="#059669" stroke-width="12" stroke-dasharray="45 250" stroke-linecap="round" />
-                                <!-- Bedas Lime Section (Unduhan) -->
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="#8ed500" stroke-width="12" stroke-dasharray="30 250" stroke-dashoffset="-48" stroke-linecap="round" />
-                                <!-- Amber Section (Inorga) -->
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="#f59e0b" stroke-width="12" stroke-dasharray="25 250" stroke-dashoffset="-80" stroke-linecap="round" />
-                                <!-- Teal Section (Galeri) -->
-                                <circle cx="50" cy="50" r="40" fill="none" stroke="#0d9488" stroke-width="12" stroke-dasharray="18 250" stroke-dashoffset="-107" stroke-linecap="round" />
-                            </svg>
-                            <div class="text-center z-10 pb-1">
-                                <span class="text-[10px] font-bold text-slate-400 block uppercase">Total Konten</span>
-                                <span class="text-3xl font-black text-slate-900 leading-none">{{ $totalBerita + $totalUnduhan + $totalInorga }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Legend List with Percentage -->
-                        <div class="flex-1 w-full space-y-2.5 text-xs">
-                            <div class="flex items-center justify-between">
-                                <span class="flex items-center gap-2 font-bold text-slate-700">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> Berita Terbit
-                                </span>
-                                <span class="font-black text-slate-900">84%</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="flex items-center gap-2 font-bold text-slate-700">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-teal-600"></span> Galeri Foto
-                                </span>
-                                <span class="font-black text-slate-900">8%</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="flex items-center gap-2 font-bold text-slate-700">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-lime-600"></span> Inorga Aktif
-                                </span>
-                                <span class="font-black text-slate-900">5%</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="flex items-center gap-2 font-bold text-slate-700">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Dokumen SK
-                                </span>
-                                <span class="font-black text-slate-900">3%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Top Kontingen / Kecamatan Leaderboard (Col-Span 6) -->
-                <div class="md:col-span-6 bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="flex items-center gap-1.5 text-sm font-black text-slate-900">
-                                <span>Klasemen Unggulan FORKAB</span>
-                                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
-                            </span>
-                        </div>
-
-                        <!-- 3 Top Ranked Kecamatan -->
-                        <div class="space-y-3.5 mt-4">
-                            <!-- #1 -->
-                            <div class="flex items-center justify-between gap-3 p-2.5 rounded-2xl bg-amber-50/50 border border-amber-100">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-xs font-black text-amber-700">#1</span>
-                                    <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center font-black text-xs">
-                                        🥇
-                                    </div>
-                                    <div>
-                                        <h4 class="text-xs font-bold text-slate-900">{{ $topKecamatan->kecamatan->nama_kecamatan ?? 'Kecamatan Margahayu' }}</h4>
-                                        <span class="text-[10px] text-slate-500 font-medium">Kontingen Juara Umum</span>
-                                    </div>
-                                </div>
-                                <span class="text-xs font-black text-amber-700 flex items-center gap-1">
-                                    <span class="w-2 h-2 rounded-full bg-amber-500"></span> 100 pts
-                                </span>
-                            </div>
-
-                            <!-- #2 -->
-                            <div class="flex items-center justify-between gap-3 p-2.5 rounded-2xl hover:bg-slate-50 transition-colors">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-xs font-black text-slate-400">#2</span>
-                                    <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-black text-xs">
-                                        🥈
-                                    </div>
-                                    <div>
-                                        <h4 class="text-xs font-bold text-slate-900">Kecamatan Soreang</h4>
-                                        <span class="text-[10px] text-slate-400 font-medium">Runner Up Kontingen</span>
-                                    </div>
-                                </div>
-                                <span class="text-xs font-black text-slate-600 flex items-center gap-1">
-                                    <span class="w-2 h-2 rounded-full bg-slate-400"></span> 80 pts
-                                </span>
-                            </div>
-
-                            <!-- #3 -->
-                            <div class="flex items-center justify-between gap-3 p-2.5 rounded-2xl hover:bg-slate-50 transition-colors">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-xs font-black text-slate-400">#3</span>
-                                    <div class="w-8 h-8 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center font-black text-xs">
-                                        🥉
-                                    </div>
-                                    <div>
-                                        <h4 class="text-xs font-bold text-slate-900">Kecamatan Baleendah</h4>
-                                        <span class="text-[10px] text-slate-400 font-medium">Peringkat 3 Medali</span>
-                                    </div>
-                                </div>
-                                <span class="text-xs font-black text-amber-900 flex items-center gap-1">
-                                    <span class="w-2 h-2 rounded-full bg-amber-600"></span> 75 pts
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 pt-3 border-t border-slate-100 text-left">
-                        <a href="{{ route('admin.klasemen') }}" wire:navigate class="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1">
-                            <span>Lihat Semua Klasemen</span>
-                            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ROW C: BOTTOM DATA TABLE (UNGGRADED QUIZ / ARTIKEL VERIFIKASI) -->
-            <div class="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="flex items-center gap-1.5 text-sm font-black text-slate-900">
-                        <span>Publikasi & Liputan Terkini</span>
-                        <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="inline-flex items-center gap-0.5 text-[11px] font-bold text-emerald-600">
+                        <i data-lucide="trending-up" class="w-3 h-3"></i> +24.8%
                     </span>
-                    <a href="{{ route('admin.berita') }}" wire:navigate class="text-xs font-bold text-emerald-700 hover:underline">Kelola Berita</a>
+                    <span class="text-[10px] text-slate-400 font-medium">minggu ini</span>
+                </div>
+            </div>
+
+            <!-- Bar Chart Visualization (Compact) -->
+            <div class="mt-4 pt-2 relative">
+                <!-- Dotted Baseline Target -->
+                <div class="absolute top-8 left-0 right-0 flex items-center z-10 pointer-events-none">
+                    <div class="px-1.5 py-0.5 rounded bg-slate-900 text-white text-[9px] font-black">
+                        5.2k avg
+                    </div>
+                    <div class="flex-1 border-b border-dashed border-slate-300 ml-1.5"></div>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs min-w-[550px]">
-                        <thead>
-                            <tr class="text-[11px] font-bold text-slate-400 border-b border-slate-100 pb-3">
-                                <th class="pb-3 font-semibold w-10">No</th>
-                                <th class="pb-3 font-semibold">Judul Publikasi</th>
-                                <th class="pb-3 font-semibold">Kategori</th>
-                                <th class="pb-3 font-semibold">Penulis</th>
-                                <th class="pb-3 font-semibold text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 font-medium">
-                            @forelse($beritaTerbaru as $idx => $item)
-                                <tr class="hover:bg-slate-50/70 transition-colors">
-                                    <td class="py-3.5 font-bold text-slate-900">{{ $idx + 1 }}</td>
-                                    <td class="py-3.5 font-bold text-slate-900 max-w-[260px] truncate">
-                                        {{ $item->judul }}
-                                    </td>
-                                    <td class="py-3.5 text-slate-600">
-                                        <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500">
-                                            <i data-lucide="tag" class="w-3.5 h-3.5 text-slate-400"></i>
-                                            {{ $item->kategori->nama_kategori ?? 'Umum' }}
-                                        </span>
-                                    </td>
-                                    <td class="py-3.5">
-                                        <div class="flex items-center gap-2">
-                                            <div class="w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-[10px] font-bold">
-                                                {{ substr($item->penulis->nama_lengkap ?? 'Admin', 0, 1) }}
-                                            </div>
-                                            <span class="text-slate-800 font-semibold">{{ $item->penulis->nama_lengkap ?? 'Admin KORMI' }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="py-3.5 text-right">
-                                        <a href="{{ route('admin.berita') }}" wire:navigate class="px-4 py-1.5 rounded-xl border border-slate-200 text-slate-800 font-bold text-xs hover:bg-emerald-700 hover:text-white hover:border-emerald-700 transition-all inline-block shadow-2xs">
-                                            Kelola
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="py-8 text-center text-slate-400">Belum ada publikasi berita.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                <!-- 7 Bars Grid -->
+                <div class="grid grid-cols-7 gap-2 items-end h-32 pb-4 pt-1">
+                    @foreach($weeklyViews as $bar)
+                        <div class="flex flex-col items-center gap-1.5 h-full justify-end group cursor-pointer">
+                            <div class="w-full relative flex items-end justify-center rounded-xl transition-all duration-200 {{ !empty($bar['active']) ? 'bg-gradient-to-t from-violet-600 to-indigo-600 shadow-sm shadow-indigo-500/30' : 'bg-violet-100 group-hover:bg-violet-200' }}"
+                                style="height: {{ $bar['height'] }};">
+                                @if(!empty($bar['active']))
+                                    <div class="absolute -top-6 px-1.5 py-0.5 rounded bg-indigo-600 text-white text-[9px] font-black shadow-2xs whitespace-nowrap">
+                                        {{ $bar['val'] }}k
+                                    </div>
+                                @endif
+                            </div>
+                            <span class="text-[10px] font-bold {{ !empty($bar['active']) ? 'text-indigo-600 font-black' : 'text-slate-400 group-hover:text-slate-700' }}">
+                                {{ $bar['day'] }}
+                            </span>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
 
-        <!-- RIGHT 4-COLS: TO-DO LIST & PRO / EXECUTIVE CARD -->
-        <div class="xl:col-span-4 space-y-6">
-            
-            <!-- 1. TO-DO LIST CARD -->
-            <div class="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="flex items-center gap-1.5 text-sm font-black text-slate-900">
-                        <span>Agenda KORMI</span>
-                        <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
-                    </span>
+        <!-- CARD 2: PROGRESS STATISTICS (Multi-color Strip Progress + 3 Mini Circle Stats) -->
+        <div class="md:col-span-12 lg:col-span-4 bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-black text-slate-900 tracking-tight">Progres Program Kerja</h2>
+                    <a href="{{ route('admin.proker') }}" wire:navigate class="text-slate-400 hover:text-slate-700">
+                        <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                    </a>
                 </div>
 
-                <div class="space-y-4">
-                    <!-- Add Task Input -->
-                    <div class="flex items-center gap-2 text-xs font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer pb-2">
-                        <i data-lucide="plus" class="w-4 h-4"></i>
-                        <span>Tambah agenda kegiatan baru...</span>
-                    </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{{ $overallProgressPct }}%</span>
+                    <span class="text-[11px] font-bold text-slate-400">Realisasi Target</span>
+                </div>
 
-                    <!-- Item 1 -->
-                    <div class="space-y-1 pt-2 border-t border-slate-100">
-                        <label class="flex items-start gap-3 cursor-pointer">
-                            <input type="checkbox" class="mt-0.5 rounded-full border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4">
-                            <div>
-                                <span class="text-xs font-bold text-slate-800 block">Rapat Koordinasi 31 KORCAM</span>
-                                <span class="text-[11px] text-slate-400 block mt-0.5">Sosialisasi teknis pembinaan FOTRADKAB</span>
-                                <span class="text-[10px] font-bold text-rose-500 flex items-center gap-1 mt-1">
-                                    <i data-lucide="calendar" class="w-3 h-3"></i> Besok, 09:00 WIB
-                                </span>
-                            </div>
-                        </label>
+                <!-- Multi-segment Strip Progress Bar -->
+                @php
+                    $berjalanWidth = $totalProgramKerja > 0 ? round(($prokerBerjalan / $totalProgramKerja) * 100) : 0;
+                    $selesaiWidth = $totalProgramKerja > 0 ? round(($prokerSelesai / $totalProgramKerja) * 100) : 0;
+                    $rencanaWidth = $totalProgramKerja > 0 ? (100 - $berjalanWidth - $selesaiWidth) : 0;
+                @endphp
+                <div class="mt-3 space-y-1">
+                    <div class="w-full h-2.5 bg-slate-100 rounded-full flex overflow-hidden p-0.5 gap-0.5">
+                        <div class="bg-indigo-600 h-full rounded-full transition-all" style="width: {{ max(10, $berjalanWidth) }}%;"></div>
+                        <div class="bg-emerald-500 h-full rounded-full transition-all" style="width: {{ max(10, $selesaiWidth) }}%;"></div>
+                        <div class="bg-amber-500 h-full rounded-full transition-all" style="width: {{ max(10, $rencanaWidth) }}%;"></div>
                     </div>
-
-                    <!-- Item 2 -->
-                    <div class="space-y-1 pt-3 border-t border-slate-100">
-                        <label class="flex items-start gap-3 cursor-pointer">
-                            <input type="checkbox" class="mt-0.5 rounded-full border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4">
-                            <div>
-                                <span class="text-xs font-bold text-slate-800 block">Verifikasi SK Inorga Baru (OPT)</span>
-                                <span class="text-[11px] text-slate-400 block mt-0.5">Pemeriksaan kelengkapan berkas AD/ART</span>
-                                <span class="text-[10px] font-bold text-emerald-700 flex items-center gap-1 mt-1">
-                                    <i data-lucide="flag" class="w-3 h-3"></i> Prioritas Tinggi
-                                </span>
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- Item 3 -->
-                    <div class="space-y-1 pt-3 border-t border-slate-100">
-                        <label class="flex items-start gap-3 cursor-pointer">
-                            <input type="checkbox" class="mt-0.5 rounded-full border-slate-300 text-emerald-600 focus:ring-emerald-500 w-4 h-4">
-                            <div>
-                                <span class="text-xs font-bold text-slate-800 block">Update Klasemen Medali FORKAB</span>
-                                <span class="text-[10px] font-bold text-emerald-600 flex items-center gap-1 mt-1">
-                                    <i data-lucide="check-circle" class="w-3 h-3"></i> Hari Ini
-                                </span>
-                            </div>
-                        </label>
+                    <div class="flex justify-between text-[9px] font-extrabold text-slate-400">
+                        <span class="text-indigo-600">{{ $berjalanWidth }}% Berjalan</span>
+                        <span class="text-emerald-600">{{ $selesaiWidth }}% Selesai</span>
+                        <span class="text-amber-600">{{ $rencanaWidth }}% Rencana</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. UPGRADE / EXECUTIVE SUPPORT CARD -->
-            <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/60 border border-emerald-200/80 rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
-                <div>
-                    <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider mb-2">
-                        <span>KORMI BEDAS 2026</span>
+            <!-- 3 Mini Metric Badges (In progress, Completed, Upcoming) -->
+            <div class="grid grid-cols-3 gap-2 mt-4 p-3 rounded-2xl bg-slate-50/80 border border-slate-100">
+                <!-- In progress (Indigo/Purple) -->
+                <div class="flex flex-col items-center text-center">
+                    <div class="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs">
+                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
                     </div>
-                    <h3 class="text-lg font-black text-slate-900">Pusat Data Terpadu</h3>
-                    <p class="text-xs font-black text-emerald-800 mt-0.5">KORMI Kabupaten Bandung</p>
+                    <span class="text-base font-black text-slate-900 mt-1 leading-none">{{ $prokerBerjalan }}</span>
+                    <span class="text-[9px] font-bold text-slate-500 mt-0.5">Berjalan</span>
                 </div>
 
-                <div class="space-y-2.5 text-xs font-bold text-slate-800">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
-                        <span>31 Kecamatan Terkoneksi</span>
+                <!-- Completed (Emerald) -->
+                <div class="flex flex-col items-center text-center">
+                    <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
-                        <span>Integrasi Database Duta 280 Desa</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
-                        <span>Sistem Realtime Medali FORKAB</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
-                        <span>Manajemen Arsip SK & Regulasi</span>
-                    </div>
+                    <span class="text-base font-black text-slate-900 mt-1 leading-none">{{ $prokerSelesai }}</span>
+                    <span class="text-[9px] font-bold text-slate-500 mt-0.5">Selesai</span>
                 </div>
 
-                <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
-                    Panel kendali terpadu untuk memantau kemajuan olahraga rekreasi dan tradisional masyarakat se-Kabupaten Bandung.
+                <!-- Upcoming (Amber/Orange) -->
+                <div class="flex flex-col items-center text-center">
+                    <div class="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <span class="text-base font-black text-slate-900 mt-1 leading-none">{{ $prokerRencana }}</span>
+                    <span class="text-[9px] font-bold text-slate-500 mt-0.5">Rencana</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 3: ACTIVE EVENT / HIGHLIGHT CARD -->
+        <div class="md:col-span-12 lg:col-span-4 bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between">
+            <div>
+                <!-- Top Tags -->
+                <div class="flex items-center gap-1.5 mb-2">
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-[9px] font-extrabold uppercase">
+                        {{ $activeEvent->kategoriEvent->nama_kategori ?? 'Event Akbar' }}
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/60 text-[9px] font-extrabold uppercase">
+                        Edisi {{ $activeEvent->tahun_edisi ?? 2026 }}
+                    </span>
+                </div>
+
+                <!-- Event Title & Description -->
+                <h3 class="text-sm sm:text-base font-black text-slate-900 leading-snug">
+                    {{ $activeEvent->judul_event ?? 'Festival Olahraga Rekreasi Masyarakat (FORKAB) 2026' }}
+                </h3>
+                <p class="text-[11px] font-medium text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                    {{ $activeEvent->deskripsi_lengkap ?? 'Ajang festival olahraga rekreasi terbesar se-Kabupaten Bandung dengan partisipasi 31 kontingen kecamatan.' }}
                 </p>
 
-                <a href="{{ route('beranda') }}" target="_blank" class="w-full py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer">
-                    <i data-lucide="zap" class="w-4 h-4 fill-white"></i>
-                    <span>Buka Portal Utama</span>
+                <!-- Participants Avatars & Progress Metric -->
+                <div class="grid grid-cols-2 gap-3 mt-4 pt-3 border-t border-slate-100">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 block mb-1.5">Duta Terdaftar</span>
+                        <div class="flex items-center -space-x-1.5">
+                            @forelse($topDutas as $duta)
+                                <div class="w-6 h-6 rounded-full border border-white bg-gradient-to-br from-indigo-500 to-emerald-500 text-white flex items-center justify-center text-[9px] font-black"
+                                    title="{{ $duta->nama_lengkap }}">
+                                    {{ substr($duta->nama_lengkap, 0, 1) }}
+                                </div>
+                            @empty
+                                <div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[9px] font-bold text-slate-500">
+                                    K
+                                </div>
+                            @endforelse
+                            <span class="w-6 h-6 rounded-full border border-white bg-slate-900 text-white flex items-center justify-center text-[8px] font-bold">
+                                +{{ max(0, $totalDuta - 4) }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 block mb-1.5">Kesiapan Event</span>
+                        <div class="flex items-center gap-1.5">
+                            <div class="flex-1 h-5 rounded-lg bg-amber-100/80 p-0.5 flex items-center">
+                                <div class="bg-amber-400 h-full rounded text-[9px] font-black text-amber-950 flex items-center justify-center px-1" style="width: 75%;">
+                                    75%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Black Pill CTA Button (Compact) -->
+            <div class="mt-4">
+                <a href="{{ route('admin.event') }}" wire:navigate
+                    class="w-full py-2.5 px-3.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-2xs transition-colors">
+                    <span>Kelola & Lihat Jadwal Event</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-emerald-400"></i>
                 </a>
             </div>
         </div>
+
     </div>
+
+    <!-- MIDDLE ROW: 2 Bento Cards (Distribution by Inorga/Platform + My Schedule Cards) -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
+        
+        <!-- CARD 4: BY PLATFORM / INORGA & KOMISI DISTRIBUTION (Left 4-cols) -->
+        <div class="md:col-span-12 lg:col-span-4 bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h2 class="text-sm font-black text-slate-900 tracking-tight">Kategori Inorga</h2>
+                        <p class="text-[10px] font-semibold text-slate-400">Komisi & Klub Olahraga Aktif</p>
+                    </div>
+                    <a href="{{ route('admin.inorga') }}" wire:navigate class="text-xs font-bold text-emerald-600 hover:text-emerald-700">
+                        Semua
+                    </a>
+                </div>
+
+                <!-- 4 Inorga / Komisi Items (Compact) -->
+                <div class="space-y-2.5">
+                    <!-- Item 1: OTDA -->
+                    <div class="flex items-center justify-between group p-1.5 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200/60 text-emerald-600 flex items-center justify-center shrink-0">
+                                <i data-lucide="swords" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-extrabold text-slate-900">OTDA</h4>
+                                <span class="text-[10px] text-slate-400 font-medium">Tradisional & Budaya</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-black text-slate-900 block leading-tight">{{ $komisiOtdaCount }} Inorga</span>
+                            <span class="text-[9px] text-emerald-600 font-bold">23 Klub</span>
+                        </div>
+                    </div>
+
+                    <!-- Item 2: OKK -->
+                    <div class="flex items-center justify-between group p-1.5 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200/60 text-blue-600 flex items-center justify-center shrink-0">
+                                <i data-lucide="heart-pulse" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-extrabold text-slate-900">OKK</h4>
+                                <span class="text-[10px] text-slate-400 font-medium">Kesehatan & Kebugaran</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-black text-slate-900 block leading-tight">{{ $komisiOkkCount }} Inorga</span>
+                            <span class="text-[9px] text-blue-600 font-bold">32 Klub</span>
+                        </div>
+                    </div>
+
+                    <!-- Item 3: OPT -->
+                    <div class="flex items-center justify-between group p-1.5 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200/60 text-orange-600 flex items-center justify-center shrink-0">
+                                <i data-lucide="compass" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-extrabold text-slate-900">OPT</h4>
+                                <span class="text-[10px] text-slate-400 font-medium">Petualangan & Tantangan</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-black text-slate-900 block leading-tight">{{ $komisiOptCount }} Inorga</span>
+                            <span class="text-[9px] text-orange-600 font-bold">14 Klub</span>
+                        </div>
+                    </div>
+
+                    <!-- Item 4: Sapras -->
+                    <div class="flex items-center justify-between group p-1.5 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-purple-50 border border-purple-200/60 text-purple-600 flex items-center justify-center shrink-0">
+                                <i data-lucide="building-2" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-extrabold text-slate-900">Sapras Wilayah</h4>
+                                <span class="text-[10px] text-slate-400 font-medium">31 Kecamatan</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-black text-slate-900 block leading-tight">{{ $totalSapras }} Venue</span>
+                            <span class="text-[9px] text-purple-600 font-bold">Tervalidasi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+                <span class="text-[11px] font-bold text-slate-500">Total {{ $totalInorga }} Induk Organisasi</span>
+                <a href="{{ route('admin.inorga') }}" wire:navigate class="text-xs font-extrabold text-slate-900 hover:text-emerald-700 flex items-center gap-1">
+                    <span>Kelola</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- CARD 5: MY SCHEDULE / AGENDA TAHAPAN FORKAB (Right 8-cols, 3 Colored Cards) -->
+        <div class="md:col-span-12 lg:col-span-8 bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between">
+            <div>
+                <!-- Schedule Header & Today Navigation -->
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h2 class="text-sm font-black text-slate-900 tracking-tight">Jadwal & Agenda Kegiatan</h2>
+                        <p class="text-[10px] font-semibold text-slate-400">Tahapan pelaksanaan kegiatan FORKAB & Pelatihan SDI</p>
+                    </div>
+
+                    <div class="flex items-center gap-1 bg-slate-50 border border-slate-200/70 p-0.5 rounded-xl text-xs font-bold text-slate-700">
+                        <button class="w-6 h-6 rounded-lg hover:bg-white flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
+                            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <span class="px-1.5 font-black text-slate-900 text-[10px]">Bulan Ini</span>
+                        <button class="w-6 h-6 rounded-lg hover:bg-white flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors">
+                            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3 Interactive Schedule Cards (Compact) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    
+                    <!-- Card 1: Selesai / Technical Meeting -->
+                    <div class="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/70 hover:border-slate-300 transition-all flex flex-col justify-between space-y-3">
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400 block">15 Juli 2026 • 09:00</span>
+                            <h4 class="text-xs font-black text-slate-900 mt-1 leading-snug">Technical Meeting FORKAB</h4>
+                            <div class="mt-1.5">
+                                <span class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 text-[9px] font-bold">
+                                    Selesai
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2 border-t border-slate-200/60">
+                            <div class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[9px] font-bold">
+                                TM
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-[11px] font-bold text-slate-800 block truncate">Aula Dispora</span>
+                                <span class="text-[9px] text-slate-400 block truncate">31 Kecamatan</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: ACTIVE NOW / Babak Penyisihan -->
+                    <div class="p-4 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-700 text-white shadow-md shadow-indigo-600/20 flex flex-col justify-between space-y-3 relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold text-indigo-200">01 - 20 Agt • 08:00</span>
+                            <span class="px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[9px] font-black flex items-center gap-1 shadow-2xs">
+                                <span class="w-1 h-1 rounded-full bg-slate-950 animate-ping"></span>
+                                <span>Berlangsung</span>
+                            </span>
+                        </div>
+
+                        <div>
+                            <h4 class="text-xs sm:text-sm font-black text-white leading-snug">Babak Penyisihan Seluruh Cabor</h4>
+                            <div class="mt-1.5">
+                                <span class="px-2 py-0.5 rounded bg-white/20 text-white text-[9px] font-bold backdrop-blur-sm">
+                                    Zona Wilayah
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2 border-t border-white/20">
+                            <div class="w-6 h-6 rounded-full bg-white text-indigo-700 flex items-center justify-center text-[9px] font-black">
+                                BP
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-[11px] font-black text-white block truncate">Si Jalak Harupat</span>
+                                <span class="text-[9px] text-indigo-200 block truncate">Semua Kontingen</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Akan Datang / Babak Final -->
+                    <div class="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/70 hover:border-slate-300 transition-all flex flex-col justify-between space-y-3">
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400 block">25 - 30 Agt • 08:00</span>
+                            <h4 class="text-xs font-black text-slate-900 mt-1 leading-snug">Grand Final & Pesta Rakyat</h4>
+                            <div class="mt-1.5">
+                                <span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[9px] font-bold">
+                                    Akan Datang
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2 border-t border-slate-200/60">
+                            <div class="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-[9px] font-bold">
+                                GF
+                            </div>
+                            <div class="min-w-0">
+                                <span class="text-[11px] font-bold text-slate-800 block truncate">Si Jalak Harupat</span>
+                                <span class="text-[9px] text-slate-400 block truncate">Finalis Medali</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer Link -->
+            <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+                <a href="{{ route('admin.event') }}" wire:navigate class="text-xs font-bold text-slate-600 hover:text-slate-950 flex items-center gap-1.5">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>Kalender agenda tahunan lengkap</span>
+                </a>
+                <a href="{{ route('admin.klasemen') }}" wire:navigate class="text-xs font-extrabold text-emerald-600 hover:text-emerald-800 flex items-center gap-1">
+                    <span>Klasemen Medali</span>
+                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 4. ADDITIONAL 4-BENTO COMPACT CARDS (SDI, APMO, GALERI FOTO, DOKUMEN UNDUHAN)-->
+    <!-- ========================================================================= -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+        
+        <!-- CARD A: PELATIHAN SDI -->
+        <div class="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                            <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-black text-slate-900">Pelatihan & SDI</h3>
+                            <span class="text-[9px] text-slate-400 font-semibold block">Sertifikasi Daerah</span>
+                        </div>
+                    </div>
+                    <a href="{{ route('admin.sdi') }}" wire:navigate class="text-[11px] font-bold text-blue-600 hover:underline">Kelola</a>
+                </div>
+
+                <div class="space-y-2 mt-2">
+                    @forelse($sdiJadwal as $sdi)
+                        <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded {{ $sdi->status_pendaftaran === 'penuh' ? 'bg-rose-100 text-rose-800' : 'bg-blue-100 text-blue-800' }}">
+                                    {{ $sdi->status_pendaftaran === 'penuh' ? 'Penuh' : 'Dibuka' }}
+                                </span>
+                                <span class="text-[10px] font-black text-slate-800">{{ $sdi->jumlah_pendaftar }}/{{ $sdi->kuota_peserta }} Pendaftar</span>
+                            </div>
+                            <h4 class="text-xs font-bold text-slate-900 mt-1 truncate">{{ $sdi->program->judul_program ?? $sdi->nama_angkatan }}</h4>
+                            <span class="text-[10px] text-slate-400 block truncate mt-0.5">{{ $sdi->lokasi_pelatihan }}</span>
+                        </div>
+                    @empty
+                        <p class="text-xs text-slate-400 py-3 text-center">Tidak ada jadwal.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="mt-3 pt-2.5 border-t border-slate-100">
+                <a href="{{ route('admin.sdi') }}" wire:navigate class="text-[11px] font-extrabold text-blue-600 flex items-center justify-between">
+                    <span>Lihat Daftar Peserta</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- CARD B: APRESIASI APMO -->
+        <div class="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                            <i data-lucide="award" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-black text-slate-900">Anugerah APMO</h3>
+                            <span class="text-[9px] text-slate-400 font-semibold block">Tokoh & Pegiat</span>
+                        </div>
+                    </div>
+                    <a href="{{ route('admin.apmo') }}" wire:navigate class="text-[11px] font-bold text-amber-600 hover:underline">Kelola</a>
+                </div>
+
+                <div class="space-y-2 mt-2">
+                    @forelse($apmoTerbaru as $apmo)
+                        <div class="p-2 rounded-xl bg-amber-50/50 border border-amber-100 flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+                                🏆
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h4 class="text-xs font-bold text-slate-900 truncate">{{ $apmo->nama_penerima }}</h4>
+                                <span class="text-[9px] text-amber-800 truncate block">{{ $apmo->kategori_penghargaan }}</span>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-xs text-slate-400 py-3 text-center">Belum ada data.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="mt-3 pt-2.5 border-t border-slate-100">
+                <a href="{{ route('admin.apmo') }}" wire:navigate class="text-[11px] font-extrabold text-amber-700 flex items-center justify-between">
+                    <span>Arsip Penghargaan APMO</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- CARD C: DOKUMENTASI GALERI FOTO -->
+        <div class="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                            <i data-lucide="image" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-black text-slate-900">Galeri Foto</h3>
+                            <span class="text-[9px] text-slate-400 font-semibold block">{{ $totalGaleri }} Foto Terunggah</span>
+                        </div>
+                    </div>
+                    <a href="{{ route('admin.galeri') }}" wire:navigate class="text-[11px] font-bold text-teal-600 hover:underline">Kelola</a>
+                </div>
+
+                <!-- 4 Photo Grid Thumbnails -->
+                <div class="grid grid-cols-2 gap-1.5 mt-2">
+                    @forelse($galeriTerbaru as $foto)
+                        <div class="relative h-16 rounded-xl overflow-hidden group bg-slate-100">
+                            <img src="{{ $foto->gambar_url }}" alt="{{ $foto->judul_foto }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-1">
+                                <span class="text-[8px] font-bold text-white truncate">{{ $foto->judul_foto }}</span>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-span-2 py-4 text-center text-slate-400 text-xs">Belum ada foto.</div>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="mt-3 pt-2.5 border-t border-slate-100">
+                <a href="{{ route('admin.galeri') }}" wire:navigate class="text-[11px] font-extrabold text-teal-700 flex items-center justify-between">
+                    <span>Semua Album Kegiatan</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- CARD D: DOKUMEN & REGULASI UNDUHAN -->
+        <div class="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                            <i data-lucide="file-down" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-black text-slate-900">Dokumen & SK</h3>
+                            <span class="text-[9px] text-slate-400 font-semibold block">{{ $totalUnduhanDownloads }} Total Unduhan</span>
+                        </div>
+                    </div>
+                    <a href="{{ route('admin.unduhan') }}" wire:navigate class="text-[11px] font-bold text-rose-600 hover:underline">Kelola</a>
+                </div>
+
+                <div class="space-y-2 mt-2">
+                    @forelse($unduhanTerbaru as $unduhan)
+                        <div class="p-2 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between gap-2">
+                            <div class="min-w-0">
+                                <h4 class="text-xs font-bold text-slate-900 truncate">{{ $unduhan->judul_dokumen }}</h4>
+                                <span class="text-[9px] text-slate-400 block">{{ $unduhan->ukuran_berkas }} • {{ $unduhan->jumlah_unduhan }}x unduh</span>
+                            </div>
+                            <span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-rose-100 text-rose-800 shrink-0">
+                                {{ $unduhan->ekstensi_berkas }}
+                            </span>
+                        </div>
+                    @empty
+                        <p class="text-xs text-slate-400 py-3 text-center">Belum ada dokumen.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="mt-3 pt-2.5 border-t border-slate-100">
+                <a href="{{ route('admin.unduhan') }}" wire:navigate class="text-[11px] font-extrabold text-rose-700 flex items-center justify-between">
+                    <span>Lihat Semua Berkas SK</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 5. BOTTOM TABLE SECTION (Berita Terkini & Medali Klasemen Top)             -->
+    <!-- ========================================================================= -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        
+        <!-- Left 8-cols: Publikasi Berita Terbaru (Compact) -->
+        <div class="lg:col-span-8 bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                        <i data-lucide="newspaper" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xs sm:text-sm font-black text-slate-900">Publikasi & Liputan Terkini</h3>
+                        <p class="text-[10px] font-semibold text-slate-400">Warta liputan kegiatan KORMI</p>
+                    </div>
+                </div>
+                <a href="{{ route('admin.berita') }}" wire:navigate class="text-xs font-extrabold text-emerald-700 hover:underline">
+                    Kelola Berita
+                </a>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs min-w-[480px]">
+                    <thead>
+                        <tr class="text-[10px] font-bold text-slate-400 border-b border-slate-100 pb-2">
+                            <th class="pb-2 font-semibold">Judul Publikasi</th>
+                            <th class="pb-2 font-semibold">Kategori</th>
+                            <th class="pb-2 font-semibold">Pembaca</th>
+                            <th class="pb-2 font-semibold text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-medium">
+                        @forelse($beritaTerbaru as $item)
+                            <tr class="hover:bg-slate-50/70 transition-colors">
+                                <td class="py-2.5 font-bold text-slate-900 max-w-[280px]">
+                                    <span class="line-clamp-1">{{ $item->judul }}</span>
+                                    <span class="text-[9px] font-medium text-slate-400">{{ \Carbon\Carbon::parse($item->dibuat_pada)->diffForHumans() }}</span>
+                                </td>
+                                <td class="py-2.5">
+                                    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[9px] font-bold">
+                                        {{ $item->kategori->nama_kategori ?? 'Umum' }}
+                                    </span>
+                                </td>
+                                <td class="py-2.5">
+                                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-600">
+                                        <i data-lucide="eye" class="w-3 h-3 text-slate-400"></i>
+                                        {{ number_format($item->jumlah_dilihat, 0, ',', '.') }}
+                                    </span>
+                                </td>
+                                <td class="py-2.5 text-right">
+                                    <a href="{{ route('admin.berita') }}" wire:navigate class="px-3 py-1 rounded-xl border border-slate-200 text-slate-800 font-bold text-xs hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all inline-block shadow-2xs">
+                                        Edit
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-6 text-center text-slate-400">Belum ada publikasi berita.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Right 4-cols: Top Klasemen Medali (Compact) -->
+        <div class="lg:col-span-4 bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                            <i data-lucide="trophy" class="w-3.5 h-3.5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs sm:text-sm font-black text-slate-900">Klasemen Teratas</h3>
+                            <p class="text-[10px] font-semibold text-slate-400">Peringkat Medali Kontingen</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2 mt-2">
+                    <!-- #1 Margahayu -->
+                    <div class="p-2.5 rounded-2xl bg-amber-50/70 border border-amber-200/60 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] font-black flex items-center justify-center shadow-2xs">1</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-900">{{ $topKecamatan->kecamatan->nama_kecamatan ?? 'Margahayu' }}</h4>
+                                <span class="text-[9px] text-amber-800 font-bold">Juara Bertahan</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-black text-amber-700">🥇 {{ $topKecamatan->jumlah_emas ?? 12 }} Emas</span>
+                    </div>
+
+                    <!-- #2 Soreang -->
+                    <div class="p-2.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-700 text-[10px] font-black flex items-center justify-center">2</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-900">Soreang</h4>
+                                <span class="text-[9px] text-slate-400 font-medium">Runner Up</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-black text-slate-700">🥈 9 Emas</span>
+                    </div>
+
+                    <!-- #3 Baleendah -->
+                    <div class="p-2.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-full bg-amber-200 text-amber-900 text-[10px] font-black flex items-center justify-center">3</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-900">Baleendah</h4>
+                                <span class="text-[9px] text-slate-400 font-medium">Peringkat 3</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-black text-amber-800">🥉 7 Emas</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3 pt-2.5 border-t border-slate-100">
+                <a href="{{ route('admin.klasemen') }}" wire:navigate class="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center justify-between">
+                    <span>Lihat 31 Kecamatan</span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
 </div>

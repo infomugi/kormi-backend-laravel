@@ -306,9 +306,9 @@ class EventKelola extends Component
     public function simpanEvent(): void
     {
         $rules = [
-            'kategori_event_id' => 'required|exists:kormi_kategori_event,id',
+            'kategori_event_id' => 'required|exists:event_kategori,id',
             'judul_event'       => 'required|min:3|max:200',
-            'slug'              => 'required|max:200|unique:kormi_event,slug,' . ($this->editEventId ?? 'NULL') . ',id',
+            'slug'              => 'required|max:200|unique:event_kegiatan,slug,' . ($this->editEventId ?? 'NULL') . ',id',
             'tahun_edisi'       => 'required|integer|min:2000|max:2099',
             'lokasi_utama'      => 'required|string|max:255',
             'tanggal_mulai'     => 'required|date',

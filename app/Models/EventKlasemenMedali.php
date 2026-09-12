@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EventKlasemenMedali extends ModelDasar
 {
-    protected $table = 'kormi_event_klasemen_medali';
+    protected $table = 'event_klasemen_medali';
 
     protected $casts = [
         'jumlah_emas' => 'integer',

@@ -344,7 +344,7 @@
                                         >
                                     </x-table.td>
 
-                                    <!-- Thumbnail & Title -->
+                                    <!-- Thumbnail & Title (Inline Editable) -->
                                     <x-table.td>
                                         <div class="flex items-center gap-3 max-w-lg">
                                             <div class="relative shrink-0 group">
@@ -359,16 +359,30 @@
                                                 @endif
                                             </div>
 
-                                            <div class="min-w-0 space-y-0.5">
-                                                <a 
-                                                    href="{{ route('admin.berita.edit', $b->id) }}" 
-                                                    wire:navigate
-                                                    class="font-black text-slate-900 text-xs hover:text-indigo-600 line-clamp-1 leading-tight transition-colors cursor-pointer block"
-                                                    title="{{ $b->judul }}"
+                                            <div class="min-w-0 flex-1 space-y-1">
+                                                <!-- Editable Judul -->
+                                                <x-table.editable-cell 
+                                                    :model-id="$b->id" 
+                                                    field="judul" 
+                                                    :value="$b->judul"
+                                                    placeholder="Tulis judul berita..."
                                                 >
-                                                    {{ $b->judul }}
-                                                </a>
-                                                <p class="text-[11px] text-slate-400 line-clamp-1 font-normal leading-normal">{{ $b->ringkasan }}</p>
+                                                    <span class="font-black text-slate-900 text-xs hover:text-indigo-600 line-clamp-1 leading-tight transition-colors block">
+                                                        {{ $b->judul }}
+                                                    </span>
+                                                </x-table.editable-cell>
+
+                                                <!-- Editable Ringkasan -->
+                                                <x-table.editable-cell 
+                                                    :model-id="$b->id" 
+                                                    field="ringkasan" 
+                                                    type="textarea"
+                                                    :value="$b->ringkasan"
+                                                    placeholder="Tambah ringkasan singkat..."
+                                                >
+                                                    <p class="text-[11px] text-slate-400 line-clamp-1 font-normal leading-normal">{{ $b->ringkasan ?: 'Klik untuk tambah ringkasan...' }}</p>
+                                                </x-table.editable-cell>
+
                                                 <div class="flex items-center gap-2 text-[10px] text-slate-400">
                                                     <span class="font-bold text-slate-600 truncate max-w-[120px]">{{ $b->penulis->nama_lengkap ?? 'Redaksi' }}</span>
                                                     <span>•</span>
@@ -381,18 +395,33 @@
                                         </div>
                                     </x-table.td>
 
-                                    <!-- Category Badge -->
+                                    <!-- Category Badge (Inline Editable Select) -->
                                     <x-table.td>
-                                        <span 
-                                            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-2xs whitespace-nowrap"
-                                            style="background-color: {{ $b->kategori->kode_warna_hex ? $b->kategori->kode_warna_hex.'15' : '#4f46e515' }}; color: {{ $b->kategori->kode_warna_hex ?: '#4f46e5' }}; border-color: {{ $b->kategori->kode_warna_hex ? $b->kategori->kode_warna_hex.'30' : '#4f46e530' }};"
+                                        @php
+                                            $kategoriOptions = $kategoriList->map(fn($k) => [
+                                                'value' => (string) $k->id,
+                                                'label' => $k->nama_kategori,
+                                                'color' => $k->kode_warna_hex ?: '#4f46e5'
+                                            ])->toArray();
+                                        @endphp
+                                        <x-table.editable-cell 
+                                            :model-id="$b->id" 
+                                            field="kategori_id" 
+                                            type="select"
+                                            :options="$kategoriOptions"
+                                            :value="(string) $b->kategori_id"
                                         >
-                                            <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: {{ $b->kategori->kode_warna_hex ?: '#4f46e5' }}"></span>
-                                            <span>{{ $b->kategori->nama_kategori ?? 'Umum' }}</span>
-                                        </span>
+                                            <span 
+                                                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-2xs whitespace-nowrap hover:scale-105 transition-all"
+                                                style="background-color: {{ $b->kategori->kode_warna_hex ? $b->kategori->kode_warna_hex.'15' : '#4f46e515' }}; color: {{ $b->kategori->kode_warna_hex ?: '#4f46e5' }}; border-color: {{ $b->kategori->kode_warna_hex ? $b->kategori->kode_warna_hex.'30' : '#4f46e530' }};"
+                                            >
+                                                <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: {{ $b->kategori->kode_warna_hex ?: '#4f46e5' }}"></span>
+                                                <span>{{ $b->kategori->nama_kategori ?? 'Umum' }}</span>
+                                            </span>
+                                        </x-table.editable-cell>
                                     </x-table.td>
 
-                                    <!-- Status & Featured Toggle -->
+                                    <!-- Status & Featured Toggle (Inline Editable Select & Star) -->
                                     <x-table.td>
                                         <div class="flex items-center gap-1.5">
                                             @php
@@ -402,22 +431,32 @@
                                                     'archived'  => 'bg-slate-100 text-slate-700 border-slate-200',
                                                     default     => 'bg-slate-100 text-slate-700 border-slate-200'
                                                 };
+                                                $statusOptions = [
+                                                    ['value' => 'published', 'label' => 'Published (Live)', 'color' => '#10b981'],
+                                                    ['value' => 'draft', 'label' => 'Draft', 'color' => '#f59e0b'],
+                                                    ['value' => 'archived', 'label' => 'Archived', 'color' => '#64748b'],
+                                                ];
                                             @endphp
 
-                                            <button 
-                                                type="button" 
-                                                wire:click="toggleStatus('{{ $b->id }}')" 
-                                                class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border {{ $statusStyle }} hover:scale-105 transition-all cursor-pointer whitespace-nowrap"
-                                                title="Ubah status"
+                                            <x-table.editable-cell 
+                                                :model-id="$b->id" 
+                                                field="status_publikasi" 
+                                                type="select"
+                                                :options="$statusOptions"
+                                                :value="$b->status_publikasi"
                                             >
-                                                {{ $b->status_publikasi }}
-                                            </button>
+                                                <span 
+                                                    class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border {{ $statusStyle }} hover:scale-105 transition-all whitespace-nowrap inline-block"
+                                                >
+                                                    {{ $b->status_publikasi }}
+                                                </span>
+                                            </x-table.editable-cell>
                                             
                                             <button 
                                                 type="button" 
                                                 wire:key="star-btn-{{ $b->id }}"
                                                 wire:click="toggleUnggulan('{{ $b->id }}')" 
-                                                class="p-1 rounded-lg transition-all hover:scale-110 cursor-pointer {{ $b->status_unggulan ? 'text-amber-500 bg-amber-50' : 'text-slate-300 hover:text-amber-400 hover:bg-slate-100' }}" 
+                                                class="p-1 rounded-lg transition-all hover:scale-110 cursor-pointer shrink-0 {{ $b->status_unggulan ? 'text-amber-500 bg-amber-50' : 'text-slate-300 hover:text-amber-400 hover:bg-slate-100' }}" 
                                                 title="{{ $b->status_unggulan ? 'Hapus dari Berita Utama' : 'Jadikan Berita Utama' }}"
                                             >
                                                 <i data-lucide="star" class="w-3.5 h-3.5 {{ $b->status_unggulan ? 'fill-amber-400 text-amber-500' : '' }}"></i>
@@ -425,12 +464,20 @@
                                         </div>
                                     </x-table.td>
 
-                                    <!-- Views -->
+                                    <!-- Views (Inline Editable Number) -->
                                     <x-table.td class="font-extrabold text-slate-800">
-                                        <div class="inline-flex items-center gap-1.5 text-xs text-slate-700">
-                                            <i data-lucide="eye" class="w-3.5 h-3.5 text-slate-400"></i>
-                                            <span>{{ number_format($b->jumlah_dilihat) }}</span>
-                                        </div>
+                                        <x-table.editable-cell 
+                                            :model-id="$b->id" 
+                                            field="jumlah_dilihat" 
+                                            type="number"
+                                            :value="(string) $b->jumlah_dilihat"
+                                            placeholder="0"
+                                        >
+                                            <div class="inline-flex items-center gap-1.5 text-xs text-slate-700">
+                                                <i data-lucide="eye" class="w-3.5 h-3.5 text-slate-400"></i>
+                                                <span>{{ number_format($b->jumlah_dilihat) }}</span>
+                                            </div>
+                                        </x-table.editable-cell>
                                     </x-table.td>
 
                                     <!-- Publish Date -->

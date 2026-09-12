@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class KategoriEvent extends ModelDasar
 {
-    protected $table = 'kormi_kategori_event';
+    protected $table = 'event_kategori';
 
     public function events(): HasMany
     {

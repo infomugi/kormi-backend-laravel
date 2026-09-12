@@ -164,7 +164,7 @@
                         <option value="50">50 / hal</option>
                     </select>
 
-                    <!-- View Switcher -->
+                    <!-- View Switcher with localStorage persistence -->
                     <div 
                         x-data="{
                             mode: localStorage.getItem('kormi_proker_view') || @js($tampilanMode),
@@ -269,12 +269,12 @@
                                     sort-field="nama_bidang" 
                                     :current-sort="$sortField" 
                                     :current-direction="$sortDirection"
-                                    class="w-48"
+                                    class="w-52"
                                 >
                                     Bidang & Tahun
                                 </x-table.th>
                                 <x-table.th 
-                                    align="center"
+                                    align="center" 
                                     sortable 
                                     sort-field="bulan_mulai" 
                                     :current-sort="$sortField" 
@@ -284,17 +284,17 @@
                                     Jadwal
                                 </x-table.th>
                                 <x-table.th 
-                                    align="right"
+                                    align="right" 
                                     sortable 
                                     sort-field="estimasi_anggaran" 
                                     :current-sort="$sortField" 
                                     :current-direction="$sortDirection"
-                                    class="w-36"
+                                    class="w-40"
                                 >
                                     Anggaran
                                 </x-table.th>
                                 <x-table.th 
-                                    align="center"
+                                    align="center" 
                                     sortable 
                                     sort-field="status_kegiatan" 
                                     :current-sort="$sortField" 
@@ -303,15 +303,15 @@
                                 >
                                     Status
                                 </x-table.th>
-                                <x-table.th align="center" class="w-28">Aksi</x-table.th>
+                                <x-table.th align="right" class="w-32">Aksi</x-table.th>
                             </tr>
                         </x-table.thead>
 
                         <x-table.tbody>
                             @forelse($prokerList as $item)
-                                <x-table.tr :selected="in_array($item->id, $selectedProker)">
+                                <x-table.tr wire:key="row-proker-{{ $item->id }}" :selected="in_array($item->id, $selectedProker)">
                                     <!-- Checkbox -->
-                                    <x-table.td align="center" class="!px-4">
+                                    <x-table.td align="center" class="!px-3.5 w-10">
                                         <input 
                                             type="checkbox" 
                                             wire:model.live="selectedProker" 
@@ -320,33 +320,118 @@
                                         >
                                     </x-table.td>
 
-                                    <!-- Program Kerja & Sasaran -->
+                                    <!-- Program Kerja & Sasaran (With Inline Edit Nama & Sasaran) -->
                                     <x-table.td>
                                         <div class="flex items-start gap-3.5">
-                                            <div class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200/80 text-amber-700 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                                            <div 
+                                                wire:click="bukaPratinjau('{{ $item->id }}')"
+                                                class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200/80 text-amber-700 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs cursor-pointer hover:bg-amber-100 transition-colors"
+                                                title="Lihat detail program"
+                                            >
                                                 <i data-lucide="{{ $item->ikon ?: 'activity' }}" class="w-5 h-5"></i>
                                             </div>
 
-                                            <div class="min-w-0">
-                                                <h3 class="font-black text-slate-900 text-sm leading-snug group-hover:text-amber-600 transition-colors">
-                                                    {{ $item->nama_kegiatan }}
-                                                </h3>
-                                                @if($item->target_sasaran)
-                                                    <p class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
-                                                        <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400"></i>
-                                                        <span>Sasaran: {{ $item->target_sasaran }}</span>
-                                                    </p>
-                                                @endif
+                                            <div class="min-w-0 max-w-lg flex-1">
+                                                <!-- Inline Edit Nama Kegiatan -->
+                                                <div 
+                                                    x-data="{ 
+                                                        editing: false, 
+                                                        val: '{{ addslashes($item->nama_kegiatan) }}',
+                                                        save() {
+                                                            if (this.val.trim() !== '' && this.val !== '{{ addslashes($item->nama_kegiatan) }}') {
+                                                                $wire.updateFieldInline('{{ $item->id }}', 'nama_kegiatan', this.val);
+                                                            }
+                                                            this.editing = false;
+                                                        }
+                                                    }"
+                                                >
+                                                    <div x-show="!editing" @dblclick="editing = true; $nextTick(() => $refs.namaInput.focus())" class="cursor-pointer group/inline flex items-start gap-1">
+                                                        <h3 class="font-black text-slate-900 text-sm leading-snug group-hover/inline:text-amber-600 transition-colors line-clamp-1">
+                                                            {{ $item->nama_kegiatan }}
+                                                        </h3>
+                                                        <i data-lucide="edit-2" class="w-3 h-3 text-slate-300 opacity-0 group-hover/inline:opacity-100 transition-opacity shrink-0 mt-1"></i>
+                                                    </div>
+                                                    <input 
+                                                        x-ref="namaInput"
+                                                        x-show="editing" 
+                                                        x-model="val" 
+                                                        @keydown.enter="save()" 
+                                                        @keydown.escape="editing = false; val = '{{ addslashes($item->nama_kegiatan) }}'" 
+                                                        @blur="save()"
+                                                        type="text" 
+                                                        class="w-full px-2 py-0.5 bg-amber-50 border border-amber-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                                    >
+                                                </div>
+
+                                                <!-- Inline Edit Target Sasaran -->
+                                                <div 
+                                                    x-data="{ 
+                                                        editing: false, 
+                                                        val: '{{ addslashes($item->target_sasaran ?? '') }}',
+                                                        save() {
+                                                            if (this.val !== '{{ addslashes($item->target_sasaran ?? '') }}') {
+                                                                $wire.updateFieldInline('{{ $item->id }}', 'target_sasaran', this.val);
+                                                            }
+                                                            this.editing = false;
+                                                        }
+                                                    }"
+                                                    class="mt-1"
+                                                >
+                                                    <div x-show="!editing" @dblclick="editing = true; $nextTick(() => $refs.sasaranInput.focus())" class="cursor-pointer group/inline flex items-center gap-1.5 text-xs text-slate-500">
+                                                        <i data-lucide="users" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+                                                        <span class="truncate">{{ $item->target_sasaran ? 'Sasaran: ' . $item->target_sasaran : '+ Tambah Sasaran' }}</span>
+                                                        <i data-lucide="edit-2" class="w-2.5 h-2.5 text-slate-300 opacity-0 group-hover/inline:opacity-100 transition-opacity shrink-0"></i>
+                                                    </div>
+                                                    <input 
+                                                        x-ref="sasaranInput"
+                                                        x-show="editing" 
+                                                        x-model="val" 
+                                                        @keydown.enter="save()" 
+                                                        @keydown.escape="editing = false; val = '{{ addslashes($item->target_sasaran ?? '') }}'" 
+                                                        @blur="save()"
+                                                        type="text" 
+                                                        placeholder="Target sasaran peserta..."
+                                                        class="w-full px-1.5 py-0.5 bg-amber-50 border border-amber-300 rounded text-[11px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                                    >
+                                                </div>
                                             </div>
                                         </div>
                                     </x-table.td>
 
-                                    <!-- Bidang & Tahun -->
+                                    <!-- Bidang & Tahun (With Inline Edit Bidang) -->
                                     <x-table.td>
                                         <div class="space-y-1">
-                                            <span class="font-bold text-slate-800 text-xs block">
-                                                {{ $item->nama_bidang }}
-                                            </span>
+                                            <!-- Inline Edit Bidang -->
+                                            <div 
+                                                x-data="{ 
+                                                    editing: false, 
+                                                    val: '{{ addslashes($item->nama_bidang) }}',
+                                                    save() {
+                                                        if (this.val.trim() !== '' && this.val !== '{{ addslashes($item->nama_bidang) }}') {
+                                                            $wire.updateFieldInline('{{ $item->id }}', 'nama_bidang', this.val);
+                                                        }
+                                                        this.editing = false;
+                                                    }
+                                                }"
+                                            >
+                                                <div x-show="!editing" @dblclick="editing = true; $nextTick(() => $refs.bidangInput.focus())" class="cursor-pointer group/inline flex items-center gap-1">
+                                                    <span class="font-bold text-slate-800 text-xs block group-hover/inline:text-amber-600">
+                                                        {{ $item->nama_bidang }}
+                                                    </span>
+                                                    <i data-lucide="edit-2" class="w-2.5 h-2.5 text-slate-300 opacity-0 group-hover/inline:opacity-100 transition-opacity"></i>
+                                                </div>
+                                                <input 
+                                                    x-ref="bidangInput"
+                                                    x-show="editing" 
+                                                    x-model="val" 
+                                                    @keydown.enter="save()" 
+                                                    @keydown.escape="editing = false; val = '{{ addslashes($item->nama_bidang) }}'" 
+                                                    @blur="save()"
+                                                    type="text" 
+                                                    class="w-full px-1.5 py-0.5 bg-amber-50 border border-amber-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                                >
+                                            </div>
+
                                             <span class="inline-block px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-black text-[10px]">
                                                 TA {{ $item->tahun_anggaran }}
                                             </span>
@@ -367,81 +452,90 @@
                                         @endif
                                     </x-table.td>
 
-                                    <!-- Estimasi Anggaran -->
+                                    <!-- Estimasi Anggaran (With Inline Edit Anggaran) -->
                                     <x-table.td align="right">
-                                        <span class="font-black text-slate-900 text-xs font-mono">
-                                            {{ $item->anggaran_rupiah }}
-                                        </span>
-                                    </x-table.td>
-
-                                    <!-- Status Kegiatan -->
-                                    <x-table.td align="center">
-                                        @php
-                                            $statusMap = [
-                                                'rencana' => ['bg' => 'bg-blue-50 text-blue-700 border-blue-200', 'dot' => 'bg-blue-500', 'label' => 'Rencana'],
-                                                'berjalan' => ['bg' => 'bg-amber-50 text-amber-700 border-amber-200', 'dot' => 'bg-amber-500', 'label' => 'Berjalan'],
-                                                'selesai' => ['bg' => 'bg-emerald-50 text-emerald-700 border-emerald-200', 'dot' => 'bg-emerald-500', 'label' => 'Selesai'],
-                                                'ditunda' => ['bg' => 'bg-rose-50 text-rose-700 border-rose-200', 'dot' => 'bg-rose-500', 'label' => 'Ditunda'],
-                                            ];
-                                            $st = $statusMap[$item->status_kegiatan] ?? ['bg' => 'bg-slate-50 text-slate-700 border-slate-200', 'dot' => 'bg-slate-500', 'label' => ucfirst($item->status_kegiatan)];
-                                        @endphp
                                         <div 
-                                            x-data="{ open: false }" 
-                                            class="relative inline-block text-left"
+                                            x-data="{ 
+                                                editing: false, 
+                                                val: '{{ (int) $item->estimasi_anggaran }}',
+                                                save() {
+                                                    if (this.val !== '{{ (int) $item->estimasi_anggaran }}') {
+                                                        $wire.updateFieldInline('{{ $item->id }}', 'estimasi_anggaran', this.val);
+                                                    }
+                                                    this.editing = false;
+                                                }
+                                            }"
                                         >
-                                            <button 
-                                                @click="open = !open" 
-                                                type="button" 
-                                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer border {{ $st['bg'] }} hover:shadow-2xs"
-                                                title="Klik untuk ubah status"
-                                            >
-                                                <span class="w-1.5 h-1.5 rounded-full {{ $st['dot'] }}"></span>
-                                                <span>{{ $st['label'] }}</span>
-                                                <i data-lucide="chevron-down" class="w-2.5 h-2.5 opacity-60"></i>
-                                            </button>
-
-                                            <div 
-                                                x-show="open" 
-                                                @click.outside="open = false" 
-                                                x-transition 
-                                                class="absolute right-0 z-30 mt-1 w-32 origin-top-right rounded-2xl bg-white p-1.5 shadow-lg border border-slate-200 text-left"
-                                                style="display: none;"
-                                            >
-                                                <button type="button" wire:click="updateStatus('{{ $item->id }}', 'rencana')" @click="open = false" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold text-blue-700 hover:bg-blue-50 cursor-pointer flex items-center gap-2">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Rencana
-                                                </button>
-                                                <button type="button" wire:click="updateStatus('{{ $item->id }}', 'berjalan')" @click="open = false" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold text-amber-700 hover:bg-amber-50 cursor-pointer flex items-center gap-2">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Berjalan
-                                                </button>
-                                                <button type="button" wire:click="updateStatus('{{ $item->id }}', 'selesai')" @click="open = false" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold text-emerald-700 hover:bg-emerald-50 cursor-pointer flex items-center gap-2">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Selesai
-                                                </button>
-                                                <button type="button" wire:click="updateStatus('{{ $item->id }}', 'ditunda')" @click="open = false" class="w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-700 hover:bg-rose-50 cursor-pointer flex items-center gap-2">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Ditunda
-                                                </button>
+                                            <div x-show="!editing" @dblclick="editing = true; $nextTick(() => $refs.anggaranInput.focus())" class="cursor-pointer group/inline inline-flex items-center gap-1 justify-end">
+                                                <span class="font-black text-slate-900 text-xs font-mono group-hover/inline:text-amber-600">
+                                                    {{ $item->anggaran_rupiah }}
+                                                </span>
+                                                <i data-lucide="edit-2" class="w-2.5 h-2.5 text-slate-300 opacity-0 group-hover/inline:opacity-100 transition-opacity"></i>
                                             </div>
+                                            <input 
+                                                x-ref="anggaranInput"
+                                                x-show="editing" 
+                                                x-model="val" 
+                                                @keydown.enter="save()" 
+                                                @keydown.escape="editing = false; val = '{{ (int) $item->estimasi_anggaran }}'" 
+                                                @blur="save()"
+                                                type="number" 
+                                                class="w-28 px-1.5 py-0.5 bg-amber-50 border border-amber-300 rounded text-right text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                            >
                                         </div>
                                     </x-table.td>
 
-                                    <!-- Actions -->
+                                    <!-- Status Kegiatan (Dropdown Instant) -->
                                     <x-table.td align="center">
-                                        <div class="flex items-center justify-center gap-1.5">
+                                        <select 
+                                            wire:change="updateFieldInline('{{ $item->id }}', 'status_kegiatan', $event.target.value)"
+                                            class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500 {{ match($item->status_kegiatan) {
+                                                'rencana' => 'bg-blue-50 text-blue-700 border-blue-200',
+                                                'berjalan' => 'bg-amber-50 text-amber-700 border-amber-200',
+                                                'selesai' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                                default => 'bg-rose-50 text-rose-700 border-rose-200'
+                                            } }}"
+                                        >
+                                            <option value="rencana" {{ $item->status_kegiatan === 'rencana' ? 'selected' : '' }}>Rencana</option>
+                                            <option value="berjalan" {{ $item->status_kegiatan === 'berjalan' ? 'selected' : '' }}>Berjalan</option>
+                                            <option value="selesai" {{ $item->status_kegiatan === 'selesai' ? 'selected' : '' }}>Selesai</option>
+                                            <option value="ditunda" {{ $item->status_kegiatan === 'ditunda' ? 'selected' : '' }}>Ditunda</option>
+                                        </select>
+                                    </x-table.td>
+
+                                    <!-- Actions -->
+                                    <x-table.td align="right">
+                                        <div class="flex items-center justify-end gap-1">
+                                            <x-table.action-btn 
+                                                size="sm"
+                                                variant="secondary" 
+                                                icon="eye" 
+                                                wire:click="bukaPratinjau('{{ $item->id }}')" 
+                                                title="Lihat Detail Program" 
+                                            />
+
                                             <x-table.action-btn 
                                                 size="sm"
                                                 variant="warning" 
                                                 icon="edit-3" 
                                                 loading-target="bukaFormEdit('{{ $item->id }}')"
                                                 wire:click="bukaFormEdit('{{ $item->id }}')" 
-                                                title="Edit Program" 
+                                                title="Edit Data Lengkap" 
+                                            />
+
+                                            <x-table.action-btn 
+                                                size="sm"
+                                                variant="secondary" 
+                                                icon="copy" 
+                                                wire:click="duplikatProker('{{ $item->id }}')" 
+                                                title="Duplikat Program" 
                                             />
 
                                             <x-table.action-btn 
                                                 size="sm"
                                                 variant="danger" 
                                                 icon="trash-2" 
-                                                loading-target="hapus('{{ $item->id }}')"
-                                                wire:click="hapus('{{ $item->id }}')" 
-                                                wire:confirm="Yakin ingin menghapus program kerja ini?" 
+                                                wire:click="konfirmasiHapus('{{ $item->id }}')" 
                                                 title="Hapus Program" 
                                             />
                                         </div>
@@ -499,8 +593,8 @@
                                     </span>
                                 </div>
 
-                                <div class="flex items-start gap-3 my-3">
-                                    <div class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                                <div class="flex items-start gap-3 my-3 cursor-pointer" wire:click="bukaPratinjau('{{ $item->id }}')">
+                                    <div class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs group-hover:scale-105 transition-transform">
                                         <i data-lucide="{{ $item->ikon ?: 'activity' }}" class="w-5 h-5"></i>
                                     </div>
                                     <div class="min-w-0">
@@ -537,12 +631,27 @@
                                 <span class="text-[10px] font-bold text-slate-400">ID: {{ substr($item->id, 0, 8) }}</span>
 
                                 <div class="flex items-center gap-1.5">
-                                    <button wire:click="bukaFormEdit('{{ $item->id }}')" title="Edit Program" class="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-amber-50 hover:text-amber-600 transition-all cursor-pointer">
-                                        <i data-lucide="edit-3" class="w-4 h-4"></i>
-                                    </button>
-                                    <button wire:click="hapus('{{ $item->id }}')" wire:confirm="Yakin ingin menghapus program ini?" title="Hapus Program" class="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition-all cursor-pointer">
-                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                    </button>
+                                    <x-table.action-btn 
+                                        size="sm"
+                                        variant="secondary" 
+                                        icon="eye" 
+                                        wire:click="bukaPratinjau('{{ $item->id }}')" 
+                                        title="Pratinjau Program" 
+                                    />
+                                    <x-table.action-btn 
+                                        size="sm"
+                                        variant="warning" 
+                                        icon="edit-3" 
+                                        wire:click="bukaFormEdit('{{ $item->id }}')" 
+                                        title="Edit Program" 
+                                    />
+                                    <x-table.action-btn 
+                                        size="sm"
+                                        variant="danger" 
+                                        icon="trash-2" 
+                                        wire:click="konfirmasiHapus('{{ $item->id }}')" 
+                                        title="Hapus Program" 
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -651,6 +760,7 @@
                                     name="nama_kegiatan" 
                                     wire:model="nama_kegiatan" 
                                     placeholder="Contoh: Festival Olahraga Rekreasi Tradisional Tingkat Kabupaten Bandung 2026..." 
+                                    size="lg"
                                 />
                             </x-form.field>
 
@@ -694,8 +804,8 @@
                                 <x-form.field label="Bulan Mulai" name="bulan_mulai">
                                     <x-form.select name="bulan_mulai" wire:model="bulan_mulai">
                                         <option value="">-- Pilih Bulan Mulai --</option>
-                                        @foreach(['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'] as $idx => $mName)
-                                            <option value="{{ $idx + 1 }}">{{ $mName }}</option>
+                                        @foreach(['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'] as $idx => $bln)
+                                            <option value="{{ $idx + 1 }}">{{ $bln }}</option>
                                         @endforeach
                                     </x-form.select>
                                 </x-form.field>
@@ -703,8 +813,8 @@
                                 <x-form.field label="Bulan Selesai" name="bulan_selesai">
                                     <x-form.select name="bulan_selesai" wire:model="bulan_selesai">
                                         <option value="">-- Pilih Bulan Selesai --</option>
-                                        @foreach(['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'] as $idx => $mName)
-                                            <option value="{{ $idx + 1 }}">{{ $mName }}</option>
+                                        @foreach(['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'] as $idx => $bln)
+                                            <option value="{{ $idx + 1 }}">{{ $bln }}</option>
                                         @endforeach
                                     </x-form.select>
                                 </x-form.field>
@@ -712,87 +822,48 @@
                         </x-form.card>
                     </div>
 
-                    <!-- Right Column (4 cols): Status, Ikon & Preview -->
+                    <!-- Right Column (4 cols): Status & Ikon Settings -->
                     <div class="lg:col-span-4 space-y-6">
-                        <!-- Status & Ikon Card -->
                         <x-form.card 
-                            title="Status & Simbol Visual" 
-                            subtitle="Status pelaksanaan dan ikon grafis program."
-                            icon="sliders"
+                            title="Status & Pengaturan Visual" 
+                            subtitle="Status realisasi tahapan dan ikon kegiatan."
+                            icon="settings"
                         >
                             <!-- Status Kegiatan -->
-                            <x-form.field label="Status Kegiatan" name="status_kegiatan" :required="true">
-                                <x-form.select name="status_kegiatan" wire:model.live="status_kegiatan">
-                                    <option value="rencana">Rencana (Tahap Perencanaan)</option>
-                                    <option value="berjalan">Berjalan (Sedang Berlangsung)</option>
-                                    <option value="selesai">Selesai (Telah Terlaksana)</option>
-                                    <option value="ditunda">Ditunda (Pending / Reschedule)</option>
+                            <x-form.field label="Status Realisasi" name="status_kegiatan" :required="true">
+                                <x-form.select name="status_kegiatan" wire:model="status_kegiatan">
+                                    <option value="rencana">Rencana</option>
+                                    <option value="berjalan">Sedang Berjalan</option>
+                                    <option value="selesai">Selesai Terlaksana</option>
+                                    <option value="ditunda">Ditunda</option>
                                 </x-form.select>
                             </x-form.field>
 
-                            <!-- Ikon Lucide -->
-                            <x-form.field label="Nama Ikon (Lucide)" name="ikon">
-                                <x-form.input 
-                                    name="ikon" 
-                                    wire:model.live.debounce.300ms="ikon" 
-                                    placeholder="activity, trophy, flame..." 
-                                    icon="smile"
-                                />
+                            <!-- Ikon Visual -->
+                            <x-form.field label="Ikon Kegiatan (Lucide)" name="ikon">
+                                <x-form.select name="ikon" wire:model="ikon">
+                                    <option value="activity">Activity (Standar)</option>
+                                    <option value="trophy">Trophy (Kejuaraan/Festival)</option>
+                                    <option value="award">Award (Penghargaan)</option>
+                                    <option value="target">Target (Pelatihan/Bimtek)</option>
+                                    <option value="users">Users (Komunitas/Sosialisasi)</option>
+                                    <option value="map-pin">Map Pin (Wilayah/Ekspedisi)</option>
+                                    <option value="calendar">Calendar (Agenda Rutin)</option>
+                                    <option value="zap">Zap (Aksi Cepat)</option>
+                                </x-form.select>
                             </x-form.field>
-
-                            <!-- Quick Icon Suggestions -->
-                            <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center gap-2 flex-wrap">
-                                @foreach(['activity', 'trophy', 'flame', 'award', 'flag', 'calendar', 'users', 'target'] as $ic)
-                                    <button 
-                                        type="button" 
-                                        wire:click="$set('ikon', '{{ $ic }}')"
-                                        class="p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 transition-all cursor-pointer shadow-2xs"
-                                        title="{{ $ic }}"
-                                    >
-                                        <i data-lucide="{{ $ic }}" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                @endforeach
-                            </div>
                         </x-form.card>
 
-                        <!-- Live Card Preview -->
-                        <x-form.card 
-                            title="Pratinjau Kartu" 
-                            subtitle="Simulasi visual program kerja."
-                            icon="eye"
-                        >
-                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold text-[10px]">
-                                        TA {{ $tahun_anggaran }}
-                                    </span>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider {{ $status_kegiatan === 'selesai' ? 'bg-emerald-100 text-emerald-800' : ($status_kegiatan === 'berjalan' ? 'bg-amber-100 text-amber-800' : ($status_kegiatan === 'ditunda' ? 'bg-rose-100 text-rose-800' : 'bg-blue-100 text-blue-800')) }}">
-                                        {{ ucfirst($status_kegiatan) }}
-                                    </span>
-                                </div>
-
-                                <div class="flex items-start gap-3 pt-1">
-                                    <div class="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-600/20">
-                                        <i data-lucide="{{ $ikon ?: 'activity' }}" class="w-4 h-4"></i>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <h4 class="text-xs font-black text-slate-900 line-clamp-2">
-                                            {{ $nama_kegiatan ?: 'Nama kegiatan program kerja...' }}
-                                        </h4>
-                                        <p class="text-[11px] text-slate-500 mt-0.5">
-                                            {{ $nama_bidang ?: 'Nama Bidang Pelaksana' }}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                @if($estimasi_anggaran)
-                                    <div class="pt-2 border-t border-slate-200 flex justify-between text-xs">
-                                        <span class="text-slate-400 font-bold">Anggaran:</span>
-                                        <span class="font-mono font-black text-emerald-600">Rp {{ number_format($estimasi_anggaran, 0, ',', '.') }}</span>
-                                    </div>
-                                @endif
-                            </div>
-                        </x-form.card>
+                        <!-- Guide Information Card -->
+                        <div class="bg-amber-50/70 border border-amber-200/80 rounded-3xl p-5 space-y-3">
+                            <h4 class="text-xs font-black text-amber-900 uppercase tracking-wider flex items-center gap-2">
+                                <i data-lucide="info" class="w-4 h-4 text-amber-600"></i>
+                                <span>Alur Program Kerja</span>
+                            </h4>
+                            <p class="text-xs text-amber-950 leading-relaxed">
+                                Program kerja yang disetujui akan dipublikasikan ke portal utama KORMI sebagai bentuk transparansi rencana aksi pembinaan olahraga rekreasi masyarakat di Kabupaten Bandung.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -812,10 +883,146 @@
                         icon="save" 
                         loading-target="simpan"
                     >
-                        {{ $editId ? 'Perbarui Program' : 'Simpan Program' }}
+                        {{ $editId ? 'Perbarui Program' : 'Simpan Program ke Database' }}
                     </x-form.button>
                 </x-form.action-bar>
             </form>
+        </div>
+    @endif
+
+    <!-- ========================================================= -->
+    <!-- MODAL: PRATINJAU KARTU DETAIL PROGRAM KERJA               -->
+    <!-- ========================================================= -->
+    @if($tampilkanModalPratinjau && $pratinjauProker)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+            <div class="bg-white rounded-3xl max-w-xl w-full shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+                <!-- Modal Header -->
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                            <i data-lucide="{{ $pratinjauProker->ikon ?: 'briefcase' }}" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-black text-slate-900">Detail Program Kerja KORMI</h3>
+                            <p class="text-[10px] text-slate-400">Tahun Anggaran {{ $pratinjauProker->tahun_anggaran }} • {{ $pratinjauProker->nama_bidang }}</p>
+                        </div>
+                    </div>
+                    <button type="button" wire:click="tutupPratinjau" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 overflow-y-auto space-y-5">
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700">
+                                TA {{ $pratinjauProker->tahun_anggaran }}
+                            </span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider {{ match($pratinjauProker->status_kegiatan) {
+                                'rencana' => 'bg-blue-50 text-blue-700 border border-blue-200',
+                                'berjalan' => 'bg-amber-50 text-amber-700 border border-amber-200',
+                                'selesai' => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+                                default => 'bg-rose-50 text-rose-700 border border-rose-200'
+                            } }}">
+                                {{ ucfirst($pratinjauProker->status_kegiatan) }}
+                            </span>
+                        </div>
+                        <h2 class="text-lg font-black text-slate-900 leading-snug">{{ $pratinjauProker->nama_kegiatan }}</h2>
+                        <p class="text-xs font-bold text-amber-700">{{ $pratinjauProker->nama_bidang }}</p>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Estimasi Anggaran</span>
+                            <span class="font-bold text-emerald-600 font-mono">{{ $pratinjauProker->anggaran_rupiah }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Jadwal Pelaksanaan</span>
+                            <span class="font-bold text-slate-800">
+                                {{ $pratinjauProker->bulan_mulai_label ?? '-' }}{{ $pratinjauProker->bulan_selesai && $pratinjauProker->bulan_selesai !== $pratinjauProker->bulan_mulai ? ' - ' . $pratinjauProker->bulan_selesai_label : '' }}
+                            </span>
+                        </div>
+                        @if($pratinjauProker->target_sasaran)
+                            <div class="col-span-2">
+                                <span class="text-[10px] text-slate-400 font-bold uppercase block">Target Sasaran</span>
+                                <span class="font-bold text-slate-800">{{ $pratinjauProker->target_sasaran }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    @if($pratinjauProker->tujuan_kegiatan)
+                        <div class="space-y-1.5">
+                            <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Tujuan & Latar Belakang:</h4>
+                            <p class="text-xs text-slate-600 leading-relaxed p-3.5 rounded-2xl bg-amber-50/50 border border-amber-100 whitespace-pre-line">
+                                {{ $pratinjauProker->tujuan_kegiatan }}
+                            </p>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                    <button 
+                        type="button" 
+                        wire:click="bukaFormEdit('{{ $pratinjauProker->id }}')" 
+                        class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                        <span>Edit Data Program</span>
+                    </button>
+
+                    <button 
+                        type="button" 
+                        wire:click="tutupPratinjau" 
+                        class="px-5 py-2 rounded-xl bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider hover:bg-slate-300 transition-colors cursor-pointer"
+                    >
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- ========================================================= -->
+    <!-- MODAL: KONFIRMASI HAPUS PROKER                            -->
+    <!-- ========================================================= -->
+    @if($tampilkanModalHapus)
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+            <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100 p-6 sm:p-7 space-y-6 text-center">
+                <div class="w-14 h-14 rounded-3xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto shadow-sm">
+                    <i data-lucide="alert-triangle" class="w-7 h-7"></i>
+                </div>
+
+                <div class="space-y-2">
+                    <h3 class="text-lg font-black text-slate-900">Hapus Program Kerja?</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Apakah Anda yakin ingin menghapus program kerja <br>
+                        <span class="font-bold text-slate-900 italic">"{{ $hapusNama }}"</span>?
+                    </p>
+                    <p class="text-[11px] text-rose-600 font-medium">Data yang dihapus tidak dapat dipulihkan kembali.</p>
+                </div>
+
+                <div class="flex items-center justify-center gap-3 pt-2">
+                    <button 
+                        type="button" 
+                        wire:click="batalHapus" 
+                        class="px-6 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                        Batalkan
+                    </button>
+
+                    <button 
+                        type="button" 
+                        wire:click="prosesHapus" 
+                        class="px-6 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs uppercase tracking-wider shadow-md shadow-rose-600/20 transition-all cursor-pointer flex items-center gap-2"
+                    >
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Ya, Hapus Data</span>
+                    </button>
+                </div>
+            </div>
         </div>
     @endif
 

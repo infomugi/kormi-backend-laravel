@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EventCabang extends ModelDasar
 {
-    protected $table = 'kormi_event_cabang';
+    protected $table = 'event_cabang';
 
     public function event(): BelongsTo
     {

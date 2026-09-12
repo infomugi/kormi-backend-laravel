@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Peran extends ModelDasar
 {
-    protected $table = 'kormi_peran';
+    protected $table = 'sys_peran';
 
     protected $casts = [
         'hak_akses' => 'array',

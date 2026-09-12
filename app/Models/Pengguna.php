@@ -17,7 +17,7 @@ class Pengguna extends Authenticatable
     const UPDATED_AT = 'diperbarui_pada';
     const DELETED_AT = 'dihapus_pada';
 
-    protected $table = 'kormi_pengguna';
+    protected $table = 'sys_pengguna';
     protected $keyType = 'string';
     public $incrementing = false;
     protected $guarded = [];

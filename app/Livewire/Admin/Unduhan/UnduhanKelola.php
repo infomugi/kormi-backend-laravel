@@ -52,7 +52,7 @@ class UnduhanKelola extends Component
     {
         $rules = [
             'judul_dokumen'  => 'required|min:3|max:255',
-            'kategori_id'    => 'required|exists:kormi_kategori_unduhan,id',
+            'kategori_id'    => 'required|exists:media_kategori_unduhan,id',
             'ekstensi_berkas'=> 'required|max:10',
         ];
 

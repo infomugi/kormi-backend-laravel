@@ -146,6 +146,56 @@ class AdminCmsCrudTest extends TestCase
         $this->assertNull(Berita::find($b2->id));
     }
 
+    public function test_berita_inline_editable(): void
+    {
+        $kategori1 = KategoriBerita::first();
+        $kategori2 = KategoriBerita::skip(1)->first() ?? $kategori1;
+
+        $berita = Berita::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'kategori_id' => $kategori1->id,
+            'penulis_id' => Pengguna::first()->id,
+            'judul' => 'Judul Berita Sebelum Inline Edit',
+            'slug' => 'judul-berita-sebelum-inline-edit',
+            'ringkasan' => 'Ringkasan Sebelum Inline Edit',
+            'isi_konten' => 'Konten lengkap artikel berita',
+            'gambar_utama' => 'https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=800',
+            'status_publikasi' => 'draft',
+            'status_unggulan' => false,
+            'jumlah_dilihat' => 10,
+        ]);
+
+        // 1. Edit Judul Inline
+        Livewire::test(BeritaKelola::class)
+            ->call('updateFieldInline', $berita->id, 'judul', 'Judul Baru Dari Inline Edit')
+            ->assertHasNoErrors();
+        $this->assertEquals('Judul Baru Dari Inline Edit', $berita->fresh()->judul);
+
+        // 2. Edit Ringkasan Inline
+        Livewire::test(BeritaKelola::class)
+            ->call('updateFieldInline', $berita->id, 'ringkasan', 'Ringkasan Baru Dari Inline Edit')
+            ->assertHasNoErrors();
+        $this->assertEquals('Ringkasan Baru Dari Inline Edit', $berita->fresh()->ringkasan);
+
+        // 3. Edit Kategori Inline
+        Livewire::test(BeritaKelola::class)
+            ->call('updateFieldInline', $berita->id, 'kategori_id', $kategori2->id)
+            ->assertHasNoErrors();
+        $this->assertEquals($kategori2->id, $berita->fresh()->kategori_id);
+
+        // 4. Edit Status Publikasi Inline
+        Livewire::test(BeritaKelola::class)
+            ->call('updateFieldInline', $berita->id, 'status_publikasi', 'published')
+            ->assertHasNoErrors();
+        $this->assertEquals('published', $berita->fresh()->status_publikasi);
+
+        // 5. Edit Views Count Inline
+        Livewire::test(BeritaKelola::class)
+            ->call('updateFieldInline', $berita->id, 'jumlah_dilihat', 2500)
+            ->assertHasNoErrors();
+        $this->assertEquals(2500, $berita->fresh()->jumlah_dilihat);
+    }
+
 
     public function test_galeri_crud(): void
     {

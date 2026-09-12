@@ -100,11 +100,11 @@ class BeritaKelola extends Component
         $rules = [
             'judul'             => 'required|min:5|max:255',
             'slug'              => 'required|max:255',
-            'kategori_id'       => 'required|exists:kormi_kategori_berita,id',
+            'kategori_id'       => 'required|exists:media_kategori_berita,id',
             'ringkasan'         => 'required|max:500',
             'isi_konten'        => 'required|min:10',
             'status_publikasi'  => 'required|in:draft,published,archived',
-            'penulis_id'        => 'nullable|exists:kormi_pengguna,id',
+            'penulis_id'        => 'nullable|exists:sys_pengguna,id',
             'keterangan_gambar' => 'nullable|max:255',
             'tanggal_publikasi' => 'nullable|date',
         ];
@@ -413,6 +413,44 @@ class BeritaKelola extends Component
         session()->flash('pesan', 'Status Berita "' . Str::limit($berita->judul, 30) . '" ' . $pesan);
     }
 
+    public function updateFieldInline(string $id, string $field, $value): void
+    {
+        $berita = Berita::findOrFail($id);
+
+        if (!in_array($field, ['judul', 'ringkasan', 'kategori_id', 'status_publikasi', 'jumlah_dilihat', 'status_unggulan'])) {
+            return;
+        }
+
+        if ($field === 'judul') {
+            $value = trim((string) $value);
+            if (strlen($value) < 5) {
+                session()->flash('pesan', 'Gagal: Judul artikel minimal harus 5 karakter.');
+                return;
+            }
+            $berita->judul = $value;
+            // Update slug jika berita belum pernah diubah manual
+            $berita->slug = Str::slug($value);
+        } elseif ($field === 'ringkasan') {
+            $berita->ringkasan = trim((string) $value);
+        } elseif ($field === 'kategori_id') {
+            if (KategoriBerita::where('id', $value)->exists()) {
+                $berita->kategori_id = $value;
+            }
+        } elseif ($field === 'status_publikasi') {
+            if (in_array($value, ['published', 'draft', 'archived'])) {
+                $berita->status_publikasi = $value;
+                if ($value === 'published' && !$berita->tanggal_publikasi) {
+                    $berita->tanggal_publikasi = now();
+                }
+            }
+        } elseif ($field === 'jumlah_dilihat') {
+            $berita->jumlah_dilihat = max(0, (int) $value);
+        }
+
+        $berita->save();
+        session()->flash('pesan', 'Berhasil memperbarui ' . ucwords(str_replace('_', ' ', $field)) . ' untuk berita "' . Str::limit($berita->judul, 30) . '"');
+    }
+
     public function toggleStatus(string $id): void
     {
         $berita = Berita::findOrFail($id);
@@ -516,7 +554,7 @@ class BeritaKelola extends Component
     public function simpanKategoriBaru(): void
     {
         $this->validate([
-            'kategoriBaruNama' => 'required|min:3|max:100|unique:kormi_kategori_berita,nama_kategori',
+            'kategoriBaruNama' => 'required|min:3|max:100|unique:media_kategori_berita,nama_kategori',
             'kategoriBaruWarna' => 'required|regex:/^#[a-fA-F0-9]{6}$/',
         ], [
             'kategoriBaruNama.required' => 'Nama kategori wajib diisi.',

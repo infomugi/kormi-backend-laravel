@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DesaKelurahan extends ModelDasar
 {
-    protected $table = 'kormi_desa_kelurahan';
+    protected $table = 'ref_desa_kelurahan';
 
     public function kecamatan(): BelongsTo
     {
