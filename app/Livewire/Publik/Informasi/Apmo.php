@@ -4,18 +4,30 @@ namespace App\Livewire\Publik\Informasi;
 
 use App\Models\ApmoPenerima;
 use App\Models\ApmoTahun;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
+#[Title('Anugerah Prestasi (APMO) - KORMI Kabupaten Bandung')]
 class Apmo extends Component
 {
+    #[Url(as: 'tahun')]
     public int $tahunDipilih = 2025;
+
+    public function filterTahun(int $thn): void
+    {
+        $this->tahunDipilih = $thn;
+    }
 
     public function render()
     {
-        $tahunList = ApmoTahun::orderByDesc('tahun')->pluck('tahun')->toArray();
-        if (empty($tahunList)) {
-            $tahunList = [2025, 2024];
+        $tahunList = ApmoTahun::orderByDesc('tahun')->get();
+        
+        if ($tahunList->isNotEmpty() && !in_array($this->tahunDipilih, $tahunList->pluck('tahun')->toArray())) {
+            $this->tahunDipilih = $tahunList->first()->tahun;
         }
+
+        $tahunAktif = $tahunList->firstWhere('tahun', $this->tahunDipilih);
 
         $penerimaList = ApmoPenerima::whereHas('tahun', fn($q) => $q->where('tahun', $this->tahunDipilih))
             ->orderBy('urutan')
@@ -23,8 +35,10 @@ class Apmo extends Component
 
         return view('livewire.publik.informasi.apmo', [
             'tahunList' => $tahunList,
+            'tahunAktif' => $tahunAktif,
             'penerimaList' => $penerimaList,
-        ])->layout('components.layouts.app', ['title' => 'Anugerah Prestasi (APMO) - KORMI Kabupaten Bandung']);
+        ])->layout('components.layouts.app');
     }
 }
+
 

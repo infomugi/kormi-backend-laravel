@@ -1,15 +1,18 @@
-<nav x-data="{ scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 50)" :class="{ 'py-4 shadow-2xl scale-[0.99]': scrolled, 'py-5': !scrolled }" class="fixed top-4 left-1/2 -translate-x-1/2 w-[98%] max-w-[1500px] z-50 transition-all duration-500 rounded-full border border-slate-200 glass">
-    <div class="container mx-auto px-10 flex justify-between items-center">
-        <a href="{{ route('beranda') }}" wire:navigate class="flex items-center gap-4">
-            <img src="{{ asset('assets/image/logo-kormi.png') }}" class="w-10 h-10 object-contain" alt="Logo Kormi" />
-            <div>
-                <h1 class="text-lg font-black leading-none tracking-tight text-slate-900">KORMI</h1>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Kabupaten Bandung</p>
+<nav x-data="{ scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 30)" :class="{ 'py-2.5 shadow-xl bg-white/95 border-slate-200/90': scrolled, 'py-3.5 bg-white/85 border-slate-200/60': !scrolled }" class="fixed top-3 left-1/2 -translate-x-1/2 w-[95%] max-w-[1360px] z-50 transition-all duration-300 rounded-full border glass backdrop-blur-xl">
+    <div class="container mx-auto px-6 sm:px-8 flex justify-between items-center">
+        <a href="{{ route('beranda') }}" wire:navigate class="flex items-center gap-3 group">
+            <img src="{{ asset('assets/image/logo-kormi.png') }}" class="w-8 h-8 sm:w-9 sm:h-9 object-contain group-hover:scale-105 transition-transform" alt="Logo Kormi" />
+            <div class="leading-none">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-base font-black tracking-tight text-slate-900">KORMI</span>
+                    <span class="px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[9px] font-black uppercase tracking-wider">Kab. Bandung</span>
+                </div>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Komite Olahraga Masyarakat</p>
             </div>
         </a>
 
         <!-- Desktop Menu -->
-        <div class="hidden lg:flex items-center gap-8">
+        <div class="hidden lg:flex items-center gap-6">
             @foreach($menuItems as $item)
                 @php
                     $isActive = false;

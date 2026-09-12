@@ -51,4 +51,17 @@ class PengurusModel extends ModelDasar
 
         return app(\App\Services\StorageService::class)->getTemporaryUrl($this->foto_url);
     }
+
+    public function getInitialDuaHurufAttribute(): string
+    {
+        $nama = preg_replace('/^(h\.|hj\.|dr\.|drs\.|ir\.|prof\.)\s+/i', '', trim($this->nama_lengkap ?? ''));
+        $words = preg_split('/\s+/', $nama);
+        if (empty($words) || empty($words[0])) {
+            return 'KM';
+        }
+        if (count($words) === 1) {
+            return strtoupper(substr($words[0], 0, 2));
+        }
+        return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+    }
 }

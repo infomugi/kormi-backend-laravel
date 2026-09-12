@@ -2,94 +2,95 @@
 
 namespace App\Livewire\Publik\Tentang;
 
+use App\Models\PengurusModel;
+use App\Models\PeriodeKepengurusan;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
+#[Title('Susunan Pengurus - KORMI Kabupaten Bandung')]
 class Pengurus extends Component
 {
+    #[Url(as: 'bidang')]
+    public string $filterBidang = 'semua';
+
+    #[Url(as: 'cari')]
+    public string $cari = '';
+
+    public function setBidang(string $bidang): void
+    {
+        $this->filterBidang = $bidang;
+    }
+
     public function render()
     {
-        $periodeAktif = \App\Models\PeriodeKepengurusan::with('pengurus')->aktif()->first();
+        $periodeAktif = PeriodeKepengurusan::aktif()->first() 
+            ?? PeriodeKepengurusan::orderByDesc('tahun_mulai')->first();
 
-        if ($periodeAktif && $periodeAktif->pengurus->isNotEmpty()) {
-            $grouped = $periodeAktif->pengurus->groupBy('kategori_jabatan');
-            $struktur = [];
-            foreach ($grouped as $kategori => $members) {
-                $struktur[] = [
-                    'title' => $kategori,
-                    'members' => $members->map(fn($m) => $m->nama_lengkap . ($m->nama_jabatan ? ' (' . $m->nama_jabatan . ')' : ''))->toArray()
-                ];
+        $query = PengurusModel::tampil()
+            ->when($periodeAktif, fn($q) => $q->where('periode_id', $periodeAktif->id))
+            ->when(!empty($this->cari), function ($q) {
+                $q->where(function ($sub) {
+                    $sub->where('nama_lengkap', 'like', "%{$this->cari}%")
+                        ->orWhere('jabatan', 'like', "%{$this->cari}%")
+                        ->orWhere('kategori_bidang', 'like', "%{$this->cari}%");
+                });
+            })
+            ->urut();
+
+        $pengurusCollection = $query->get();
+
+        // Kategori hierarchy order
+        $kategoriOrder = [
+            'Pelindung',
+            'Dewan Kehormatan',
+            'Dewan Pembina',
+            'Dewan Pakar',
+            'Pengurus Harian',
+            'Komisi OTKB',
+            'Komisi OKK',
+            'Komisi OPT',
+        ];
+
+        $bidangTersedia = PengurusModel::tampil()
+            ->when($periodeAktif, fn($q) => $q->where('periode_id', $periodeAktif->id))
+            ->whereNotNull('kategori_bidang')
+            ->where('kategori_bidang', '!=', '')
+            ->distinct()
+            ->pluck('kategori_bidang')
+            ->toArray();
+
+        // Group by kategori_bidang
+        $grouped = $pengurusCollection->groupBy(function ($item) {
+            return $item->kategori_bidang ?: 'Pengurus Lainnya';
+        });
+
+        // Filter if specific bidang selected
+        if ($this->filterBidang !== 'semua' && !empty($this->filterBidang)) {
+            $grouped = $grouped->filter(function ($items, $key) {
+                return strtolower($key) === strtolower($this->filterBidang);
+            });
+        }
+
+        // Sort groups based on standard hierarchy
+        $sortedGroups = [];
+        foreach ($kategoriOrder as $kat) {
+            if ($grouped->has($kat)) {
+                $sortedGroups[$kat] = $grouped->get($kat);
             }
-        } else {
-            $struktur = [
-                [
-                    'title' => 'Pelindung',
-                    'members' => ['Bupati Bandung', 'Wakil Bupati Bandung']
-                ],
-                [
-                    'title' => 'Dewan Kehormatan',
-                    'members' => [
-                        'H. Cucun Ahmad Syamsurijal, M.A.P',
-                        'H. Asep Romy Romaya, S.E.',
-                        'H. Agus Yasmin',
-                        'Hj. Renie Rahayu Fauzie, S.H.'
-                    ]
-                ],
-                [
-                    'title' => 'Dewan Pembina',
-                    'members' => [
-                        'Sekretaris Daerah Kabupaten Bandung',
-                        'Asisten Pemerintahan dan Kesejahteraan Rakyat',
-                        'Kepala Dinas Pemuda dan Olahraga',
-                        'Kepala Dinas Pendidikan',
-                        'Kepala Dinas Kebudayaan',
-                        'Kepala Dinas Pariwisata dan Ekonomi Kreatif',
-                        'Kepala Dinas Kesehatan',
-                        'Kepala Dinas Koperasi dan UKM',
-                        'Kepala Dinas Perdagangan dan Perindustrian',
-                        'Kepala Dinas Komunikasi dan Informatika'
-                    ]
-                ],
-                [
-                    'title' => 'Dewan Pakar',
-                    'members' => ['Al Hijaz Farabi DY, S.IP.', 'Ating Rochyadi, M.Pd.']
-                ],
-                [
-                    'title' => 'Pengurus Harian',
-                    'members' => [
-                        'Ketua Umum: Hj. Emma Dety Permanawati, S.Pd.I., M.M.',
-                        'Wakil Ketua: Margin Winaya, S.H., Ir. Hj. Tintin Indyati Amiyana, Linda Herlina, Hamdan Nursidik, S.E.Sy.',
-                        'Sekretaris Umum: Muhammad Iqbal Nurhidayatullah, S.IP.',
-                        'Wakil Sekretaris: Arief Sulaiman Martondi, S.E., M.M.',
-                        'Bendahara Umum: Witri Andayani, S.P.',
-                        'Wakil Bendahara: Siti Nur Arofah, S.IP.'
-                    ]
-                ],
-                [
-                    'title' => 'Komisi Olahraga Tradisional & Kreasi Budaya (OTKB)',
-                    'members' => [
-                        'Ketua Komisi: Arya Wiranata, S.Pd.',
-                        'Anggota: Yatti Mulyati, Yoga Jibja Pratama, Kharisma Nayra Althafunisa, Hernando, Humaira Hayun Islamy'
-                    ]
-                ],
-                [
-                    'title' => 'Komisi Olahraga Kesehatan & Kebugaran (OKK)',
-                    'members' => [
-                        'Ketua Komisi: Tohir',
-                        'Anggota: Ir. Ela Musliawati, Muhammad Reza Putra Nurhendi, Rizha Rafli Ghifari, Saadillah Amir Husaeni'
-                    ]
-                ],
-                [
-                    'title' => 'Komisi Olahraga Petualangan & Tantangan (OPT)',
-                    'members' => [
-                        'Ketua Komisi: Zico Prasetya Aldrine',
-                        'Anggota: Fajar Saeful Rahman, Gunawan, Wendi Purwanto, Dariel Fadhlilah Konjala, S.Par., M.Si.'
-                    ]
-                ]
-            ];
+        }
+        foreach ($grouped as $key => $items) {
+            if (!isset($sortedGroups[$key])) {
+                $sortedGroups[$key] = $items;
+            }
         }
 
         return view('livewire.publik.tentang.pengurus', [
-            'struktur' => $struktur,
-        ])->layout('components.layouts.app', ['title' => 'Susunan Pengurus - KORMI Kabupaten Bandung']);
+            'periodeAktif'    => $periodeAktif,
+            'sortedGroups'    => $sortedGroups,
+            'bidangTersedia'  => $bidangTersedia,
+            'totalPengurus'   => $pengurusCollection->count(),
+        ])->layout('components.layouts.app');
     }
 }
+

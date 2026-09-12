@@ -48,6 +48,30 @@ class DutaOlahraga extends ModelDasar
         return $this->belongsTo(DesaKelurahan::class, 'desa_kelurahan_id');
     }
 
+    public function getFotoDutaUrlAttribute(): ?string
+    {
+        $val = $this->attributes['foto_url'] ?? null;
+
+        if (empty($val)) {
+            return null;
+        }
+
+        if (str_starts_with($val, 'http://') || str_starts_with($val, 'https://')) {
+            return $val;
+        }
+
+        return app(\App\Services\StorageService::class)->getTemporaryUrl($val);
+    }
+
+    public function getInitialDuaHurufAttribute(): string
+    {
+        $words = preg_split('/\s+/', trim($this->nama_lengkap ?: 'Duta'));
+        if (count($words) >= 2) {
+            return strtoupper(mb_substr($words[0], 0, 1) . mb_substr($words[1], 0, 1));
+        }
+        return strtoupper(mb_substr($this->nama_lengkap ?: 'DU', 0, 2));
+    }
+
     /**
      * Helper backward compatibility: get prestasis alias
      */
@@ -64,3 +88,4 @@ class DutaOlahraga extends ModelDasar
         return $this->nomor_telepon ?: $this->akun_instagram;
     }
 }
+

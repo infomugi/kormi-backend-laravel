@@ -42,4 +42,23 @@ class Inorga extends ModelDasar
     {
         return $this->hasMany(EventCabang::class, 'inorga_id');
     }
+
+    public function getInitialDuaHurufAttribute(): string
+    {
+        $clean = preg_replace('/[^A-Za-z0-9]/', '', $this->singkatan ?? '');
+        return strtoupper(substr($clean ?: 'IN', 0, 2));
+    }
+
+    public function getLogoGambarUrlAttribute(): ?string
+    {
+        if (empty($this->logo_url)) {
+            return null;
+        }
+
+        if (str_starts_with($this->logo_url, 'http://') || str_starts_with($this->logo_url, 'https://')) {
+            return $this->logo_url;
+        }
+
+        return app(\App\Services\StorageService::class)->getTemporaryUrl($this->logo_url) ?? null;
+    }
 }

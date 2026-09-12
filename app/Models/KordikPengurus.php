@@ -52,4 +52,14 @@ class KordikPengurus extends ModelDasar
 
         return app(\App\Services\StorageService::class)->getTemporaryUrl($this->foto_ketua_url);
     }
+
+    public function getInitialDuaHurufAttribute(): string
+    {
+        $words = preg_split('/\s+/', trim($this->nama_ketua ?: 'Koordinator'));
+        if (count($words) >= 2) {
+            return strtoupper(mb_substr($words[0], 0, 1) . mb_substr($words[1], 0, 1));
+        }
+        return strtoupper(mb_substr($this->nama_ketua ?: 'KD', 0, 2));
+    }
 }
+
