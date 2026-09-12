@@ -1,51 +1,53 @@
 <div class="space-y-0 text-slate-800">
     <!-- 1. COMPACT PRO HERO SECTION -->
-    <section class="relative min-h-[82vh] flex items-center justify-center pt-24 pb-16 overflow-hidden bg-slate-950 -mt-24">
-        <!-- Ambient background with subtle particle texture -->
+    <section class="relative min-h-[86vh] flex items-center justify-center pt-28 pb-20 overflow-hidden bg-slate-950 -mt-24">
+        <!-- Ambient background with refined particle mesh glow -->
         <div class="absolute inset-0 z-0 pointer-events-none">
             <img src="{{ asset('assets/image/hero-bg.jpg') }}" class="w-full h-full object-cover opacity-20 scale-105" alt="Hero Background" onerror="this.style.display='none'" />
-            <div class="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/90 to-slate-950"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/85 to-slate-950"></div>
             <!-- Concentrated glow spotlights -->
-            <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-emerald-500/15 blur-[140px] rounded-full"></div>
-            <div class="absolute bottom-0 right-10 w-[350px] h-[350px] bg-lime-400/10 blur-[120px] rounded-full"></div>
+            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] bg-emerald-500/20 blur-[150px] rounded-full"></div>
+            <div class="absolute bottom-10 right-10 w-[400px] h-[400px] bg-lime-400/15 blur-[130px] rounded-full"></div>
+            <div class="absolute top-1/2 left-10 w-[350px] h-[350px] bg-teal-500/15 blur-[120px] rounded-full"></div>
+            <!-- Subtle Grid Lines Effect -->
+            <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b10_1px,transparent_1px),linear-gradient(to_bottom,#1e293b10_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] opacity-40"></div>
         </div>
 
         <div class="container mx-auto px-6 relative z-10 text-center flex flex-col items-center">
-            <!-- Official Header Badge -->
-            <div class="inline-flex items-center gap-3 sm:gap-4 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl mb-6 hover:border-emerald-500/30 transition-colors">
-                <img src="{{ asset('assets/image/logo-kab-bandung.png') }}" class="h-6 sm:h-7 object-contain" alt="Logo Kab Bandung" />
-                <div class="w-px h-4 bg-white/15"></div>
-                <img src="{{ asset('assets/image/logo-bedas.png') }}" class="h-6 sm:h-7 object-contain" alt="Logo Bedas" />
-                <div class="w-px h-4 bg-white/15"></div>
-                <img src="{{ asset('assets/image/logo-kormi.png') }}" class="h-6 sm:h-7 object-contain" alt="Logo Kormi" />
+            <!-- Official Header Badge with Glow -->
+            <div class="inline-flex items-center gap-3 sm:gap-4 px-4 py-2 rounded-full bg-white/[0.07] border border-white/15 backdrop-blur-2xl shadow-[0_0_30px_rgba(16,185,129,0.15)] mb-6 hover:border-emerald-400/40 hover:bg-white/[0.1] transition-all duration-300">
+                <img src="{{ asset('assets/image/logo-kab-bandung.png') }}" class="h-6 sm:h-7 object-contain drop-shadow" alt="Logo Kab Bandung" />
+                <div class="w-px h-4 bg-white/20"></div>
+                <img src="{{ asset('assets/image/logo-bedas.png') }}" class="h-6 sm:h-7 object-contain drop-shadow" alt="Logo Bedas" />
+                <div class="w-px h-4 bg-white/20"></div>
+                <img src="{{ asset('assets/image/logo-kormi.png') }}" class="h-6 sm:h-7 object-contain drop-shadow" alt="Logo Kormi" />
             </div>
 
-            <div class="max-w-3xl space-y-4">
-                <div class="inline-block">
-                    <span class="px-3.5 py-1 rounded-full text-[10px] font-extrabold tracking-[0.2em] uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-                        Portal Resmi Komite Olahraga Masyarakat Indonesia
-                    </span>
+            <div class="max-w-4xl space-y-5">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[10px] font-black tracking-[0.2em] uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 backdrop-blur-md">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Portal Resmi Komite Olahraga Masyarakat Indonesia</span>
                 </div>
                 
-                <h1 class="text-3xl sm:text-5xl md:text-6xl font-black leading-[1.12] tracking-tight text-white uppercase">
+                <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.08] tracking-tight text-white uppercase drop-shadow-sm">
                     KORMI <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-lime-400">KABUPATEN BANDUNG</span>
                 </h1>
                 
-                <p class="text-sm sm:text-base text-slate-300 font-medium max-w-xl mx-auto leading-relaxed opacity-85">
+                <p class="text-sm sm:text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto leading-relaxed opacity-90">
                     Mewadahi, membina, dan mengembangkan olahraga rekreasi untuk menciptakan masyarakat yang <span class="text-emerald-400 font-bold">Sehat</span>, <span class="text-lime-300 font-bold">Bugar</span>, dan <span class="text-teal-300 font-bold">Gembira</span>.
                 </p>
 
-                <!-- Compact Pro Actions -->
-                <div class="flex flex-wrap justify-center items-center gap-3 pt-4">
-                    <a href="{{ route('inorga') }}" wire:navigate class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-full font-extrabold text-xs shadow-lg shadow-emerald-900/30 transition-all hover:-translate-y-0.5 active:scale-95 flex items-center gap-2 uppercase tracking-wider group">
+                <!-- Ultra-Pro Action Buttons -->
+                <div class="flex flex-wrap justify-center items-center gap-3.5 pt-4">
+                    <a href="{{ route('inorga') }}" wire:navigate class="px-7 py-3.5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-full font-black text-xs shadow-xl shadow-emerald-950/50 hover:shadow-emerald-500/30 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 flex items-center gap-2.5 uppercase tracking-wider group border border-emerald-400/30">
                         <span>Direktori INORGA</span>
-                        <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform"></i>
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                     </a>
-                    <a href="#komisi-section" class="px-6 py-3 bg-white/10 hover:bg-white/15 border border-white/15 text-white rounded-full font-bold text-xs backdrop-blur-md transition-all hover:-translate-y-0.5 uppercase tracking-wider flex items-center gap-2">
+                    <a href="#komisi-section" class="px-6 py-3.5 bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 text-white rounded-full font-bold text-xs backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 uppercase tracking-wider flex items-center gap-2">
                         <i data-lucide="layers" class="w-3.5 h-3.5 text-lime-400"></i>
                         <span>3 Rumpun Komisi</span>
                     </a>
-                    <a href="{{ route('visimisi') }}" wire:navigate class="px-5 py-3 hover:text-emerald-400 text-slate-400 rounded-full font-bold text-xs transition-colors uppercase tracking-wider">
+                    <a href="{{ route('visimisi') }}" wire:navigate class="px-5 py-3.5 hover:text-emerald-400 text-slate-300 hover:bg-white/5 rounded-full font-bold text-xs transition-all uppercase tracking-wider">
                         Profil Organisasi
                     </a>
                 </div>
@@ -53,15 +55,15 @@
         </div>
 
         <!-- Sleek bottom blend -->
-        <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
     </section>
 
     <!-- 2. EXECUTIVE FLOATING METRICS (ULTRA-PRO GLASS) -->
-    <section class="relative z-20 -mt-10 max-w-6xl mx-auto px-6">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 p-3.5 sm:p-4 bg-white/95 rounded-3xl border border-slate-200/90 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] backdrop-blur-xl">
+    <section class="relative z-20 -mt-12 max-w-6xl mx-auto px-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 p-4 sm:p-5 bg-white/95 rounded-3xl border border-slate-200/90 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.09)] backdrop-blur-2xl">
             <!-- Metric 1: INORGA -->
-            <div class="group p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 hover:bg-emerald-50/60 border border-slate-100 hover:border-emerald-200/80 transition-all duration-300 flex items-center gap-3.5 text-left">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform shrink-0">
+            <a href="{{ route('inorga') }}" wire:navigate class="group p-4 sm:p-4.5 rounded-2xl bg-slate-50/80 hover:bg-emerald-50/70 border border-slate-200/70 hover:border-emerald-300/90 transition-all duration-300 flex items-center gap-3.5 text-left hover:shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-500/25 group-hover:scale-110 group-hover:rotate-2 transition-transform shrink-0">
                     <i data-lucide="award" class="w-5 h-5"></i>
                 </div>
                 <div class="min-w-0">
@@ -71,11 +73,11 @@
                     </div>
                     <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider mt-1 group-hover:text-emerald-700 transition-colors truncate">INORGA Induk</div>
                 </div>
-            </div>
+            </a>
 
             <!-- Metric 2: KORCAM -->
-            <div class="group p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 hover:bg-blue-50/60 border border-slate-100 hover:border-blue-200/80 transition-all duration-300 flex items-center gap-3.5 text-left">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform shrink-0">
+            <a href="{{ route('kordikecamatan') }}" wire:navigate class="group p-4 sm:p-4.5 rounded-2xl bg-slate-50/80 hover:bg-blue-50/70 border border-slate-200/70 hover:border-blue-300/90 transition-all duration-300 flex items-center gap-3.5 text-left hover:shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-110 group-hover:rotate-2 transition-transform shrink-0">
                     <i data-lucide="map-pin" class="w-5 h-5"></i>
                 </div>
                 <div class="min-w-0">
@@ -85,11 +87,11 @@
                     </div>
                     <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider mt-1 group-hover:text-blue-700 transition-colors truncate">KORCAM Wilayah</div>
                 </div>
-            </div>
+            </a>
 
             <!-- Metric 3: DUTA -->
-            <div class="group p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 hover:bg-amber-50/60 border border-slate-100 hover:border-amber-200/80 transition-all duration-300 flex items-center gap-3.5 text-left">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform shrink-0">
+            <a href="{{ route('dutaolahraga') }}" wire:navigate class="group p-4 sm:p-4.5 rounded-2xl bg-slate-50/80 hover:bg-amber-50/70 border border-slate-200/70 hover:border-amber-300/90 transition-all duration-300 flex items-center gap-3.5 text-left hover:shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-amber-500/25 group-hover:scale-110 group-hover:rotate-2 transition-transform shrink-0">
                     <i data-lucide="users" class="w-5 h-5"></i>
                 </div>
                 <div class="min-w-0">
@@ -99,11 +101,11 @@
                     </div>
                     <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider mt-1 group-hover:text-amber-700 transition-colors truncate">Duta Olahraga</div>
                 </div>
-            </div>
+            </a>
 
             <!-- Metric 4: SAPRAS -->
-            <div class="group p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 hover:bg-purple-50/60 border border-slate-100 hover:border-purple-200/80 transition-all duration-300 flex items-center gap-3.5 text-left">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center text-white shadow-md shadow-purple-500/20 group-hover:scale-105 transition-transform shrink-0">
+            <a href="{{ route('sapras') }}" wire:navigate class="group p-4 sm:p-4.5 rounded-2xl bg-slate-50/80 hover:bg-purple-50/70 border border-slate-200/70 hover:border-purple-300/90 transition-all duration-300 flex items-center gap-3.5 text-left hover:shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center text-white shadow-md shadow-purple-500/25 group-hover:scale-110 group-hover:rotate-2 transition-transform shrink-0">
                     <i data-lucide="activity" class="w-5 h-5"></i>
                 </div>
                 <div class="min-w-0">
@@ -113,7 +115,7 @@
                     </div>
                     <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider mt-1 group-hover:text-purple-700 transition-colors truncate">Fasilitas Sarpras</div>
                 </div>
-            </div>
+            </a>
         </div>
     </section>
 
