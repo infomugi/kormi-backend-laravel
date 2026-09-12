@@ -11,9 +11,9 @@
 @php
     $sizeClasses = [
         'sm' => 'px-3 py-1.5 text-xs rounded-xl',
-        'default' => 'px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs font-bold rounded-xl sm:rounded-2xl',
-        'lg' => 'px-4 sm:px-5 py-2.5 sm:py-3 text-sm sm:text-base font-bold rounded-xl sm:rounded-2xl',
-    ][$size] ?? 'px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs font-bold rounded-xl sm:rounded-2xl';
+        'default' => 'px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-xl sm:rounded-2xl',
+        'lg' => 'px-4 sm:px-5 py-3 sm:py-4 text-sm sm:text-base font-extrabold rounded-xl sm:rounded-2xl',
+    ][$size] ?? 'px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-xl sm:rounded-2xl';
 @endphp
 
 <div 
@@ -48,14 +48,14 @@
     <button 
         type="button" 
         @click="open = !open; if(open) $nextTick(() => $refs.searchInput?.focus())"
-        class="w-full flex items-center justify-between text-left bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 focus:bg-white focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 focus:outline-none transition-all duration-200 cursor-pointer shadow-2xs {{ $sizeClasses }}"
+        class="w-full flex items-center justify-between text-left bg-slate-50/70 hover:bg-slate-100/60 focus:bg-white border border-slate-200 focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 focus:outline-none transition-all duration-200 cursor-pointer shadow-2xs {{ $sizeClasses }}"
         :class="open ? 'ring-3 ring-emerald-600/15 border-emerald-600 bg-white' : ''"
     >
         <div class="flex items-center gap-2 min-w-0 flex-1 pr-2">
             <template x-if="selectedOption">
                 <div class="flex items-center gap-2 min-w-0">
                     <template x-if="selectedOption.color">
-                        <span class="w-2.5 h-2.5 rounded-full shrink-0" :style="'background-color: ' + selectedOption.color"></span>
+                        <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs" :style="'background-color: ' + selectedOption.color"></span>
                     </template>
                     <span class="font-bold text-slate-900 truncate" x-text="selectedOption.label"></span>
                     <template x-if="selectedOption.badge">

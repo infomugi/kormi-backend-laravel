@@ -636,10 +636,13 @@
                                 </x-form.field>
 
                                 <x-form.field label="Tanggal Lahir" name="tanggal_lahir">
-                                    <x-form.input 
-                                        type="date"
+                                    <x-form.datepicker 
                                         name="tanggal_lahir" 
                                         wire:model="tanggal_lahir" 
+                                        :enableTime="false"
+                                        dateFormat="Y-m-d"
+                                        altFormat="j F Y"
+                                        placeholder="Pilih tanggal lahir..."
                                     />
                                 </x-form.field>
                             </div>

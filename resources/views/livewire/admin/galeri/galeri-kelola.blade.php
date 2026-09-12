@@ -935,11 +935,13 @@
                             <!-- Tanggal & Lokasi -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <x-form.field label="Tanggal Pelaksanaan" name="tanggal_kegiatan">
-                                    <x-form.input 
-                                        type="date"
+                                    <x-form.datepicker 
                                         name="tanggal_kegiatan" 
                                         wire:model="tanggal_kegiatan" 
-                                        icon="calendar"
+                                        :enableTime="false"
+                                        dateFormat="Y-m-d"
+                                        altFormat="j F Y"
+                                        placeholder="Pilih tanggal..."
                                     />
                                 </x-form.field>
 

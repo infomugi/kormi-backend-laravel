@@ -839,10 +839,13 @@
 
                         <!-- Tanggal Acara -->
                         <x-form.field label="Tanggal Pelaksanaan Acara" name="tanggal_penganugerahan">
-                            <x-form.input 
-                                type="date" 
+                            <x-form.datepicker 
                                 name="tanggal_penganugerahan" 
                                 wire:model="tanggal_penganugerahan" 
+                                :enableTime="false"
+                                dateFormat="Y-m-d"
+                                altFormat="j F Y"
+                                placeholder="Pilih tanggal acara..."
                             />
                         </x-form.field>
 

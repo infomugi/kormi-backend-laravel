@@ -152,7 +152,7 @@ Route::prefix('admin')->group(function () {
         $user = \App\Models\Pengguna::where('email', $email)->first();
         if (!$user) {
             \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
-            return back()->withInput()->withErrors(['email' => 'Alamat email tidak terdaftar dalam sistem CMS KORMI.']);
+            return back()->withInput()->withErrors(['email' => 'Alamat email atau kata sandi yang Anda masukkan tidak sesuai.']);
         }
 
         if (isset($user->status_aktif) && !$user->status_aktif) {
@@ -161,7 +161,7 @@ Route::prefix('admin')->group(function () {
 
         if (!\Illuminate\Support\Facades\Hash::check($password, $user->kata_sandi)) {
             \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
-            return back()->withInput()->withErrors(['kata_sandi' => 'Kata sandi yang Anda masukkan salah. Silakan periksa kembali.']);
+            return back()->withInput()->withErrors(['email' => 'Alamat email atau kata sandi yang Anda masukkan tidak sesuai.']);
         }
 
         \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
@@ -175,14 +175,14 @@ Route::prefix('admin')->group(function () {
         return redirect()->intended(route('admin.dashboard'));
     })->name('admin.masuk.post');
     
-    Route::match(['get', 'post'], '/keluar', function () {
+    Route::post('/keluar', function () {
         Auth::logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();
         return redirect()->route('login');
     })->name('admin.keluar');
     
-    Route::get('/logout', function () {
+    Route::post('/logout', function () {
         Auth::logout();
         request()->session()->invalidate();
         request()->session()->regenerateToken();

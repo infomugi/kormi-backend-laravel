@@ -26,11 +26,13 @@
         <x-slot:actions>
             <div class="flex items-center gap-2.5 bg-white px-3 py-1.5 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-2xs">
                 <span class="text-xs font-bold text-slate-500 shrink-0">Pilih Event:</span>
-                <select wire:model.live="eventDipilih" class="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer">
-                    @foreach($eventList as $e)
-                        <option value="{{ $e->id }}">{{ $e->judul_event }} ({{ $e->tahun_edisi }})</option>
-                    @endforeach
-                </select>
+                <div class="min-w-[220px]">
+                    <x-form.select wire:model.live="eventDipilih" size="sm">
+                        @foreach($eventList as $e)
+                            <option value="{{ $e->id }}">{{ $e->judul_event }} ({{ $e->tahun_edisi }})</option>
+                        @endforeach
+                    </x-form.select>
+                </div>
             </div>
         </x-slot:actions>
     </x-table.header>

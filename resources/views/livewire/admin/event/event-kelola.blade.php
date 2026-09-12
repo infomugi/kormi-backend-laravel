@@ -594,11 +594,13 @@
                         <!-- Tanggal Mulai -->
                         <div>
                             <x-form.field label="Tanggal Mulai" name="tanggal_mulai" required>
-                                <x-form.input 
-                                    type="date" 
+                                <x-form.datepicker 
                                     name="tanggal_mulai" 
                                     wire:model="tanggal_mulai" 
-                                    required 
+                                    :enableTime="false"
+                                    dateFormat="Y-m-d"
+                                    altFormat="j F Y"
+                                    placeholder="Pilih tanggal mulai..."
                                 />
                             </x-form.field>
                         </div>
@@ -606,11 +608,13 @@
                         <!-- Tanggal Selesai -->
                         <div>
                             <x-form.field label="Tanggal Selesai" name="tanggal_selesai" required>
-                                <x-form.input 
-                                    type="date" 
+                                <x-form.datepicker 
                                     name="tanggal_selesai" 
                                     wire:model="tanggal_selesai" 
-                                    required 
+                                    :enableTime="false"
+                                    dateFormat="Y-m-d"
+                                    altFormat="j F Y"
+                                    placeholder="Pilih tanggal selesai..."
                                 />
                             </x-form.field>
                         </div>
@@ -1015,11 +1019,13 @@
             <div class="grid grid-cols-3 gap-2">
                 <div class="col-span-1">
                     <x-form.field label="Tanggal" name="jadwal_tanggal" required>
-                        <x-form.input 
-                            type="date" 
+                        <x-form.datepicker 
                             name="jadwal_tanggal" 
                             wire:model="jadwal_tanggal" 
-                            required 
+                            :enableTime="false"
+                            dateFormat="Y-m-d"
+                            altFormat="j F Y"
+                            placeholder="Pilih tanggal..."
                         />
                     </x-form.field>
                 </div>

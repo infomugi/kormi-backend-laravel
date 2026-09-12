@@ -908,19 +908,25 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <!-- Tanggal Mulai -->
                                 <x-form.field label="Tanggal Mulai Pelaksanaan" name="tanggal_mulai" :required="true">
-                                    <x-form.input 
-                                        type="date" 
+                                    <x-form.datepicker 
                                         name="tanggal_mulai" 
                                         wire:model="tanggal_mulai" 
+                                        :enableTime="false"
+                                        dateFormat="Y-m-d"
+                                        altFormat="j F Y"
+                                        placeholder="Pilih tanggal mulai..."
                                     />
                                 </x-form.field>
 
                                 <!-- Tanggal Selesai -->
                                 <x-form.field label="Tanggal Selesai Pelaksanaan" name="tanggal_selesai" :required="true">
-                                    <x-form.input 
-                                        type="date" 
+                                    <x-form.datepicker 
                                         name="tanggal_selesai" 
                                         wire:model="tanggal_selesai" 
+                                        :enableTime="false"
+                                        dateFormat="Y-m-d"
+                                        altFormat="j F Y"
+                                        placeholder="Pilih tanggal selesai..."
                                     />
                                 </x-form.field>
                             </div>

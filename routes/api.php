@@ -14,7 +14,7 @@ use App\Models\PengaturanSitus;
 | Menyediakan data publik untuk Mobile App, Widget Web, & Integrasi
 */
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->middleware('throttle:60,1')->group(function () {
     // 1. Pengaturan & Profil Situs
     Route::get('/pengaturan', function () {
         $settings = PengaturanSitus::pluck('nilai_pengaturan', 'kunci_pengaturan');

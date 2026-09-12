@@ -57,8 +57,10 @@ class Daftar extends Component
         $this->validate();
 
         try {
-            // Find default role or first role
-            $peran = Peran::where('slug', 'super-admin')->first() ?? Peran::first();
+            // Amankan default role pendaftaran: utamakan peran dengan hak akses terbatas (editor-berita)
+            $peran = Peran::where('slug', 'editor-berita')->first() 
+                ?? Peran::whereNotIn('slug', ['super-admin', 'superadmin', 'admin'])->first() 
+                ?? Peran::first();
 
             $pengguna = Pengguna::create([
                 'id' => (string) Str::uuid(),

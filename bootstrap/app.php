@@ -15,13 +15,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'peran' => \App\Http\Middleware\CekPeran::class,
         ]);
-
-        $middleware->validateCsrfTokens(except: [
-            'admin/keluar',
-            'admin/logout',
-            'keluar',
-            'logout',
-        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

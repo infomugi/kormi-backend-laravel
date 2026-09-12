@@ -793,10 +793,13 @@
                                 </x-form.field>
 
                                 <x-form.field label="Tanggal SK Pengukuhan" name="tanggal_sk">
-                                    <x-form.input 
-                                        type="date"
+                                    <x-form.datepicker 
                                         name="tanggal_sk" 
                                         wire:model="tanggal_sk" 
+                                        :enableTime="false"
+                                        dateFormat="Y-m-d"
+                                        altFormat="j F Y"
+                                        placeholder="Pilih tanggal SK..."
                                     />
                                 </x-form.field>
                             </div>
