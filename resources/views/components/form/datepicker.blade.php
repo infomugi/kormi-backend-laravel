@@ -17,6 +17,7 @@
 @endphp
 
 <div 
+    wire:ignore
     x-data="{
         picker: null,
         value: @entangle($attributes->wire('model')),
@@ -25,7 +26,7 @@
                 if (!window.flatpickr) return;
                 
                 if (this.picker) {
-                    this.picker.destroy();
+                    try { this.picker.destroy(); } catch (e) {}
                 }
 
                 this.picker = window.flatpickr(this.$refs.dateInput, {
@@ -37,7 +38,7 @@
                     time_24hr: true,
                     defaultDate: this.value || null,
                     @if($minDate) minDate: '{{ $minDate }}', @endif
-                    disableMobile: false,
+                    disableMobile: 'true',
                     onChange: (selectedDates, dateStr) => {
                         this.value = dateStr;
                     }
@@ -50,29 +51,35 @@
 
             this.$watch('value', (newVal) => {
                 if (this.picker && newVal !== this.picker.input.value) {
-                    this.picker.setDate(newVal, false);
+                    this.picker.setDate(newVal || '', false);
                 }
             });
+        },
+        openPicker() {
+            if (this.picker) {
+                this.picker.open();
+            }
         },
         clearDate() {
             this.value = null;
             if (this.picker) this.picker.clear();
         }
     }" 
-    class="relative w-full group select-none"
+    @click="openPicker()"
+    class="relative w-full group select-none cursor-pointer"
 >
     <!-- Calendar Icon Indicator -->
     <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-600 pointer-events-none z-10 flex items-center justify-center">
         <i data-lucide="calendar" class="w-4 h-4"></i>
     </div>
 
-    <!-- Hidden native flatpickr target -->
+    <!-- Hidden native flatpickr target with fallback dimensions -->
     <input 
         x-ref="dateInput"
         type="text"
         @if($name) name="{{ $name }}" id="{{ $name }}" @endif
         placeholder="{{ $placeholder }}"
-        class="hidden"
+        class="w-full bg-slate-50/70 border border-slate-200 text-slate-900 font-bold transition-all duration-200 cursor-pointer shadow-2xs {{ $sizeClasses }}"
     >
 
     <!-- Clear / Reset Date Button -->

@@ -199,6 +199,22 @@ Route::prefix('admin')->group(function () {
             Route::get('/berita', BeritaKelola::class)->name('admin.berita');
             Route::get('/berita/tambah', BeritaForm::class)->name('admin.berita.tambah');
             Route::get('/berita/{id}/edit', BeritaForm::class)->name('admin.berita.edit');
+            Route::post('/berita/upload-foto-konten', function (\Illuminate\Http\Request $request) {
+                $request->validate([
+                    'foto' => 'required|image|max:10240', // Maks 10MB
+                ]);
+
+                /** @var \App\Services\StorageService $storage */
+                $storage = app(\App\Services\StorageService::class);
+                $path = $storage->uploadGambar($request->file('foto'), 'berita/konten');
+                $url = $storage->getTemporaryUrl($path, 525600) ?? $path; // 1 year signed URL
+
+                return response()->json([
+                    'success' => true,
+                    'path' => $path,
+                    'url' => $url,
+                ]);
+            })->name('admin.berita.upload-foto-konten');
             Route::get('/galeri', GaleriKelola::class)->name('admin.galeri');
             Route::get('/unduhan', UnduhanKelola::class)->name('admin.unduhan');
         });

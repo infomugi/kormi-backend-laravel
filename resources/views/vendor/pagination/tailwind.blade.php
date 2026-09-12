@@ -1,5 +1,5 @@
 @if ($paginator->hasPages())
-    <nav role="navigation" aria-label="{{ __('Pagination Navigation') }}" class="flex flex-col sm:flex-row items-center justify-between gap-4">
+    <nav role="navigation" aria-label="{{ __('Pagination Navigation') }}" class="flex flex-col sm:flex-row items-center justify-between gap-3">
         
         {{-- Summary Text --}}
         <div class="flex items-center text-xs text-slate-500 font-medium">
@@ -21,12 +21,17 @@
                     <span class="hidden sm:inline">Sebelumnya</span>
                 </span>
             @else
-                <a href="{{ $paginator->previousPageUrl() }}" rel="prev" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 hover:border-slate-300 hover:text-indigo-600 active:scale-95 transition-all shadow-xs">
+                <button 
+                    type="button" 
+                    wire:click="previousPage('{{ $paginator->getPageName() }}')" 
+                    wire:loading.attr="disabled"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 hover:border-slate-300 hover:text-indigo-600 active:scale-95 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                >
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                     </svg>
                     <span class="hidden sm:inline">Sebelumnya</span>
-                </a>
+                </button>
             @endif
 
             {{-- Pagination Elements --}}
@@ -45,9 +50,14 @@
                                     {{ $page }}
                                 </span>
                             @else
-                                <a href="{{ $url }}" class="inline-flex items-center justify-center min-w-[32px] h-8 px-2.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 hover:border-slate-300 hover:text-indigo-600 active:scale-95 transition-all shadow-xs">
+                                <button 
+                                    type="button" 
+                                    wire:click="gotoPage({{ $page }}, '{{ $paginator->getPageName() }}')" 
+                                    wire:loading.attr="disabled"
+                                    class="inline-flex items-center justify-center min-w-[32px] h-8 px-2.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 hover:border-slate-300 hover:text-indigo-600 active:scale-95 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                                >
                                     {{ $page }}
-                                </a>
+                                </button>
                             @endif
                         @endforeach
                     @endif
@@ -56,12 +66,17 @@
 
             {{-- Next Page Link --}}
             @if ($paginator->hasMorePages())
-                <a href="{{ $paginator->nextPageUrl() }}" rel="next" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 hover:border-slate-300 hover:text-indigo-600 active:scale-95 transition-all shadow-xs">
+                <button 
+                    type="button" 
+                    wire:click="nextPage('{{ $paginator->getPageName() }}')" 
+                    wire:loading.attr="disabled"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200/80 rounded-xl hover:bg-slate-50 hover:border-slate-300 hover:text-indigo-600 active:scale-95 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                >
                     <span class="hidden sm:inline">Berikutnya</span>
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                     </svg>
-                </a>
+                </button>
             @else
                 <span aria-disabled="true" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-slate-50 border border-slate-200/60 rounded-xl cursor-not-allowed select-none">
                     <span class="hidden sm:inline">Berikutnya</span>

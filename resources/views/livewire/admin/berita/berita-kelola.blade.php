@@ -53,7 +53,7 @@
             </x-table.header>
 
             <!-- 2. KPI METRIC STATS (6 Cards Symmetric Grid with Animated Shimmer Placeholder) -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5 sm:gap-3">
                 <x-table.stats-card
                     title="Total Berita"
                     :value="number_format($totalBerita)"
@@ -118,106 +118,125 @@
                     title="Total Pembaca"
                     :value="number_format($totalViews)"
                     unit="Views"
-                    subtitle="~" . number_format($rataRataViews) . "/post rata-rata"
+                    :subtitle="'~' . number_format($rataRataViews) . ' /post rata-rata'"
                     icon="eye"
                     color="cyan"
                     loading-target="cari, urutkan, setFilterKategori"
                 />
             </div>
 
-            <!-- 3. FILTER & SEARCH TOOLBAR -->
-            <x-table.filter-bar search-placeholder="Cari judul artikel, ringkasan, isi konten..." search-model="cari">
+            <!-- 3. FILTER & SEARCH TOOLBAR (PRO REDESIGN) -->
+            <x-table.filter-bar search-placeholder="Cari judul artikel, sinopsis, isi konten..." search-model="cari">
                 <x-slot:top>
-                    <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none w-full">
+                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none w-full">
                         <button 
                             type="button"
                             wire:click="setFilterKategori('Semua')" 
-                            class="px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 {{ $kategoriDipilih === 'Semua' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80' }}"
+                            class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-2 {{ $kategoriDipilih === 'Semua' ? 'bg-slate-900 text-white shadow-sm ring-1 ring-slate-900/20' : 'bg-slate-100 hover:bg-slate-200/80 text-slate-600 hover:text-slate-900 border border-slate-200/70' }}"
                         >
                             <span>Semua Kategori</span>
-                            <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $kategoriDipilih === 'Semua' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600' }}">{{ $totalBerita }}</span>
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-black {{ $kategoriDipilih === 'Semua' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700' }}">{{ $totalBerita }}</span>
                         </button>
 
                         @foreach($kategoriList as $k)
                             <button 
                                 type="button"
                                 wire:click="setFilterKategori('{{ $k->id }}')" 
-                                class="px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap shrink-0 transition-all cursor-pointer flex items-center gap-2 {{ $kategoriDipilih === $k->id ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/80' }}"
+                                class="px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition-all cursor-pointer flex items-center gap-2 {{ $kategoriDipilih === $k->id ? 'bg-slate-900 text-white shadow-sm ring-1 ring-slate-900/20' : 'bg-slate-100 hover:bg-slate-200/80 text-slate-600 hover:text-slate-900 border border-slate-200/70' }}"
                             >
-                                <span class="w-2 h-2 rounded-full shrink-0" style="background-color: {{ $k->kode_warna_hex ?: '#4f46e5' }}"></span>
+                                <span class="w-2 h-2 rounded-full shrink-0 ring-1 ring-white/60" style="background-color: {{ $k->kode_warna_hex ?: '#4f46e5' }}"></span>
                                 <span>{{ $k->nama_kategori }}</span>
-                                <span class="px-1.5 py-0.5 rounded-full text-[10px] {{ $kategoriDipilih === $k->id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600' }}">{{ $k->berita_count }}</span>
+                                <span class="px-1.5 py-0.5 rounded-md text-[10px] font-black {{ $kategoriDipilih === $k->id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700' }}">{{ $k->berita_count }}</span>
                             </button>
                         @endforeach
                     </div>
                 </x-slot:top>
 
                 <x-slot:actions>
-                    <!-- Status Filter -->
-                    <select wire:model.live="statusDipilih" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
-                        <option value="Semua">Semua Status</option>
-                        <option value="published">Status: Published</option>
-                        <option value="draft">Status: Draft</option>
-                        <option value="archived">Status: Archived</option>
-                    </select>
+                    <div class="flex items-center gap-2 w-full lg:w-auto flex-wrap sm:flex-nowrap">
+                        <!-- Status Filter -->
+                        <select wire:model.live="statusDipilih" class="h-10 px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer shadow-2xs">
+                            <option value="Semua">Semua Status</option>
+                            <option value="published">Status: Published</option>
+                            <option value="draft">Status: Draft</option>
+                            <option value="archived">Status: Archived</option>
+                        </select>
 
-                    <!-- Featured Filter -->
-                    <select wire:model.live="unggulanDipilih" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
-                        <option value="Semua">Semua Sorotan</option>
-                        <option value="1">⭐ Berita Utama</option>
-                        <option value="0">Berita Standar</option>
-                    </select>
+                        <!-- Featured Filter -->
+                        <select wire:model.live="unggulanDipilih" class="h-10 px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer shadow-2xs">
+                            <option value="Semua">Semua Sorotan</option>
+                            <option value="1">⭐ Berita Utama</option>
+                            <option value="0">Berita Standar</option>
+                        </select>
 
-                    <!-- Sort By -->
-                    <select wire:model.live="urutkan" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
-                        <option value="terbaru">Urutan: Terbaru</option>
-                        <option value="terlama">Urutan: Terlama</option>
-                        <option value="terpopuler">Urutan: Terbanyak Dilihat</option>
-                        <option value="judul_asc">Judul: A - Z</option>
-                    </select>
+                        <!-- Sort By -->
+                        <select wire:model.live="urutkan" class="h-10 px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer shadow-2xs">
+                            <option value="terbaru">Urutan: Terbaru</option>
+                            <option value="terlama">Urutan: Terlama</option>
+                            <option value="terpopuler">Terbanyak Dilihat</option>
+                            <option value="judul_asc">Judul: A - Z</option>
+                        </select>
 
-                    <!-- Per Page -->
-                    <select wire:model.live="perPage" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
-                        <option value="10">10 / hal</option>
-                        <option value="25">25 / hal</option>
-                        <option value="50">50 / hal</option>
-                    </select>
+                        <!-- Per Page -->
+                        <select wire:model.live="perPage" class="h-10 px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer shadow-2xs">
+                            <option value="10">10 / hal</option>
+                            <option value="25">25 / hal</option>
+                            <option value="50">50 / hal</option>
+                        </select>
 
-                    <!-- View Switcher with localStorage persistence -->
-                    <div 
-                        x-data="{
-                            mode: localStorage.getItem('kormi_datatable_view') || @js($tampilanMode),
-                            setMode(val) {
-                                this.mode = val;
-                                localStorage.setItem('kormi_datatable_view', val);
-                                $wire.set('tampilanMode', val);
-                            }
-                        }"
-                        x-init="
-                            if (localStorage.getItem('kormi_datatable_view') && localStorage.getItem('kormi_datatable_view') !== @js($tampilanMode)) {
-                                $wire.set('tampilanMode', localStorage.getItem('kormi_datatable_view'));
-                            }
-                        "
-                        class="flex items-center p-1 bg-slate-100 rounded-2xl border border-slate-200 shrink-0"
-                    >
-                        <button 
-                            type="button" 
-                            @click="setMode('tabel')" 
-                            :class="mode === 'tabel' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-400 hover:text-slate-700'"
-                            class="p-1.5 rounded-xl transition-all cursor-pointer"
-                            title="Tampilan Tabel Data"
+                        <!-- Active Filters Reset Button -->
+                        @php
+                            $filterAktifCount = ($statusDipilih !== 'Semua' ? 1 : 0) + ($unggulanDipilih !== 'Semua' ? 1 : 0) + ($kategoriDipilih !== 'Semua' ? 1 : 0) + ($cari ? 1 : 0) + ($urutkan !== 'terbaru' ? 1 : 0);
+                        @endphp
+                        @if($filterAktifCount > 0)
+                            <button 
+                                type="button" 
+                                wire:click="resetSemuaFilter" 
+                                class="h-10 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95 shrink-0"
+                                title="Reset Semua Filter"
+                            >
+                                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                                <span>Reset</span>
+                                <span class="w-4 h-4 rounded-full bg-rose-200 text-rose-800 text-[10px] font-black flex items-center justify-center">{{ $filterAktifCount }}</span>
+                            </button>
+                        @endif
+
+                        <!-- View Switcher with localStorage persistence -->
+                        <div 
+                            x-data="{
+                                mode: localStorage.getItem('kormi_datatable_view') || @js($tampilanMode),
+                                setMode(val) {
+                                    this.mode = val;
+                                    localStorage.setItem('kormi_datatable_view', val);
+                                    $wire.set('tampilanMode', val);
+                                }
+                            }"
+                            x-init="
+                                if (localStorage.getItem('kormi_datatable_view') && localStorage.getItem('kormi_datatable_view') !== @js($tampilanMode)) {
+                                    $wire.set('tampilanMode', localStorage.getItem('kormi_datatable_view'));
+                                }
+                            "
+                            class="h-10 flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 shrink-0 shadow-2xs"
                         >
-                            <i data-lucide="list" class="w-4 h-4"></i>
-                        </button>
-                        <button 
-                            type="button" 
-                            @click="setMode('grid')" 
-                            :class="mode === 'grid' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-400 hover:text-slate-700'"
-                            class="p-1.5 rounded-xl transition-all cursor-pointer"
-                            title="Tampilan Kartu / Grid"
-                        >
-                            <i data-lucide="layout-grid" class="w-4 h-4"></i>
-                        </button>
+                            <button 
+                                type="button" 
+                                @click="setMode('tabel')" 
+                                :class="mode === 'tabel' ? 'bg-white text-slate-900 shadow-xs font-bold' : 'text-slate-400 hover:text-slate-700'"
+                                class="h-full px-2.5 rounded-lg transition-all cursor-pointer flex items-center justify-center"
+                                title="Tampilan Tabel Data"
+                            >
+                                <i data-lucide="list" class="w-4 h-4"></i>
+                            </button>
+                            <button 
+                                type="button" 
+                                @click="setMode('grid')" 
+                                :class="mode === 'grid' ? 'bg-white text-slate-900 shadow-xs font-bold' : 'text-slate-400 hover:text-slate-700'"
+                                class="h-full px-2.5 rounded-lg transition-all cursor-pointer flex items-center justify-center"
+                                title="Tampilan Kartu / Grid"
+                            >
+                                <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     </div>
                 </x-slot:actions>
             </x-table.filter-bar>
@@ -342,9 +361,9 @@
 
                                             <div class="min-w-0 space-y-0.5">
                                                 <a 
-                                                    href="javascript:void(0)" 
-                                                    wire:click="bukaFormEdit('{{ $b->id }}')" 
-                                                    class="font-black text-slate-900 text-xs hover:text-indigo-600 line-clamp-1 leading-tight transition-colors cursor-pointer"
+                                                    href="{{ route('admin.berita.edit', $b->id) }}" 
+                                                    wire:navigate
+                                                    class="font-black text-slate-900 text-xs hover:text-indigo-600 line-clamp-1 leading-tight transition-colors cursor-pointer block"
                                                     title="{{ $b->judul }}"
                                                 >
                                                     {{ $b->judul }}
@@ -444,6 +463,7 @@
                                                 icon="external-link" 
                                                 href="{{ route('berita.detail', $b->slug) }}" 
                                                 target="_blank" 
+                                                rel="noopener noreferrer"
                                                 title="Buka Halaman Publik" 
                                             />
 
@@ -462,8 +482,8 @@
                                                 size="sm"
                                                 variant="indigo" 
                                                 icon="edit-3" 
-                                                loading-target="bukaFormEdit('{{ $b->id }}')"
-                                                wire:click="bukaFormEdit('{{ $b->id }}')" 
+                                                href="{{ route('admin.berita.edit', $b->id) }}" 
+                                                wire:navigate
                                                 title="Edit Berita" 
                                             />
 
@@ -559,9 +579,11 @@
                             <!-- Card Body -->
                             <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
                                 <div class="space-y-2">
-                                    <h3 class="font-black text-slate-900 text-base leading-snug line-clamp-2 hover:text-indigo-600 transition-colors cursor-pointer" wire:click="bukaFormEdit('{{ $b->id }}')">
-                                        {{ $b->judul }}
-                                    </h3>
+                                    <a href="{{ route('admin.berita.edit', $b->id) }}" wire:navigate class="block">
+                                        <h3 class="font-black text-slate-900 text-base leading-snug line-clamp-2 hover:text-indigo-600 transition-colors">
+                                            {{ $b->judul }}
+                                        </h3>
+                                    </a>
                                     <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">{{ $b->ringkasan }}</p>
                                 </div>
 
@@ -596,21 +618,22 @@
                                     <a 
                                         href="{{ route('berita.detail', $b->slug) }}" 
                                         target="_blank" 
+                                        rel="noopener noreferrer"
                                         class="py-2 rounded-xl bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 font-bold text-xs transition-colors flex items-center justify-center gap-1 cursor-pointer" 
                                         title="Halaman Web"
                                     >
                                         <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                                     </a>
 
-                                    <button 
-                                        type="button" 
-                                        wire:click="bukaFormEdit('{{ $b->id }}')" 
+                                    <a 
+                                        href="{{ route('admin.berita.edit', $b->id) }}" 
+                                        wire:navigate
                                         class="py-2 rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 font-bold text-xs transition-all flex items-center justify-center gap-1 cursor-pointer" 
                                         title="Edit"
                                     >
                                         <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                                         <span>Edit</span>
-                                    </button>
+                                    </a>
 
                                     <button 
                                         type="button" 

@@ -3,18 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Pengguna;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class AdminCmsRoutesTest extends TestCase
 {
-    use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->seed();
-    }
+    use DatabaseTransactions;
     public function test_guest_is_redirected_to_login_when_accessing_admin_pages(): void
     {
         $response = $this->get('/admin');

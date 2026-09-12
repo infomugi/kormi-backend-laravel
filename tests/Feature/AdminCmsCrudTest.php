@@ -27,19 +27,18 @@ use App\Models\KategoriUnduhan;
 use App\Models\KomisiInorga;
 use App\Models\Kecamatan;
 use App\Models\Pengguna;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class AdminCmsCrudTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed();
-        $admin = Pengguna::first();
+        $admin = Pengguna::where('email', 'admin@kormibdg.id')->first() ?? Pengguna::first();
         if ($admin) {
             $this->actingAs($admin);
         }

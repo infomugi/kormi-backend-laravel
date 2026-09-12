@@ -353,11 +353,10 @@ class BeritaForm extends Component
         ]);
 
         $kat = KategoriBerita::create([
-            'id' => (string) Str::uuid(),
-            'nama_kategori' => $this->kategoriBaruNama,
-            'slug' => Str::slug($this->kategoriBaruNama),
-            'kode_warna_hex' => $this->kategoriBaruWarna,
-            'urutan' => KategoriBerita::max('urutan') + 1,
+            'id'             => (string) Str::uuid(),
+            'nama_kategori'  => trim($this->kategoriBaruNama),
+            'slug'           => Str::slug($this->kategoriBaruNama),
+            'kode_warna_hex' => $this->kategoriBaruWarna ?: '#059669',
         ]);
 
         $this->kategori_id = $kat->id;

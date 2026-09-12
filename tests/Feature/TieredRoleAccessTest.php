@@ -11,12 +11,6 @@ class TieredRoleAccessTest extends TestCase
 {
     use DatabaseTransactions;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->seed();
-    }
-
     public function test_super_admin_can_access_all_routes(): void
     {
         $superAdminRole = Peran::where('slug', 'super-admin')->first();
