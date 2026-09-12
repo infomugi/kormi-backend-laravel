@@ -3,7 +3,7 @@
     <!-- ========================================================================= -->
     <!-- 1. TOP HEADER / COMPACT EXECUTIVE BAR                                     -->
     <!-- ========================================================================= -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/80 shadow-2xs">
+    <div class="hidden sm:flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/80 shadow-2xs">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-black text-base shadow-sm shadow-emerald-600/20 shrink-0">
                 KB
@@ -32,7 +32,7 @@
     <!-- ========================================================================= -->
     <!-- 2. COMPACT STATS STRIP (6 PILL METRICS)                                  -->
     <!-- ========================================================================= -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+    <div class="hidden sm:grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <!-- Metric 1: Inorga -->
         <a href="{{ route('admin.inorga') }}" wire:navigate class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-emerald-300 transition-all flex items-center gap-3 group">
             <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">

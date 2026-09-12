@@ -53,7 +53,7 @@
             </x-table.header>
 
             <!-- 2. KPI METRIC STATS (6 Cards Symmetric Grid with Animated Shimmer Placeholder) -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5 sm:gap-3">
+            <div class="hidden sm:grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5 sm:gap-3">
                 <x-table.stats-card
                     title="Total Berita"
                     :value="number_format($totalBerita)"

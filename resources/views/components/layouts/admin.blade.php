@@ -19,6 +19,60 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f8fafc;
         }
+
+        /* iOS Liquid Glass Dynamics */
+        @keyframes iosLiquidPulse {
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+            33% {
+                transform: translate(12px, -8px) scale(1.12) rotate(120deg);
+            }
+            66% {
+                transform: translate(-10px, 6px) scale(0.92) rotate(240deg);
+            }
+            100% {
+                transform: translate(0, 0) scale(1) rotate(360deg);
+            }
+        }
+
+        @keyframes iosMeshShimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .ios-liquid-dock {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(28px) saturate(210%);
+            -webkit-backdrop-filter: blur(28px) saturate(210%);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 
+                0 20px 40px -10px rgba(2, 44, 34, 0.15),
+                0 1px 3px 0 rgba(0, 0, 0, 0.04),
+                inset 0 1px 1px 0 rgba(255, 255, 255, 0.9),
+                inset 0 -1px 2px 0 rgba(0, 0, 0, 0.03);
+        }
+
+        .ios-liquid-orb-1 {
+            animation: iosLiquidPulse 10s ease-in-out infinite alternate;
+        }
+
+        .ios-liquid-orb-2 {
+            animation: iosLiquidPulse 14s ease-in-out infinite alternate-reverse;
+        }
+
+        .ios-liquid-orb-3 {
+            animation: iosLiquidPulse 8s ease-in-out infinite alternate;
+        }
+
+        .ios-active-pill {
+            background: linear-gradient(135deg, rgba(5, 150, 105, 0.12) 0%, rgba(16, 185, 129, 0.2) 100%);
+            box-shadow: 
+                0 4px 12px rgba(5, 150, 105, 0.12),
+                inset 0 1px 1px rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
     </style>
 </head>
 
@@ -930,9 +984,108 @@
         </div>
 
         <!-- MAIN FULL WIDTH CONTENT CONTAINER -->
-        <main class="w-full flex-1 p-4 sm:p-6 lg:p-8 min-w-0">
+        <main class="w-full flex-1 p-4 sm:p-6 lg:p-8 min-w-0 pb-24 md:pb-8">
             {{ $slot }}
         </main>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- MOBILE BOTTOM APP NAVIGATION BAR (SEAMLESS INTEGRATED iOS BAR) -->
+    <!-- ========================================================= -->
+    <div class="md:hidden fixed bottom-0 inset-x-0 z-40">
+        <!-- Full Width Seamless iOS Liquid Glass Bar Attached to Screen Bottom -->
+        <nav class="relative border-t border-white/80 ios-liquid-dock px-3 pt-2 pb-5 sm:pb-3 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]">
+            
+            <!-- Fluid Ambient Liquid Orbs Under The Glass -->
+            <div class="absolute -top-10 left-10 w-36 h-24 bg-emerald-400/25 rounded-full blur-2xl pointer-events-none ios-liquid-orb-1"></div>
+            <div class="absolute -top-10 right-10 w-36 h-24 bg-lime-400/25 rounded-full blur-2xl pointer-events-none ios-liquid-orb-2"></div>
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-20 bg-teal-400/20 rounded-full blur-xl pointer-events-none ios-liquid-orb-3"></div>
+
+            <!-- iOS Specular Bevel & Top Line Reflection -->
+            <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none"></div>
+
+            <!-- Inner Navigation Buttons Row -->
+            <div class="flex items-center justify-around relative z-10 max-w-lg mx-auto">
+                
+                <!-- 1. Beranda / Dashboard -->
+                <a href="{{ route('admin.dashboard') }}" wire:navigate
+                    class="flex flex-col items-center justify-center flex-1 py-1 transition-all duration-300 group {{ request()->routeIs('admin.dashboard') ? 'text-emerald-900 font-extrabold scale-105' : 'text-slate-500 hover:text-slate-900 font-semibold' }}">
+                    <div class="relative flex items-center justify-center w-12 h-8 rounded-2xl transition-all duration-300 {{ request()->routeIs('admin.dashboard') ? 'ios-active-pill text-emerald-800' : 'group-hover:bg-black/5' }}">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 {{ request()->routeIs('admin.dashboard') ? 'stroke-[2.5] text-emerald-700' : 'stroke-[1.75]' }}"></i>
+                        @if(request()->routeIs('admin.dashboard'))
+                            <span class="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-emerald-600 shadow-[0_0_8px_rgba(5,150,105,0.8)]"></span>
+                        @endif
+                    </div>
+                    <span class="text-[10px] mt-0.5 tracking-tight font-bold">Dashboard</span>
+                </a>
+
+                @if($isEditor)
+                <!-- 2. Berita & Warta -->
+                <a href="{{ route('admin.berita') }}" wire:navigate
+                    class="flex flex-col items-center justify-center flex-1 py-1 transition-all duration-300 group {{ request()->routeIs('admin.berita*') ? 'text-emerald-900 font-extrabold scale-105' : 'text-slate-500 hover:text-slate-900 font-semibold' }}">
+                    <div class="relative flex items-center justify-center w-12 h-8 rounded-2xl transition-all duration-300 {{ request()->routeIs('admin.berita*') ? 'ios-active-pill text-emerald-800' : 'group-hover:bg-black/5' }}">
+                        <i data-lucide="newspaper" class="w-5 h-5 {{ request()->routeIs('admin.berita*') ? 'stroke-[2.5] text-emerald-700' : 'stroke-[1.75]' }}"></i>
+                        @if(request()->routeIs('admin.berita*'))
+                            <span class="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-emerald-600 shadow-[0_0_8px_rgba(5,150,105,0.8)]"></span>
+                        @endif
+                    </div>
+                    <span class="text-[10px] mt-0.5 tracking-tight font-bold">Berita</span>
+                </a>
+                @endif
+
+                @if($isInorga)
+                <!-- 3. Inorga & Olahraga -->
+                <a href="{{ route('admin.inorga') }}" wire:navigate
+                    class="flex flex-col items-center justify-center flex-1 py-1 transition-all duration-300 group {{ request()->routeIs('admin.inorga*') ? 'text-emerald-900 font-extrabold scale-105' : 'text-slate-500 hover:text-slate-900 font-semibold' }}">
+                    <div class="relative flex items-center justify-center w-12 h-8 rounded-2xl transition-all duration-300 {{ request()->routeIs('admin.inorga*') ? 'ios-active-pill text-emerald-800' : 'group-hover:bg-black/5' }}">
+                        <i data-lucide="boxes" class="w-5 h-5 {{ request()->routeIs('admin.inorga*') ? 'stroke-[2.5] text-emerald-700' : 'stroke-[1.75]' }}"></i>
+                        @if(request()->routeIs('admin.inorga*'))
+                            <span class="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-emerald-600 shadow-[0_0_8px_rgba(5,150,105,0.8)]"></span>
+                        @endif
+                    </div>
+                    <span class="text-[10px] mt-0.5 tracking-tight font-bold">Inorga</span>
+                </a>
+                @endif
+
+                @if($isInorga)
+                <!-- 4. Event / Kejuaraan -->
+                <a href="{{ route('admin.event') }}" wire:navigate
+                    class="flex flex-col items-center justify-center flex-1 py-1 transition-all duration-300 group {{ request()->routeIs('admin.event*') || request()->routeIs('admin.klasemen*') ? 'text-emerald-900 font-extrabold scale-105' : 'text-slate-500 hover:text-slate-900 font-semibold' }}">
+                    <div class="relative flex items-center justify-center w-12 h-8 rounded-2xl transition-all duration-300 {{ request()->routeIs('admin.event*') || request()->routeIs('admin.klasemen*') ? 'ios-active-pill text-emerald-800' : 'group-hover:bg-black/5' }}">
+                        <i data-lucide="trophy" class="w-5 h-5 {{ request()->routeIs('admin.event*') || request()->routeIs('admin.klasemen*') ? 'stroke-[2.5] text-emerald-700' : 'stroke-[1.75]' }}"></i>
+                        @if(request()->routeIs('admin.event*'))
+                            <span class="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-emerald-600 shadow-[0_0_8px_rgba(5,150,105,0.8)]"></span>
+                        @endif
+                    </div>
+                    <span class="text-[10px] mt-0.5 tracking-tight font-bold">Event</span>
+                </a>
+                @elseif($isKorcam)
+                <!-- 4 Alt for Korcam: Kordik / Wilayah -->
+                <a href="{{ route('admin.kordik') }}" wire:navigate
+                    class="flex flex-col items-center justify-center flex-1 py-1 transition-all duration-300 group {{ request()->routeIs('admin.kordik*') ? 'text-emerald-900 font-extrabold scale-105' : 'text-slate-500 hover:text-slate-900 font-semibold' }}">
+                    <div class="relative flex items-center justify-center w-12 h-8 rounded-2xl transition-all duration-300 {{ request()->routeIs('admin.kordik*') ? 'ios-active-pill text-emerald-800' : 'group-hover:bg-black/5' }}">
+                        <i data-lucide="network" class="w-5 h-5 {{ request()->routeIs('admin.kordik*') ? 'stroke-[2.5] text-emerald-700' : 'stroke-[1.75]' }}"></i>
+                        @if(request()->routeIs('admin.kordik*'))
+                            <span class="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-emerald-600 shadow-[0_0_8px_rgba(5,150,105,0.8)]"></span>
+                        @endif
+                    </div>
+                    <span class="text-[10px] mt-0.5 tracking-tight font-bold">Kordik</span>
+                </a>
+                @endif
+
+                <!-- 5. Menu Lainnya / Drawer Trigger -->
+                <button type="button" @click="mobileMenuOpen = !mobileMenuOpen"
+                    class="flex flex-col items-center justify-center flex-1 py-1 transition-all duration-300 group cursor-pointer"
+                    :class="mobileMenuOpen ? 'text-emerald-950 font-extrabold scale-105' : 'text-slate-500 hover:text-slate-900 font-semibold'">
+                    <div class="relative flex items-center justify-center w-12 h-8 rounded-2xl transition-all duration-300"
+                        :class="mobileMenuOpen ? 'bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-md shadow-emerald-600/30' : 'group-hover:bg-black/5'">
+                        <i data-lucide="layout-grid" class="w-5 h-5" :class="mobileMenuOpen ? 'stroke-[2.5]' : 'stroke-[1.75]'"></i>
+                    </div>
+                    <span class="text-[10px] mt-0.5 tracking-tight font-bold">Menu</span>
+                </button>
+
+            </div>
+        </nav>
     </div>
 
     @livewireScripts

@@ -76,7 +76,7 @@
     $cfg = $colorConfig[$color] ?? $colorConfig['indigo'];
 @endphp
 
-<div {{ $attributes->merge(['class' => "relative bg-gradient-to-br {$cfg['bgGradient']} rounded-2xl sm:rounded-3xl p-4 sm:p-5 lg:px-6 lg:py-4.5 border border-slate-200/90 shadow-xs overflow-hidden"]) }}>
+<div {{ $attributes->merge(['class' => "hidden sm:block relative bg-gradient-to-br {$cfg['bgGradient']} rounded-2xl sm:rounded-3xl p-4 sm:p-5 lg:px-6 lg:py-4.5 border border-slate-200/90 shadow-xs overflow-hidden"]) }}>
     <!-- Decorative Ambient Blur -->
     <div class="absolute -right-10 -top-10 w-48 h-48 {{ $cfg['ambient'] }} rounded-full blur-3xl pointer-events-none"></div>
 

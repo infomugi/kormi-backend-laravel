@@ -106,13 +106,17 @@ COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 # Ensure executable permission for entrypoint
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Create necessary directories and set ownership & permissions
-RUN mkdir -p /var/log/supervisor /var/run/nginx \
-    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+# Create necessary runtime directories and set ownership & permissions
+RUN mkdir -p /var/log/supervisor /var/run/nginx /run/nginx /var/lib/nginx/tmp /var/log/nginx \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/lib/nginx /var/log/nginx /run/nginx \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Coolify exposes port 80 by default for web applications
 EXPOSE 80
+
+# Healthcheck for Coolify & Traefik
+HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=3 \
+    CMD curl -f http://127.0.0.1/up || curl -f http://127.0.0.1/ || exit 1
 
 # Define entrypoint and default execution command
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
