@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Force HTTPS URL scheme when behind SSL reverse proxy (Coolify / Traefik / Docker / Production)
+        if (app()->environment('production') || request()->header('X-Forwarded-Proto') === 'https' || str_starts_with(config('app.url', ''), 'https://')) {
+            URL::forceScheme('https');
+        }
+
         $observer = \App\Observers\AktivitasObserver::class;
         
         \App\Models\Berita::observe($observer);
