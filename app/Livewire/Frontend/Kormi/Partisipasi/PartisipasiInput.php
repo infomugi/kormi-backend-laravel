@@ -209,8 +209,18 @@ class PartisipasiInput extends Component
         if ($this->foto_kegiatan) {
             /** @var StorageService $storage */
             $storage = app(StorageService::class);
-            $pathFoto = $storage->uploadGambar($this->foto_kegiatan, 'partisipasi/mandiri');
+            try {
+                $pathFoto = $storage->uploadGambar($this->foto_kegiatan, 'partisipasi/mandiri');
+            } catch (\InvalidArgumentException $e) {
+                $this->addError('foto_kegiatan', $e->getMessage());
+                return;
+            }
         }
+
+        // Sanitasi teks anti XSS / Deface injection
+        $namaAktivitasSanitized = strip_tags(trim($this->nama_aktivitas));
+        $namaTempatSanitized = strip_tags(trim($this->nama_tempat));
+        $catatanSanitized = $this->catatan ? strip_tags(trim($this->catatan)) : null;
 
         PartisipasiAktivitas::create([
             'pengguna_id' => auth()->id(),
@@ -218,7 +228,7 @@ class PartisipasiInput extends Component
             'inorga_id' => $this->inorga_id ?: null,
             'kecamatan_id' => $this->kecamatan_id,
             'desa_kelurahan_id' => $this->desa_kelurahan_id ?: null,
-            'nama_aktivitas' => trim($this->nama_aktivitas),
+            'nama_aktivitas' => $namaAktivitasSanitized,
             'tanggal_aktivitas' => $this->tanggal_aktivitas,
             'waktu_mulai' => $this->waktu_mulai ?: null,
             'durasi_menit' => $this->durasi_menit,
@@ -226,11 +236,11 @@ class PartisipasiInput extends Component
             'jumlah_peserta' => 1,
             'kategori_lokasi' => $this->kategori_lokasi,
             'sapras_id' => $this->sapras_id ?: null,
-            'nama_tempat' => trim($this->nama_tempat),
+            'nama_tempat' => $namaTempatSanitized,
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'foto_kegiatan' => $pathFoto,
-            'catatan' => $this->catatan ?: null,
+            'catatan' => $catatanSanitized,
             'status_verifikasi' => 'valid',
         ]);
 

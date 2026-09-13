@@ -17,20 +17,49 @@ class StorageService
     /**
      * Upload gambar ke MinIO dan kembalikan path file.
      * Mendukung TemporaryUploadedFile dari Livewire maupun UploadedFile biasa.
+     * Dilengkapi validasi MIME asli, anti-shell, anti-backdoor, dan ekstensi whitelist.
      *
      * @param  TemporaryUploadedFile|UploadedFile  $file
      * @param  string  $folder  Folder tujuan (contoh: 'berita', 'galeri/foto')
      * @return string  Path file yang tersimpan di MinIO
+     * @throws \InvalidArgumentException Jika file terdeteksi berbahaya atau bukan gambar valid.
      */
     public function uploadGambar($file, string $folder = 'gambar'): string
     {
-        $ekstensi = $file->getClientOriginalExtension() ?: 'jpg';
+        $realPath = $file->getRealPath();
+        if (!$realPath || !file_exists($realPath)) {
+            throw new \InvalidArgumentException('Berkas tidak ditemukan atau gagal diunggah.');
+        }
+
+        // 1. Validasi MIME Type Asli (Magic Byte Inspection)
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($realPath);
+
+        $allowedMimes = [
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/webp' => 'webp',
+            'image/gif'  => 'gif',
+        ];
+
+        if (!isset($allowedMimes[$mime])) {
+            throw new \InvalidArgumentException('Format berkas gambar tidak valid atau tidak diizinkan. Hanya diperbolehkan JPG, PNG, WEBP, dan GIF.');
+        }
+
+        // 2. Anti-Shell / Anti-Backdoor Scanner (Cek Payload PHP/Executable di dalam konten gambar)
+        $content = file_get_contents($realPath);
+        if ($this->containsExecutablePayload($content)) {
+            throw new \InvalidArgumentException('Berkas ditolak karena mengandung pola kode berbahaya / skrip tidak sah.');
+        }
+
+        // 3. Sanitasi Ekstensi & Nama File (UUID acak murni, mencegah path traversal dan ekstensi ganda seperti shell.php.jpg)
+        $ekstensi = $allowedMimes[$mime];
         $namaFile = Str::uuid() . '.' . $ekstensi;
-        $path = $folder . '/' . $namaFile;
+        $path = trim($folder, '/') . '/' . $namaFile;
 
         Storage::disk($this->disk)->put(
             $path,
-            file_get_contents($file->getRealPath()),
+            $content,
             'private'
         );
 
@@ -46,17 +75,74 @@ class StorageService
      */
     public function uploadBerkas($file, string $folder = 'dokumen'): string
     {
-        $ekstensi = $file->getClientOriginalExtension() ?: 'pdf';
+        $realPath = $file->getRealPath();
+        if (!$realPath || !file_exists($realPath)) {
+            throw new \InvalidArgumentException('Berkas tidak ditemukan.');
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($realPath);
+
+        $allowedMimes = [
+            'application/pdf' => 'pdf',
+            'application/msword' => 'doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+            'application/vnd.ms-excel' => 'xls',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
+            'application/zip' => 'zip',
+        ];
+
+        if (!isset($allowedMimes[$mime])) {
+            throw new \InvalidArgumentException('Format dokumen tidak didukung atau dilarang.');
+        }
+
+        $content = file_get_contents($realPath);
+        if ($this->containsExecutablePayload($content)) {
+            throw new \InvalidArgumentException('Berkas ditolak karena mengandung kode berbahaya.');
+        }
+
+        $ekstensi = $allowedMimes[$mime];
         $namaFile = Str::uuid() . '.' . $ekstensi;
-        $path = $folder . '/' . $namaFile;
+        $path = trim($folder, '/') . '/' . $namaFile;
 
         Storage::disk($this->disk)->put(
             $path,
-            file_get_contents($file->getRealPath()),
+            $content,
             'private'
         );
 
         return $path;
+    }
+
+    /**
+     * Periksa apakah konten berkas mengandung payload shell/backdoor PHP/ASP/JSP/CGI atau tag eksekusi berbahaya.
+     */
+    protected function containsExecutablePayload(string $content): bool
+    {
+        // Pola berbahaya umum pada polyglot image, webshell, backdoor
+        $suspiciousPatterns = [
+            '/<\?php/i',
+            '/<\?=/i',
+            '/<script[\s\S]*?>/i',
+            '/eval\s*\(/i',
+            '/base64_decode\s*\(/i',
+            '/system\s*\(/i',
+            '/exec\s*\(/i',
+            '/shell_exec\s*\(/i',
+            '/passthru\s*\(/i',
+            '/proc_open\s*\(/i',
+            '/popen\s*\(/i',
+            '/__halt_compiler\s*\(/i',
+            '/<%.*?%>/s', // ASP tags
+        ];
+
+        foreach ($suspiciousPatterns as $pattern) {
+            if (preg_match($pattern, $content)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

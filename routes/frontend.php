@@ -71,7 +71,7 @@ Route::get('/kontak', Kontak::class)->name('kontak');
 Route::get('/hubungi-kami', Kontak::class);
 
 // 5. Modul Partisipasi Olahraga Masyarakat (APMO Tracker)
-Route::middleware('auth')->prefix('partisipasi')->group(function () {
+Route::middleware(['auth', 'throttle:60,1'])->prefix('partisipasi')->group(function () {
     Route::get('/catat', \App\Livewire\Frontend\Kormi\Partisipasi\PartisipasiInput::class)->name('partisipasi.catat');
     Route::get('/duta', \App\Livewire\Frontend\Kormi\Partisipasi\PartisipasiDutaInput::class)->name('partisipasi.duta');
     Route::get('/riwayat', \App\Livewire\Frontend\Kormi\Partisipasi\PartisipasiRiwayat::class)->name('partisipasi.riwayat');

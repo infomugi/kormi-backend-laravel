@@ -36,6 +36,9 @@ class PartisipasiDutaInput extends Component
     public $foto_daftar_hadir = null;
     public string $catatan = '';
 
+    public int $currentStep = 1;
+    public int $totalSteps = 3;
+
     public bool $berhasilSimpan = false;
 
     public function mount(): void
@@ -98,18 +101,111 @@ class PartisipasiDutaInput extends Component
         }
     }
 
+    public function nextStep(): void
+    {
+        $this->validateCurrentStep();
+        if ($this->currentStep < $this->totalSteps) {
+            $this->currentStep++;
+        }
+    }
+
+    public function previousStep(): void
+    {
+        if ($this->currentStep > 1) {
+            $this->currentStep--;
+        }
+    }
+
+    public function setStep(int $step): void
+    {
+        if ($step < $this->currentStep) {
+            $this->currentStep = $step;
+        } elseif ($step > $this->currentStep) {
+            $this->validateCurrentStep();
+            $this->currentStep = $step;
+        }
+    }
+
+    public function validateCurrentStep(): void
+    {
+        if ($this->currentStep === 1) {
+            $this->validate([
+                'nama_aktivitas' => 'required|min:3|max:150',
+                'inorga_id' => 'nullable|exists:kormi_inorga,id',
+                'tanggal_aktivitas' => 'required|date|before_or_equal:today',
+                'durasi_menit' => 'required|integer|min:15|max:360',
+                'jumlah_peserta' => 'required|integer|min:2|max:5000',
+            ]);
+        } elseif ($this->currentStep === 2) {
+            $this->validate([
+                'kecamatan_id' => 'required|exists:ref_kecamatan,id',
+                'desa_kelurahan_id' => 'nullable|exists:ref_desa_kelurahan,id',
+                'nama_tempat' => 'required|min:3|max:200',
+            ]);
+        } elseif ($this->currentStep === 3) {
+            $this->validate([
+                'foto_kegiatan' => 'required|image|max:10240',
+                'foto_daftar_hadir' => 'nullable|image|max:10240',
+                'catatan' => 'nullable|max:500',
+            ]);
+        }
+    }
+
+    public ?string $lokasi_terdeteksi_label = null;
+
+    public function syncWaktuSekarang(): void
+    {
+        $this->tanggal_aktivitas = now()->toDateString();
+        $this->waktu_mulai = now()->format('H:i');
+    }
+
+    public function applyGeolocation($lat, $lng, ?string $fullPlace = null, ?string $subdistrict = null, ?string $village = null): void
+    {
+        if ($subdistrict) {
+            $kec = Kecamatan::where('nama_kecamatan', 'like', "%{$subdistrict}%")->first();
+            if ($kec) {
+                $this->kecamatan_id = $kec->id;
+                if ($village) {
+                    $des = DesaKelurahan::where('kecamatan_id', $kec->id)
+                        ->where('nama_desa_kelurahan', 'like', "%{$village}%")
+                        ->first();
+                    if ($des) {
+                        $this->desa_kelurahan_id = $des->id;
+                    }
+                }
+            }
+        }
+
+        if ($fullPlace && empty($this->nama_tempat)) {
+            $this->nama_tempat = $fullPlace;
+        }
+
+        $this->lokasi_terdeteksi_label = $fullPlace ?: "Koordinat: {$lat}, {$lng}";
+    }
+
     public function simpan(): void
     {
         $this->validate();
 
         /** @var StorageService $storage */
         $storage = app(StorageService::class);
-        $pathKegiatan = $storage->uploadGambar($this->foto_kegiatan, 'partisipasi/duta/kegiatan');
         
-        $pathAbsen = null;
-        if ($this->foto_daftar_hadir) {
-            $pathAbsen = $storage->uploadGambar($this->foto_daftar_hadir, 'partisipasi/duta/absensi');
+        try {
+            $pathKegiatan = $storage->uploadGambar($this->foto_kegiatan, 'partisipasi/duta/kegiatan');
+            
+            $pathAbsen = null;
+            if ($this->foto_daftar_hadir) {
+                $pathAbsen = $storage->uploadGambar($this->foto_daftar_hadir, 'partisipasi/duta/absensi');
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->addError('foto_kegiatan', $e->getMessage());
+            return;
         }
+
+        // Sanitasi teks anti XSS / Deface injection
+        $namaAktivitasSanitized = strip_tags(trim($this->nama_aktivitas));
+        $namaTempatSanitized = strip_tags(trim($this->nama_tempat));
+        $catatanSanitized = $this->catatan ? strip_tags(trim($this->catatan)) : null;
 
         PartisipasiAktivitas::create([
             'pengguna_id' => auth()->id(),
@@ -118,17 +214,17 @@ class PartisipasiDutaInput extends Component
             'inorga_id' => $this->inorga_id ?: null,
             'kecamatan_id' => $this->kecamatan_id,
             'desa_kelurahan_id' => $this->desa_kelurahan_id ?: null,
-            'nama_aktivitas' => trim($this->nama_aktivitas),
+            'nama_aktivitas' => $namaAktivitasSanitized,
             'tanggal_aktivitas' => $this->tanggal_aktivitas,
             'waktu_mulai' => $this->waktu_mulai ?: null,
             'durasi_menit' => $this->durasi_menit,
             'jenis_partisipasi' => $this->jenis_partisipasi,
             'jumlah_peserta' => $this->jumlah_peserta,
             'kategori_lokasi' => $this->kategori_lokasi,
-            'nama_tempat' => trim($this->nama_tempat),
+            'nama_tempat' => $namaTempatSanitized,
             'foto_kegiatan' => $pathKegiatan,
             'foto_daftar_hadir' => $pathAbsen,
-            'catatan' => $this->catatan ?: null,
+            'catatan' => $catatanSanitized,
             'status_verifikasi' => 'valid',
         ]);
 
@@ -140,6 +236,7 @@ class PartisipasiDutaInput extends Component
         $this->reset(['nama_aktivitas', 'inorga_id', 'foto_kegiatan', 'foto_daftar_hadir', 'catatan']);
         $this->durasi_menit = 45;
         $this->jumlah_peserta = 25;
+        $this->currentStep = 1;
         $this->berhasilSimpan = false;
         $this->resetErrorBag();
     }

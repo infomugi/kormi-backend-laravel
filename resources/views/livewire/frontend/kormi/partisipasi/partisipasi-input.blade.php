@@ -477,42 +477,16 @@
 
                             <!-- Upload Foto & Catatan -->
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
-                                <!-- Upload Foto Dropzone -->
+                                <!-- Upload Foto Dropzone via Component Image-Upload -->
                                 <div class="sm:col-span-6 space-y-2">
                                     <x-form.field label="Foto Selfie / Suasana Olahraga" name="foto_kegiatan" badge="Opsional">
-                                        <div class="relative">
-                                            @if($foto_kegiatan)
-                                                <div class="relative rounded-2xl overflow-hidden border-2 border-emerald-500/40 bg-slate-900 p-1 flex items-center justify-center h-32 group">
-                                                    <img src="{{ $foto_kegiatan->temporaryUrl() }}" alt="Preview" class="h-full w-full object-cover rounded-xl">
-                                                    <button 
-                                                        type="button" 
-                                                        wire:click="$set('foto_kegiatan', null)" 
-                                                        class="absolute top-2 right-2 p-1.5 rounded-lg bg-slate-900/80 text-rose-300 hover:text-white hover:bg-rose-600 transition cursor-pointer"
-                                                        title="Hapus foto"
-                                                    >
-                                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                                    </button>
-                                                </div>
-                                            @else
-                                                <label class="flex flex-col items-center justify-center h-32 px-4 border-2 border-dashed border-slate-200/90 rounded-2xl hover:border-emerald-500/50 hover:bg-emerald-50/20 transition-all cursor-pointer text-center group">
-                                                    <div class="w-9 h-9 rounded-xl bg-slate-100 group-hover:bg-emerald-100 text-slate-500 group-hover:text-emerald-700 flex items-center justify-center transition-colors mb-1">
-                                                        <i data-lucide="camera" class="w-4 h-4"></i>
-                                                    </div>
-                                                    <span class="text-xs font-bold text-slate-700 group-hover:text-emerald-700">Pilih Foto Kamera / Galeri</span>
-                                                    <span class="text-[10px] text-slate-400 mt-0.5">JPG, PNG maks 10MB</span>
-                                                    <input 
-                                                        type="file" 
-                                                        wire:model="foto_kegiatan" 
-                                                        accept="image/*"
-                                                        class="hidden"
-                                                    >
-                                                </label>
-                                            @endif
-                                        </div>
-                                        <div wire:loading wire:target="foto_kegiatan" class="text-[11px] font-semibold text-emerald-600 flex items-center gap-1.5 mt-1">
-                                            <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i>
-                                            Mengunggah berkas gambar...
-                                        </div>
+                                        <x-form.image-upload 
+                                            :upload="$foto_kegiatan" 
+                                            name="foto_kegiatan" 
+                                            emptyTitle="Pilih Foto Kamera / Galeri" 
+                                            emptySubtitle="Format JPG, PNG, WEBP maks 10MB" 
+                                            aspectRatio="h-32 sm:h-36"
+                                        />
                                     </x-form.field>
                                 </div>
 
