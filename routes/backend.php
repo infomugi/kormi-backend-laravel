@@ -22,6 +22,7 @@ use App\Livewire\Backend\Kormi\Apmo\ApmoKelola;
 use App\Livewire\Backend\Pengguna\PenggunaKelola;
 use App\Livewire\Backend\Pengguna\PeranKelola;
 use App\Livewire\Backend\Pengaturan\PengaturanKelola;
+use App\Livewire\Backend\Pengaturan\MenuKelola;
 use App\Livewire\Backend\Kormi\Organisasi\SejarahKelola;
 use App\Livewire\Backend\Kormi\Organisasi\VisiMisiKelola;
 use App\Livewire\Backend\Kormi\Organisasi\PengurusKelola;
@@ -124,6 +125,23 @@ Route::prefix('admin')->group(function () {
         return redirect()->route('login');
     });
 
+    Route::get('/leave-impersonation', function () {
+        if (session()->has('impersonator_id')) {
+            $originalAdminId = session('impersonator_id');
+            $originalAdmin = \App\Models\Core\Pengguna::find($originalAdminId);
+            
+            session()->forget(['impersonator_id', 'impersonator_name']);
+            
+            if ($originalAdmin) {
+                Auth::login($originalAdmin);
+                session()->regenerate();
+                session()->flash('pesan', 'Berhasil kembali ke sesi Super Administrator (' . $originalAdmin->nama_lengkap . ').');
+                return redirect()->route('admin.pengguna');
+            }
+        }
+        return redirect()->route('login');
+    })->name('admin.impersonate.leave');
+
     Route::middleware('auth')->group(function () {
         // Semua role terautentikasi dapat mengakses Dashboard
         Route::get('/', Dashboard::class)->name('admin.dashboard');
@@ -179,6 +197,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/peran', PeranKelola::class)->name('admin.peran');
             Route::get('/roles', PeranKelola::class);
             Route::get('/pengaturan', PengaturanKelola::class)->name('admin.pengaturan');
+            Route::get('/menu', MenuKelola::class)->name('admin.menu');
             Route::get('/sejarah', SejarahKelola::class)->name('admin.sejarah');
             Route::get('/visi-misi', VisiMisiKelola::class)->name('admin.visimisi');
             Route::get('/pengurus', PengurusKelola::class)->name('admin.pengurus');

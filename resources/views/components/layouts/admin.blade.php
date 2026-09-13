@@ -719,6 +719,30 @@
                     </div>
                 </div>
 
+                <!-- Menu Navigasi -->
+                <div x-show="!menuSearch || 'menu navigasi header footer sidebar navbar tautan link'.includes(menuSearch.toLowerCase())" class="relative group">
+                    <a href="{{ route('admin.menu') }}" wire:navigate
+                        class="flex items-center rounded-xl font-bold text-xs sm:text-sm transition-all duration-150 relative overflow-hidden {{ request()->routeIs('admin.menu*') ? 'bg-gradient-to-r from-emerald-500/30 to-lime-500/20 text-white font-extrabold shadow-md border border-lime-400/40 backdrop-blur-md' : 'text-emerald-100/80 hover:text-white hover:bg-white/[0.08]' }}"
+                        :class="sidebarExpanded ? 'px-3 py-2.5 gap-3' : 'w-11 h-11 justify-center mx-auto'">
+                        @if(request()->routeIs('admin.menu*'))
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-5 bg-gradient-to-b from-lime-400 to-emerald-400 rounded-r-md shadow-sm shadow-lime-400/50"></div>
+                        @endif
+                        <div class="w-5 h-5 flex items-center justify-center shrink-0">
+                            <i data-lucide="menu" class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 {{ request()->routeIs('admin.menu*') ? 'text-lime-300' : 'text-emerald-300/80 group-hover:text-lime-300' }}"></i>
+                        </div>
+                        <span x-show="sidebarExpanded" class="truncate whitespace-nowrap">Menu Navigasi</span>
+                        @if(request()->routeIs('admin.menu*'))
+                            <span x-show="sidebarExpanded" class="ml-auto flex items-center">
+                                <span class="w-2 h-2 rounded-full bg-lime-400 shadow-sm shadow-lime-400 animate-pulse"></span>
+                            </span>
+                        @endif
+                    </a>
+                    <div x-show="!sidebarExpanded" class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 bg-slate-950/95 text-white text-xs font-bold rounded-xl shadow-2xl border border-emerald-500/30 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap backdrop-blur-md flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-lime-400"></span>
+                        Menu Navigasi
+                    </div>
+                </div>
+
                 <!-- Pengaturan Situs -->
                 <div x-show="!menuSearch || 'pengaturan situs konfigurasi setting kontak sosmed logo footer meta umum'.includes(menuSearch.toLowerCase())" class="relative group">
                     <a href="{{ route('admin.pengaturan') }}" wire:navigate
@@ -816,6 +840,30 @@
 
     <!-- RIGHT MAIN WORKSPACE -->
     <div class="flex-1 flex flex-col min-w-0">
+
+        @if(session()->has('impersonator_id'))
+        <!-- ========================================================= -->
+        <!-- IMPERSONATION FLOATING ALERT BANNER                       -->
+        <!-- ========================================================= -->
+        <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white px-4 py-2.5 shadow-lg flex flex-wrap items-center justify-between gap-3 sticky top-0 z-50 border-b border-white/20 text-xs font-bold">
+            <div class="flex items-center gap-2.5">
+                <span class="px-2 py-0.5 rounded-full bg-black/20 text-amber-100 uppercase tracking-wider text-[10px] font-black flex items-center gap-1 shrink-0">
+                    <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-300"></i>
+                    <span>Mode Impersonasi</span>
+                </span>
+                <span class="leading-tight">
+                    Anda sedang masuk sebagai <strong class="text-white underline underline-offset-2">{{ auth()->user()?->nama_lengkap }}</strong> <span class="opacity-90">({{ auth()->user()?->peran?->nama_peran ?? 'Pengguna' }})</span>
+                    @if(session('impersonator_name'))
+                        <span class="hidden sm:inline text-amber-100 font-normal">&mdash; Administrator Asli: <strong class="font-bold text-white">{{ session('impersonator_name') }}</strong></span>
+                    @endif
+                </span>
+            </div>
+            <a href="{{ route('admin.impersonate.leave') }}" class="px-3.5 py-1.5 rounded-xl bg-white text-rose-700 hover:bg-rose-50 font-black text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all flex items-center gap-1.5 shrink-0">
+                <i data-lucide="log-out" class="w-3.5 h-3.5 text-rose-600"></i>
+                <span>Kembali ke Super Admin</span>
+            </a>
+        </div>
+        @endif
 
         <!-- TOP MOBILE BAR -->
         <header
@@ -956,6 +1004,10 @@
             <a href="{{ route('admin.peran') }}" wire:navigate @click="mobileMenuOpen = false"
                 class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs {{ request()->routeIs('admin.peran*') ? 'bg-gradient-to-r from-emerald-500/30 to-lime-500/20 text-white font-extrabold border border-lime-400/40 shadow-sm' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="shield-check" class="w-4 h-4 {{ request()->routeIs('admin.peran*') ? 'text-lime-300' : 'text-emerald-300' }}"></i> Peran & Hak Akses
+            </a>
+            <a href="{{ route('admin.menu') }}" wire:navigate @click="mobileMenuOpen = false"
+                class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs {{ request()->routeIs('admin.menu*') ? 'bg-gradient-to-r from-emerald-500/30 to-lime-500/20 text-white font-extrabold border border-lime-400/40 shadow-sm' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
+                <i data-lucide="menu" class="w-4 h-4 {{ request()->routeIs('admin.menu*') ? 'text-lime-300' : 'text-emerald-300' }}"></i> Menu Navigasi
             </a>
             <a href="{{ route('admin.pengaturan') }}" wire:navigate @click="mobileMenuOpen = false"
                 class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs {{ request()->routeIs('admin.pengaturan*') ? 'bg-gradient-to-r from-emerald-500/30 to-lime-500/20 text-white font-extrabold border border-lime-400/40 shadow-sm' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">

@@ -878,6 +878,30 @@
     <!-- RIGHT MAIN WORKSPACE -->
     <div class="flex-1 flex flex-col min-w-0">
 
+        @if(session()->has('impersonator_id'))
+        <!-- ========================================================= -->
+        <!-- IMPERSONATION FLOATING ALERT BANNER                       -->
+        <!-- ========================================================= -->
+        <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white px-4 py-2.5 shadow-lg flex flex-wrap items-center justify-between gap-3 sticky top-0 z-50 border-b border-white/20 text-xs font-bold">
+            <div class="flex items-center gap-2.5">
+                <span class="px-2 py-0.5 rounded-full bg-black/20 text-amber-100 uppercase tracking-wider text-[10px] font-black flex items-center gap-1 shrink-0">
+                    <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-300"></i>
+                    <span>Mode Impersonasi</span>
+                </span>
+                <span class="leading-tight">
+                    Anda sedang masuk sebagai <strong class="text-white underline underline-offset-2">{{ auth()->user()?->nama_lengkap }}</strong> <span class="opacity-90">({{ auth()->user()?->peran?->nama_peran ?? 'Pengguna' }})</span>
+                    @if(session('impersonator_name'))
+                        <span class="hidden sm:inline text-amber-100 font-normal">&mdash; Administrator Asli: <strong class="font-bold text-white">{{ session('impersonator_name') }}</strong></span>
+                    @endif
+                </span>
+            </div>
+            <a href="{{ route('admin.impersonate.leave') }}" class="px-3.5 py-1.5 rounded-xl bg-white text-rose-700 hover:bg-rose-50 font-black text-xs uppercase tracking-wider shadow-sm active:scale-95 transition-all flex items-center gap-1.5 shrink-0">
+                <i data-lucide="log-out" class="w-3.5 h-3.5 text-rose-600"></i>
+                <span>Kembali ke Super Admin</span>
+            </a>
+        </div>
+        @endif
+
         <!-- TOP MOBILE BAR -->
         <header
             class="md:hidden flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-[#021f17] to-[#043629] text-white border-b border-emerald-800/60 sticky top-0 z-40 shadow-md">

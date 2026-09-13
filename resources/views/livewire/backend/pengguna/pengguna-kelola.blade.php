@@ -381,6 +381,19 @@
                                     <!-- Actions -->
                                     <x-table.td align="center">
                                         <div class="flex items-center justify-center gap-1.5">
+                                            @if(auth()->id() !== $user->id)
+                                                <button 
+                                                    type="button" 
+                                                    wire:click="impersonate('{{ $user->id }}')" 
+                                                    wire:confirm="Masuk (Autologin / Impersonate) sebagai '{{ $user->nama_lengkap }}' ({{ $user->peran->nama_peran ?? 'Pengguna' }})?"
+                                                    class="p-2 rounded-xl text-emerald-700 bg-emerald-50/80 hover:bg-emerald-100 hover:text-emerald-900 border border-emerald-200/80 transition-all cursor-pointer flex items-center gap-1 text-xs font-bold shadow-2xs"
+                                                    title="Masuk sebagai akun ini (Impersonate / Autologin)"
+                                                >
+                                                    <i data-lucide="log-in" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                                    <span class="hidden xl:inline text-[11px]">Login</span>
+                                                </button>
+                                            @endif
+
                                             <x-table.action-btn 
                                                 size="sm"
                                                 variant="warning" 
@@ -485,6 +498,18 @@
                             </div>
 
                             <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-end gap-1.5">
+                                @if(auth()->id() !== $user->id)
+                                    <button 
+                                        type="button" 
+                                        wire:click="impersonate('{{ $user->id }}')" 
+                                        wire:confirm="Masuk (Autologin / Impersonate) sebagai '{{ $user->nama_lengkap }}' ({{ $user->peran->nama_peran ?? 'Pengguna' }})?"
+                                        class="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-900 transition-all cursor-pointer flex items-center gap-1 text-xs font-bold" 
+                                        title="Masuk sebagai akun ini (Impersonate / Autologin)"
+                                    >
+                                        <i data-lucide="log-in" class="w-4 h-4 text-emerald-600"></i>
+                                        <span class="text-[10px]">Impersonate</span>
+                                    </button>
+                                @endif
                                 <button wire:click="bukaFormEdit('{{ $user->id }}')" title="Edit Pengguna" class="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 transition-all cursor-pointer">
                                     <i data-lucide="edit-3" class="w-4 h-4"></i>
                                 </button>

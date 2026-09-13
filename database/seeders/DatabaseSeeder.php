@@ -957,5 +957,8 @@ class DatabaseSeeder extends Seeder
             'agen_pengguna' => 'Seeder Script',
             'dibuat_pada' => now(),
         ]);
+
+        // 18. Dummy Akun Setiap Role Akses
+        $this->call(DummyAkunRoleSeeder::class);
     }
 }

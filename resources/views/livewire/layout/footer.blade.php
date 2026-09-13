@@ -30,11 +30,14 @@
             <div class="lg:col-span-2 space-y-4 text-left">
                 <h5 class="text-xs font-black uppercase tracking-wider text-white border-l-2 border-emerald-500 pl-3">Navigasi</h5>
                 <ul class="space-y-2.5 text-xs text-slate-400 font-semibold">
-                    <li><a href="{{ route('visimisi') }}" wire:navigate class="hover:text-emerald-400 transition-colors flex items-center gap-1.5"><i data-lucide="chevron-right" class="w-3.5 h-3.5 text-emerald-500"></i> Visi & Misi</a></li>
-                    <li><a href="{{ route('pengurus') }}" wire:navigate class="hover:text-emerald-400 transition-colors flex items-center gap-1.5"><i data-lucide="chevron-right" class="w-3.5 h-3.5 text-emerald-500"></i> Struktur Pengurus</a></li>
-                    <li><a href="{{ route('inorga') }}" wire:navigate class="hover:text-emerald-400 transition-colors flex items-center gap-1.5"><i data-lucide="chevron-right" class="w-3.5 h-3.5 text-emerald-500"></i> Direktori Inorga</a></li>
-                    <li><a href="{{ route('kordikecamatan') }}" wire:navigate class="hover:text-emerald-400 transition-colors flex items-center gap-1.5"><i data-lucide="chevron-right" class="w-3.5 h-3.5 text-emerald-500"></i> KORCAM Kecamatan</a></li>
-                    <li><a href="{{ route('unduhan') }}" wire:navigate class="hover:text-emerald-400 transition-colors flex items-center gap-1.5"><i data-lucide="chevron-right" class="w-3.5 h-3.5 text-emerald-500"></i> Pusat Unduhan</a></li>
+                    @foreach($footerLinks as $link)
+                        <li>
+                            <a href="{{ $link['tautan'] }}" target="{{ $link['target'] }}" {{ $link['external'] ? '' : 'wire:navigate' }} class="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-emerald-500"></i>
+                                <span>{{ $link['nama'] }}</span>
+                            </a>
+                        </li>
+                    @endforeach
                 </ul>
             </div>
 

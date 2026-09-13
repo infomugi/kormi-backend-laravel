@@ -84,7 +84,7 @@ class AdminCmsRoutesTest extends TestCase
 
     public function test_authenticated_admin_can_access_all_cms_modules(): void
     {
-        $admin = Pengguna::first();
+        $admin = Pengguna::whereHas('peran', fn($q) => $q->where('slug', 'super-admin'))->first() ?? Pengguna::first();
 
         $routes = [
             '/admin',

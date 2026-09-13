@@ -456,6 +456,44 @@ class PenggunaKelola extends Component
         session()->flash('pesan', 'Pengguna "' . $nama . '" berhasil dihapus!');
     }
 
+    public function impersonate(string $id): mixed
+    {
+        $currentUser = auth()->user();
+        if (!$currentUser || !$currentUser->isSuperAdmin()) {
+            abort(403, 'Hanya Super Administrator yang memiliki wewenang untuk melakukan impersonate.');
+        }
+
+        $targetUser = Pengguna::with('peran')->findOrFail($id);
+
+        if ($targetUser->id === $currentUser->id) {
+            session()->flash('error', 'Anda saat ini sudah masuk sebagai akun ini.');
+            return null;
+        }
+
+        if (!$targetUser->status_aktif) {
+            session()->flash('error', 'Akun ' . $targetUser->nama_lengkap . ' sedang nonaktif. Aktifkan akun terlebih dahulu sebelum login.');
+            return null;
+        }
+
+        $originalAdminId = session('impersonator_id', $currentUser->id);
+        $originalAdminName = session('impersonator_name', $currentUser->nama_lengkap);
+
+        \Illuminate\Support\Facades\Auth::login($targetUser);
+        session()->regenerate();
+
+        session()->put('impersonator_id', $originalAdminId);
+        session()->put('impersonator_name', $originalAdminName);
+
+        session()->flash('pesan', 'Mode Impersonasi Aktif: Anda sekarang masuk sebagai ' . $targetUser->nama_lengkap . ' (' . ($targetUser->peran?->nama_peran ?? 'Pengguna') . ').');
+
+        // Redirect based on role
+        if ($targetUser->peran && in_array($targetUser->peran->slug, ['super-admin', 'admin-korcam', 'admin-inorga', 'editor-berita'])) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('beranda');
+    }
+
     public function render()
     {
         $peranList = Peran::orderBy('nama_peran')->get();
