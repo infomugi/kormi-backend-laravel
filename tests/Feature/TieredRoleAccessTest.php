@@ -78,6 +78,9 @@ class TieredRoleAccessTest extends TestCase
         $this->actingAs($user, 'web')->get('/admin/sapras')->assertStatus(403);
         $this->actingAs($user, 'web')->get('/admin/pengguna')->assertStatus(403);
         $this->actingAs($user, 'web')->get('/admin/pengaturan')->assertStatus(403);
+        $this->actingAs($user, 'web')->get('/admin/partisipasi')->assertStatus(403);
+        $this->actingAs($user, 'web')->get('/admin/sdi')->assertStatus(403);
+        $this->actingAs($user, 'web')->get('/admin/apmo')->assertStatus(403);
     }
 
     public function test_admin_korcam_permissions(): void
@@ -105,6 +108,9 @@ class TieredRoleAccessTest extends TestCase
         $this->actingAs($user, 'web')->get('/admin/event')->assertStatus(403);
         $this->actingAs($user, 'web')->get('/admin/pengguna')->assertStatus(403);
         $this->actingAs($user, 'web')->get('/admin/pengaturan')->assertStatus(403);
+        $this->actingAs($user, 'web')->get('/admin/partisipasi')->assertStatus(403);
+        $this->actingAs($user, 'web')->get('/admin/sdi')->assertStatus(403);
+        $this->actingAs($user, 'web')->get('/admin/apmo')->assertStatus(403);
     }
 
     public function test_admin_inorga_permissions(): void
@@ -134,6 +140,9 @@ class TieredRoleAccessTest extends TestCase
         $this->actingAs($user, 'web')->get('/admin/pengguna')->assertStatus(403);
         $this->actingAs($user, 'web')->get('/admin/peran')->assertStatus(403);
         $this->actingAs($user, 'web')->get('/admin/pengaturan')->assertStatus(403);
+        $this->actingAs($user, 'web')->get('/admin/partisipasi')->assertStatus(403);
+        $this->actingAs($user, 'web')->get('/admin/sdi')->assertStatus(403);
+        $this->actingAs($user, 'web')->get('/admin/apmo')->assertStatus(403);
     }
 
     public function test_peran_kelola_crud_and_permissions(): void

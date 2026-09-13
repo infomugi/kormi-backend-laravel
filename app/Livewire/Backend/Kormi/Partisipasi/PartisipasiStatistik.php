@@ -10,7 +10,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Layout('components.layouts.backend')]
+#[Layout('components.layouts.admin')]
 #[Title('Dashboard Statistik APMO - KORMI CMS')]
 class PartisipasiStatistik extends Component
 {

@@ -11,8 +11,8 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Layout('components.layouts.backend')]
-#[Title('Log Partisipasi Olahraga Masyarakat - KORMI CMS')]
+#[Layout('components.layouts.admin')]
+#[Title('Log Partisipasi Warga - KORMI CMS')]
 class PartisipasiKelola extends Component
 {
     use WithPagination;
