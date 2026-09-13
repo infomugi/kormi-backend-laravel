@@ -1,6 +1,8 @@
 <div class="space-y-0 text-slate-800">
-    <!-- 1. COMPACT PRO HERO SECTION -->
-    <section class="relative min-h-[86vh] flex items-center justify-center pt-28 pb-20 overflow-hidden bg-slate-950 -mt-24">
+    <!-- ========================================================== -->
+    <!-- 1. HERO SECTION: UTAMA & PINTU GERBANG PORTAL KORMI       -->
+    <!-- ========================================================== -->
+    <section class="relative min-h-[88vh] flex items-center justify-center pt-28 pb-20 overflow-hidden bg-slate-950 -mt-24">
         <!-- Ambient background with refined particle mesh glow -->
         <div class="absolute inset-0 z-0 pointer-events-none">
             <img src="{{ asset('assets/image/hero-bg.jpg') }}" class="w-full h-full object-cover opacity-20 scale-105" alt="Hero Background" onerror="this.style.display='none'" />
@@ -34,21 +36,21 @@
                 </h1>
                 
                 <p class="text-sm sm:text-base md:text-lg text-slate-300 font-medium max-w-2xl mx-auto leading-relaxed opacity-90">
-                    Mewadahi, membina, dan mengembangkan olahraga rekreasi untuk menciptakan masyarakat yang <span class="text-emerald-400 font-bold">Sehat</span>, <span class="text-lime-300 font-bold">Bugar</span>, dan <span class="text-teal-300 font-bold">Gembira</span>.
+                    Mewadahi, membina, dan mengembangkan olahraga rekreasi untuk menciptakan masyarakat Kabupaten Bandung yang <span class="text-emerald-400 font-bold">Sehat</span>, <span class="text-lime-300 font-bold">Bugar</span>, dan <span class="text-teal-300 font-bold">Gembira</span>.
                 </p>
 
-                <!-- Ultra-Pro Action Buttons -->
+                <!-- Action Hub Buttons -->
                 <div class="flex flex-wrap justify-center items-center gap-3.5 pt-4">
-                    <a href="{{ route('inorga') }}" wire:navigate class="px-7 py-3.5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-full font-black text-xs shadow-xl shadow-emerald-950/50 hover:shadow-emerald-500/30 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 flex items-center gap-2.5 uppercase tracking-wider group border border-emerald-400/30">
+                    <a href="{{ route('partisipasi.catat') }}" wire:navigate class="px-7 py-3.5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-full font-black text-xs shadow-xl shadow-emerald-950/50 hover:shadow-emerald-500/30 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 flex items-center gap-2.5 uppercase tracking-wider group border border-emerald-400/30">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Catat Olahraga Warga</span>
+                    </a>
+                    <a href="{{ route('inorga') }}" wire:navigate class="px-6 py-3.5 bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 text-white rounded-full font-bold text-xs backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="award" class="w-3.5 h-3.5 text-lime-400"></i>
                         <span>Direktori INORGA</span>
-                        <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                     </a>
-                    <a href="#komisi-section" class="px-6 py-3.5 bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 text-white rounded-full font-bold text-xs backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 uppercase tracking-wider flex items-center gap-2">
-                        <i data-lucide="layers" class="w-3.5 h-3.5 text-lime-400"></i>
-                        <span>3 Rumpun Komisi</span>
-                    </a>
-                    <a href="{{ route('visimisi') }}" wire:navigate class="px-5 py-3.5 hover:text-emerald-400 text-slate-300 hover:bg-white/5 rounded-full font-bold text-xs transition-all uppercase tracking-wider">
-                        Profil Organisasi
+                    <a href="#modul-terpadu" class="px-5 py-3.5 hover:text-emerald-400 text-slate-300 hover:bg-white/5 rounded-full font-bold text-xs transition-all uppercase tracking-wider">
+                        Jelajahi Fitur
                     </a>
                 </div>
             </div>
@@ -58,7 +60,9 @@
         <div class="absolute bottom-0 left-0 right-0 h-14 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
     </section>
 
-    <!-- 2. EXECUTIVE FLOATING METRICS (ULTRA-PRO GLASS) -->
+    <!-- ========================================================== -->
+    <!-- 2. EXECUTIVE METRICS BAR: STATISTIK KEOLAHRAGAAN & WARGA  -->
+    <!-- ========================================================== -->
     <section class="relative z-20 -mt-12 max-w-6xl mx-auto px-6">
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 p-4 sm:p-5 bg-white/95 rounded-3xl border border-slate-200/90 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.09)] backdrop-blur-2xl">
             <!-- Metric 1: INORGA -->
@@ -89,24 +93,24 @@
                 </div>
             </a>
 
-            <!-- Metric 3: DUTA -->
-            <a href="{{ route('dutaolahraga') }}" wire:navigate class="group p-4 sm:p-4.5 rounded-2xl bg-slate-50/80 hover:bg-amber-50/70 border border-slate-200/70 hover:border-amber-300/90 transition-all duration-300 flex items-center gap-3.5 text-left hover:shadow-md">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-amber-500/25 group-hover:scale-110 group-hover:rotate-2 transition-transform shrink-0">
-                    <i data-lucide="users" class="w-5 h-5"></i>
+            <!-- Metric 3: PARTISIPASI AKTIF WARGA -->
+            <a href="{{ route('partisipasi.riwayat') }}" wire:navigate class="group p-4 sm:p-4.5 rounded-2xl bg-slate-50/80 hover:bg-lime-50/70 border border-slate-200/70 hover:border-lime-300/90 transition-all duration-300 flex items-center gap-3.5 text-left hover:shadow-md">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-lime-500 to-emerald-600 flex items-center justify-center text-white shadow-md shadow-lime-500/25 group-hover:scale-110 group-hover:rotate-2 transition-transform shrink-0">
+                    <i data-lucide="activity" class="w-5 h-5"></i>
                 </div>
                 <div class="min-w-0">
                     <div class="flex items-baseline gap-1">
-                        <span class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">{{ $stats['totalDuta'] }}</span>
-                        <span class="text-amber-600 font-bold text-xs uppercase leading-none">Org</span>
+                        <span class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">{{ number_format($stats['totalAktivitasWarga'] > 0 ? $stats['totalAktivitasWarga'] : $stats['totalDuta']) }}</span>
+                        <span class="text-lime-600 font-black text-sm uppercase leading-none">{{ $stats['totalAktivitasWarga'] > 0 ? 'Log' : 'Duta' }}</span>
                     </div>
-                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider mt-1 group-hover:text-amber-700 transition-colors truncate">Duta Olahraga</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider mt-1 group-hover:text-lime-700 transition-colors truncate">Aktivitas APMO</div>
                 </div>
             </a>
 
-            <!-- Metric 4: SAPRAS -->
+            <!-- Metric 4: SAPRAS OLAHRAGA -->
             <a href="{{ route('sapras') }}" wire:navigate class="group p-4 sm:p-4.5 rounded-2xl bg-slate-50/80 hover:bg-purple-50/70 border border-slate-200/70 hover:border-purple-300/90 transition-all duration-300 flex items-center gap-3.5 text-left hover:shadow-md">
                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center text-white shadow-md shadow-purple-500/25 group-hover:scale-110 group-hover:rotate-2 transition-transform shrink-0">
-                    <i data-lucide="activity" class="w-5 h-5"></i>
+                    <i data-lucide="building" class="w-5 h-5"></i>
                 </div>
                 <div class="min-w-0">
                     <div class="flex items-baseline gap-1">
@@ -119,8 +123,56 @@
         </div>
     </section>
 
-    <!-- 3. SAMBUTAN & PILAR STRATEGIS (ULTRA-PRO CRAFTED) -->
-    <section class="py-20 bg-slate-50/70 relative overflow-hidden">
+    <!-- ========================================================== -->
+    <!-- 3. MODUL PARTISIPASI WARGA (APMO LIVE TRACKER BANNER)     -->
+    <!-- ========================================================== -->
+    <section class="py-14 bg-white relative">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-900 via-slate-900 to-teal-950 p-6 sm:p-10 text-white shadow-xl shadow-emerald-950/10 border border-emerald-800/40">
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
+                <div class="absolute -right-16 -top-16 w-64 h-64 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 grid md:grid-cols-12 gap-6 items-center">
+                    <div class="md:col-span-8 space-y-3 text-left">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[10px] font-black uppercase tracking-wider">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            Modul Partisipasi & Kebugaran Warga
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase">
+                            Catat Aktivitas Olahraga Anda, <span class="text-lime-300">Raih Badge APMO!</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal max-w-2xl">
+                            Setiap sesi senam, lari pagi, gowes, atau permainan tradisional yang Anda lakukan berkontribusi langsung pada perhitungan <strong>Angka Partisipasi Masyarakat Olahraga (APMO)</strong> Kabupaten Bandung Bedas.
+                        </p>
+                    </div>
+
+                    <div class="md:col-span-4 flex flex-col sm:flex-row md:flex-col gap-3">
+                        <a 
+                            href="{{ route('partisipasi.catat') }}" 
+                            wire:navigate
+                            class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:brightness-110 active:scale-98 text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-900/40 flex items-center justify-center gap-2"
+                        >
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                            <span>Catat Sesi Sekarang</span>
+                        </a>
+                        <a 
+                            href="{{ route('partisipasi.riwayat') }}" 
+                            wire:navigate
+                            class="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 active:scale-98 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
+                        >
+                            <i data-lucide="award" class="w-4 h-4 text-amber-400"></i>
+                            <span>Riwayat & Capaian Saya</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- 4. MODUL PROFIL & KEPEMIMPINAN STRATEGIS                   -->
+    <!-- ========================================================== -->
+    <section class="py-16 bg-slate-50/70 relative overflow-hidden">
         <div class="container mx-auto px-6 max-w-6xl">
             <div class="grid lg:grid-cols-12 gap-10 items-center">
                 
@@ -192,10 +244,13 @@
                         </div>
                     </div>
 
-                    <div class="pt-2">
+                    <div class="pt-2 flex flex-wrap gap-3">
                         <a href="{{ route('sejarah') }}" wire:navigate class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-900 text-white hover:bg-emerald-600 text-xs font-bold uppercase tracking-wider shadow-md transition-all duration-200 group">
-                            <span>Baca Linimasa Sejarah KORMI</span>
+                            <span>Sejarah KORMI</span>
                             <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                        <a href="{{ route('pengurus') }}" wire:navigate class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold uppercase tracking-wider shadow-xs transition-all duration-200">
+                            <span>Struktur Pengurus</span>
                         </a>
                     </div>
                 </div>
@@ -203,15 +258,17 @@
         </div>
     </section>
 
-    <!-- 4. 3 RUMPUN KOMISI OLAHRAGA (COMPACT PRO CARDS) -->
+    <!-- ========================================================== -->
+    <!-- 5. MODUL KEOLAHRAGAAN: 3 RUMPUN KOMISI & DIREKTORI INORGA  -->
+    <!-- ========================================================== -->
     <section id="komisi-section" class="py-16 bg-white relative">
         <div class="container mx-auto px-6 max-w-6xl">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-3">
-                <div>
-                    <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-200/60">Klasifikasi Organisasi</span>
-                    <h3 class="text-2xl sm:text-3xl font-black uppercase tracking-tight text-slate-900 mt-1.5">3 Rumpun Komisi Olahraga</h3>
+                <div class="space-y-1 text-left">
+                    <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-200/60">Modul Keolahragaan</span>
+                    <h3 class="text-2xl sm:text-3xl font-black uppercase tracking-tight text-slate-900">3 Rumpun Komisi Olahraga</h3>
                 </div>
-                <p class="text-xs text-slate-500 max-w-md">Mewadahi seluruh induk organisasi olahraga rekreasi sesuai rumpun spesifikasi.</p>
+                <p class="text-xs text-slate-500 max-w-md text-left md:text-right">Mewadahi puluhan induk organisasi olahraga rekreasi (INORGA) sesuai spesifikasi rumpun pembinaan.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -236,7 +293,7 @@
                                 </span>
                             </div>
 
-                            <div class="space-y-1.5">
+                            <div class="space-y-1.5 text-left">
                                 <h4 class="text-lg font-black uppercase leading-snug tracking-tight">{{ $komisi->nama_komisi }}</h4>
                                 <p class="text-slate-400 text-xs leading-relaxed">
                                     @if($isTradisional)
@@ -251,11 +308,11 @@
                         </div>
 
                         <div class="relative z-10 pt-5 mt-5 border-t border-white/10 flex items-center justify-between">
-                            <div>
+                            <div class="text-left">
                                 <div class="text-xl font-black text-white leading-none">{{ $komisi->inorga_count }}</div>
                                 <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">INORGA Terdaftar</div>
                             </div>
-                            <a href="{{ route('inorga') }}?komisi={{ $komisi->id }}" wire:navigate class="w-8 h-8 rounded-full bg-white/10 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-colors">
+                            <a href="{{ route('inorga') }}?komisi={{ $komisi->id }}" wire:navigate class="w-8 h-8 rounded-full bg-white/10 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-colors" title="Lihat Daftar INORGA">
                                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </a>
                         </div>
@@ -265,10 +322,12 @@
         </div>
     </section>
 
-    <!-- 5. EVENT UNGGULAN & AGENDA DAERAH -->
+    <!-- ========================================================== -->
+    <!-- 6. MODUL EVENT & FESTIVAL OLAHRAGA MASYARAKAT             -->
+    <!-- ========================================================== -->
     <section class="py-16 bg-slate-50/80 relative overflow-hidden">
         <div class="container mx-auto px-6 max-w-6xl">
-            <!-- Bedas Run Compact Banner -->
+            <!-- Bedas Run Flagship Banner -->
             <div class="relative group overflow-hidden rounded-3xl border border-emerald-500/20 shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 mb-8">
                 <div class="absolute inset-0 z-0 overflow-hidden rounded-3xl">
                     <img src="{{ asset('assets/image/event-card-bg.jpg') }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Event Background" onerror="this.src='https://images.unsplash.com/photo-1461896836934-bd45ba0fcf5b?q=80&w=1200'" />
@@ -278,7 +337,7 @@
                 <div class="relative z-10 p-6 sm:p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div class="space-y-3 text-left max-w-xl">
                         <span class="inline-block px-3 py-1 rounded-full bg-white/15 text-white font-extrabold text-[10px] uppercase tracking-wider border border-white/20">
-                            Flagship Annual Event
+                            Modul Event & Festival
                         </span>
                         <h2 class="text-2xl sm:text-4xl font-black text-white leading-tight uppercase tracking-tight">
                             BANDUNG BEDAS RUN <span class="text-lime-300">2026</span>
@@ -296,11 +355,14 @@
                         <a href="{{ route('forkab') }}" wire:navigate class="px-5 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-full font-bold text-xs uppercase tracking-wider transition-all text-center">
                             Info FORKAB
                         </a>
+                        <a href="{{ route('fotradkab') }}" wire:navigate class="px-5 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-full font-bold text-xs uppercase tracking-wider transition-all text-center">
+                            Info FOTRADKAB
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Event List Grid -->
+            <!-- Event Agenda List Grid -->
             @if($eventList->isNotEmpty())
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @foreach($eventList as $ev)
@@ -325,32 +387,34 @@
         </div>
     </section>
 
-    <!-- 6. PORTAL 8 LAYANAN TERPADU & DATA KORMI (ULTRA-PRO MATRIX) -->
-    <section class="py-20 bg-slate-50/60 relative">
+    <!-- ========================================================== -->
+    <!-- 7. ONE-STOP MATRIKS MODUL & FITUR LENGKAP APLIKASI         -->
+    <!-- ========================================================== -->
+    <section id="modul-terpadu" class="py-20 bg-white relative">
         <div class="container mx-auto px-6 max-w-6xl">
             <!-- Header Section -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
                 <div class="space-y-2 text-left">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100/80 text-emerald-800 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-300/40">
-                        <i data-lucide="grid" class="w-3 h-3 text-emerald-600"></i> One-Stop Service Portal
+                        <i data-lucide="grid" class="w-3 h-3 text-emerald-600"></i> Ekosistem Fitur & Layanan
                     </span>
                     <h3 class="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-slate-900">
                         Pusat Layanan & Data KORMI
                     </h3>
                     <p class="text-xs sm:text-sm text-slate-500 font-medium max-w-xl">
-                        Akses terpadu direktori keolahragaan, sistem indikator statistik, sarana prasarana, serta arsip regulasi resmi.
+                        Akses terpadu ke seluruh modul: direktori keolahragaan, sistem SDI/APMO, inventaris sarpras, hingga repositori unduhan resmi.
                     </p>
                 </div>
                 <div class="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-400">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>8 Modul Sistem Aktif</span>
+                    <span>8 Modul Sistem Terintegrasi</span>
                 </div>
             </div>
 
             <!-- Grid 8 Modul Pro Matrix -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 @foreach($kegiatanGrid as $item)
-                    <a href="{{ $item['link'] }}" {{ ($item['external'] ?? false) ? 'target="_blank" rel="noopener noreferrer"' : 'wire:navigate' }} class="group relative bg-white rounded-3xl p-5 border border-slate-200/80 hover:border-slate-300 shadow-sm hover:shadow-xl transition-all duration-300 block text-left transform hover:-translate-y-1 overflow-hidden flex flex-col justify-between">
+                    <a href="{{ $item['link'] }}" {{ ($item['external'] ?? false) ? 'target="_blank" rel="noopener noreferrer"' : 'wire:navigate' }} class="group relative bg-slate-50/70 hover:bg-white rounded-3xl p-5 border border-slate-200/80 hover:border-emerald-300 shadow-xs hover:shadow-xl transition-all duration-300 block text-left transform hover:-translate-y-1 overflow-hidden flex flex-col justify-between">
                         <!-- Top Accent Bar -->
                         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r {{ $item['bg_gradient'] }} opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         
@@ -380,11 +444,11 @@
                         </div>
 
                         <!-- Footer Action Link -->
-                        <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+                        <div class="pt-4 mt-4 border-t border-slate-200/60 flex items-center justify-between">
                             <span class="text-[11px] font-black uppercase tracking-wider text-slate-600 group-hover:text-emerald-600 transition-colors">
                                 Masuk Modul
                             </span>
-                            <div class="w-7 h-7 rounded-full bg-slate-100 group-hover:bg-emerald-500 group-hover:text-white flex items-center justify-center text-slate-500 transition-all duration-300">
+                            <div class="w-7 h-7 rounded-full bg-white group-hover:bg-emerald-500 group-hover:text-white flex items-center justify-center text-slate-500 transition-all duration-300 shadow-xs">
                                 <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform"></i>
                             </div>
                         </div>
@@ -394,8 +458,10 @@
         </div>
     </section>
 
-    <!-- 7. WARTA & BERITA TERKINI (ULTRA-PRO EDITORIAL CARDS) -->
-    <section class="py-20 bg-slate-50/60 relative">
+    <!-- ========================================================== -->
+    <!-- 8. MODUL MEDIA: WARTA & BERITA TERKINI                     -->
+    <!-- ========================================================== -->
+    <section class="py-20 bg-slate-50/70 relative">
         <div class="container mx-auto px-6 max-w-6xl">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-4">
                 <div class="space-y-2 text-left">
@@ -470,7 +536,9 @@
         </div>
     </section>
 
-    <!-- 8. GALERI DOKUMENTASI KEGIATAN (ULTRA-PRO MOSAIC) -->
+    <!-- ========================================================== -->
+    <!-- 9. MODUL DOKUMENTASI: GALERI AKSI & KEGIATAN LAPANGAN      -->
+    <!-- ========================================================== -->
     @if($galeriList->isNotEmpty())
         <section class="py-20 bg-white relative">
             <div class="container mx-auto px-6 max-w-6xl">
@@ -509,7 +577,9 @@
         </section>
     @endif
 
-    <!-- 9. CTA COMMUNITY BANNER (PRO & CLEAN) -->
+    <!-- ========================================================== -->
+    <!-- 10. MODUL KONTAK & KEMITRAAN KOMUNITAS                     -->
+    <!-- ========================================================== -->
     <section class="py-16 bg-slate-50 relative overflow-hidden">
         <div class="container mx-auto px-6 max-w-5xl">
             <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 p-8 sm:p-12 text-white shadow-2xl border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-8">

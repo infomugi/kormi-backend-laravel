@@ -27,6 +27,8 @@ use App\Livewire\Backend\Kormi\Organisasi\VisiMisiKelola;
 use App\Livewire\Backend\Kormi\Organisasi\PengurusKelola;
 use App\Livewire\Backend\Kormi\Organisasi\KordikKelola;
 use App\Livewire\Backend\Kormi\Organisasi\ProkerKelola;
+use App\Livewire\Backend\Kormi\Partisipasi\PartisipasiKelola;
+use App\Livewire\Backend\Kormi\Partisipasi\PartisipasiStatistik;
 
 /*
 |--------------------------------------------------------------------------
@@ -170,6 +172,8 @@ Route::prefix('admin')->group(function () {
         Route::middleware('peran:super-admin')->group(function () {
             Route::get('/sdi', SdiKelola::class)->name('admin.sdi');
             Route::get('/apmo', ApmoKelola::class)->name('admin.apmo');
+            Route::get('/partisipasi', PartisipasiKelola::class)->name('admin.partisipasi.log');
+            Route::get('/partisipasi/statistik', PartisipasiStatistik::class)->name('admin.partisipasi.statistik');
             Route::get('/pengguna', PenggunaKelola::class)->name('admin.pengguna');
             Route::get('/users', PenggunaKelola::class);
             Route::get('/peran', PeranKelola::class)->name('admin.peran');

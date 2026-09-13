@@ -36,7 +36,7 @@
                         @endif
                     </a>
                     @if(isset($item['sub']))
-                        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-64 bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.12)] border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-2 group-hover:translate-y-0 transition-all duration-200 p-2.5 z-50">
+                        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-72 bg-white rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.12)] border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-2 group-hover:translate-y-0 transition-all duration-200 p-2.5 z-50">
                             @foreach($item['sub'] as $sub)
                                 @php
                                     $isSubActive = (url()->current() === $sub['link']);

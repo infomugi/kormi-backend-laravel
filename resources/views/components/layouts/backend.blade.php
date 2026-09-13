@@ -374,6 +374,67 @@
                     </div>
                 </div>
 
+                <!-- ========================================================= -->
+                <!-- 4. PARTISIPASI OLAHRAGA (APMO TRACKER)                    -->
+                <!-- ========================================================= -->
+                <div x-show="sidebarExpanded && (!menuSearch || 'partisipasi olahraga apmo tracker log kegiatan warga duta angka statistik kebugaran analitik capaian'.includes(menuSearch.toLowerCase()))"
+                    class="px-3 pt-4 pb-1 text-[10px] font-black uppercase tracking-wider text-emerald-300/70 flex items-center justify-between">
+                    <span>Partisipasi APMO</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500/40"></span>
+                </div>
+
+                <!-- Log Data Partisipasi -->
+                <div x-show="!menuSearch || 'partisipasi log data aktivitas olahraga entri verifikasi approval riwayat'.includes(menuSearch.toLowerCase())" class="relative group">
+                    <a href="{{ route('admin.partisipasi.log') }}" wire:navigate
+                        class="flex items-center rounded-xl font-bold text-xs sm:text-sm transition-all duration-150 relative overflow-hidden {{ request()->routeIs('admin.partisipasi.log') ? 'bg-gradient-to-r from-emerald-500/30 to-lime-500/20 text-white font-extrabold shadow-md border border-lime-400/40 backdrop-blur-md' : 'text-emerald-100/80 hover:text-white hover:bg-white/[0.08]' }}"
+                        :class="sidebarExpanded ? 'px-3 py-2.5 gap-3' : 'w-11 h-11 justify-center mx-auto'">
+                        @if(request()->routeIs('admin.partisipasi.log'))
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-5 bg-gradient-to-b from-lime-400 to-emerald-400 rounded-r-md shadow-sm shadow-lime-400/50"></div>
+                        @endif
+                        <div class="w-5 h-5 flex items-center justify-center shrink-0">
+                            <i data-lucide="clipboard-list"
+                                class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 {{ request()->routeIs('admin.partisipasi.log') ? 'text-lime-300' : 'text-emerald-300/80 group-hover:text-lime-300' }}"></i>
+                        </div>
+                        <span x-show="sidebarExpanded" class="truncate whitespace-nowrap">Log Partisipasi</span>
+                        @if(request()->routeIs('admin.partisipasi.log'))
+                            <span x-show="sidebarExpanded" class="ml-auto flex items-center">
+                                <span class="w-2 h-2 rounded-full bg-lime-400 shadow-sm shadow-lime-400 animate-pulse"></span>
+                            </span>
+                        @endif
+                    </a>
+                    <div x-show="!sidebarExpanded"
+                        class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 bg-slate-950/95 text-white text-xs font-bold rounded-xl shadow-2xl border border-emerald-500/30 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap backdrop-blur-md flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-lime-400"></span>
+                        Log Partisipasi
+                    </div>
+                </div>
+
+                <!-- Statistik & Analitik APMO -->
+                <div x-show="!menuSearch || 'statistik analitik apmo grafik target wilayah kpi angka partisipasi kebugaran'.includes(menuSearch.toLowerCase())" class="relative group">
+                    <a href="{{ route('admin.partisipasi.statistik') }}" wire:navigate
+                        class="flex items-center rounded-xl font-bold text-xs sm:text-sm transition-all duration-150 relative overflow-hidden {{ request()->routeIs('admin.partisipasi.statistik') ? 'bg-gradient-to-r from-emerald-500/30 to-lime-500/20 text-white font-extrabold shadow-md border border-lime-400/40 backdrop-blur-md' : 'text-emerald-100/80 hover:text-white hover:bg-white/[0.08]' }}"
+                        :class="sidebarExpanded ? 'px-3 py-2.5 gap-3' : 'w-11 h-11 justify-center mx-auto'">
+                        @if(request()->routeIs('admin.partisipasi.statistik'))
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-5 bg-gradient-to-b from-lime-400 to-emerald-400 rounded-r-md shadow-sm shadow-lime-400/50"></div>
+                        @endif
+                        <div class="w-5 h-5 flex items-center justify-center shrink-0">
+                            <i data-lucide="bar-chart-3"
+                                class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 {{ request()->routeIs('admin.partisipasi.statistik') ? 'text-lime-300' : 'text-emerald-300/80 group-hover:text-lime-300' }}"></i>
+                        </div>
+                        <span x-show="sidebarExpanded" class="truncate whitespace-nowrap">Statistik APMO</span>
+                        @if(request()->routeIs('admin.partisipasi.statistik'))
+                            <span x-show="sidebarExpanded" class="ml-auto flex items-center">
+                                <span class="w-2 h-2 rounded-full bg-lime-400 shadow-sm shadow-lime-400 animate-pulse"></span>
+                            </span>
+                        @endif
+                    </a>
+                    <div x-show="!sidebarExpanded"
+                        class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 bg-slate-950/95 text-white text-xs font-bold rounded-xl shadow-2xl border border-emerald-500/30 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap backdrop-blur-md flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-lime-400"></span>
+                        Statistik APMO
+                    </div>
+                </div>
+
                 @if($isSuper)
                 <!-- Pelatihan & Sertifikasi SDI -->
                 <div x-show="!menuSearch || 'pelatihan sertifikasi sdi instruktur juri wasit sumber daya manusia pembina'.includes(menuSearch.toLowerCase())" class="relative group">
@@ -888,6 +949,14 @@
             <a href="{{ route('admin.duta') }}" wire:navigate @click="mobileMenuOpen = false"
                 class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs {{ request()->routeIs('admin.duta*') ? 'bg-gradient-to-r from-emerald-500/30 to-lime-500/20 text-white font-extrabold border border-lime-400/40 shadow-sm' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
                 <i data-lucide="award" class="w-4 h-4 {{ request()->routeIs('admin.duta*') ? 'text-lime-300' : 'text-emerald-300' }}"></i> Duta Olahraga
+            </a>
+            <a href="{{ route('admin.partisipasi.log') }}" wire:navigate @click="mobileMenuOpen = false"
+                class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs {{ request()->routeIs('admin.partisipasi.log') ? 'bg-gradient-to-r from-emerald-500/30 to-lime-500/20 text-white font-extrabold border border-lime-400/40 shadow-sm' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
+                <i data-lucide="clipboard-list" class="w-4 h-4 {{ request()->routeIs('admin.partisipasi.log') ? 'text-lime-300' : 'text-emerald-300' }}"></i> Log Partisipasi (APMO)
+            </a>
+            <a href="{{ route('admin.partisipasi.statistik') }}" wire:navigate @click="mobileMenuOpen = false"
+                class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs {{ request()->routeIs('admin.partisipasi.statistik') ? 'bg-gradient-to-r from-emerald-500/30 to-lime-500/20 text-white font-extrabold border border-lime-400/40 shadow-sm' : 'text-emerald-100 hover:bg-white/10 hover:text-white' }}">
+                <i data-lucide="bar-chart-3" class="w-4 h-4 {{ request()->routeIs('admin.partisipasi.statistik') ? 'text-lime-300' : 'text-emerald-300' }}"></i> Statistik APMO
             </a>
             @if($isSuper)
             <a href="{{ route('admin.sdi') }}" wire:navigate @click="mobileMenuOpen = false"

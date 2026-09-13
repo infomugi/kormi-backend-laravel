@@ -35,4 +35,9 @@ class Kecamatan extends ModelDasar
     {
         return $this->hasMany(Sapras::class, 'kecamatan_id');
     }
+
+    public function partisipasi(): HasMany
+    {
+        return $this->hasMany(\App\Models\Kormi\PartisipasiAktivitas::class, 'kecamatan_id');
+    }
 }

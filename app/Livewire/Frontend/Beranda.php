@@ -147,6 +147,8 @@ class Beranda extends Component
             'totalKecamatan' => Kecamatan::count(),
             'totalSapras' => Sapras::count(),
             'totalUnduhan' => Unduhan::count(),
+            'totalAktivitasWarga' => \App\Models\Kormi\PartisipasiAktivitas::valid()->count(),
+            'totalPesertaWarga' => \App\Models\Kormi\PartisipasiAktivitas::valid()->sum('jumlah_peserta'),
         ];
 
         return view('livewire.frontend.beranda', [

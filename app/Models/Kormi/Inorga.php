@@ -47,6 +47,11 @@ class Inorga extends ModelDasar
         return $this->hasMany(EventCabang::class, 'inorga_id');
     }
 
+    public function partisipasi(): HasMany
+    {
+        return $this->hasMany(PartisipasiAktivitas::class, 'inorga_id');
+    }
+
     public function getInitialDuaHurufAttribute(): string
     {
         $clean = preg_replace('/[^A-Za-z0-9]/', '', $this->singkatan ?? '');

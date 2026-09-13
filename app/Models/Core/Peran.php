@@ -69,6 +69,14 @@ class Peran extends ModelDasar
                 'apmo' => ['nama' => 'Anugerah APMO', 'deskripsi' => 'Kategori dan daftar penerima anugerah insan penggerak olahraga', 'routes' => ['admin.apmo']],
             ],
         ],
+        'partisipasi' => [
+            'nama' => 'Partisipasi Olahraga (APMO)',
+            'deskripsi' => 'Pencatatan dan pemantauan angka partisipasi masyarakat olahraga dari warga dan duta.',
+            'items' => [
+                'partisipasi_log' => ['nama' => 'Log Aktivitas Masyarakat', 'deskripsi' => 'Kelola log aktivitas olahraga harian warga & laporan duta desa', 'routes' => ['admin.partisipasi.log']],
+                'partisipasi_statistik' => ['nama' => 'Statistik & Indeks APMO', 'deskripsi' => 'Dashboard capaian APMO 31 kecamatan dan cabor terpopuler', 'routes' => ['admin.partisipasi.statistik']],
+            ],
+        ],
         'sistem' => [
             'nama' => 'Sistem & Pengaturan',
             'deskripsi' => 'Manajemen akun pengguna dan konfigurasi portal resmi.',

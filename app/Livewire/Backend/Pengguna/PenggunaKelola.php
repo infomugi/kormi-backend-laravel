@@ -147,6 +147,8 @@ class PenggunaKelola extends Component
             ->when($this->statusDipilih !== 'Semua', function ($q) {
                 if ($this->statusDipilih === 'Aktif') {
                     $q->where('status_aktif', true);
+                } elseif ($this->statusDipilih === 'Pending') {
+                    $q->where('status_aktif', false)->whereNull('disetujui_pada');
                 } elseif ($this->statusDipilih === 'Non-Aktif') {
                     $q->where('status_aktif', false);
                 }
@@ -410,6 +412,35 @@ class PenggunaKelola extends Component
         $this->selectedUsers = [];
     }
 
+    public function setujuiAkun(string $id): void
+    {
+        $user = Pengguna::findOrFail($id);
+        $user->update([
+            'status_aktif' => true,
+            'disetujui_pada' => now(),
+            'disetujui_oleh' => auth()->id(),
+        ]);
+
+        session()->flash('pesan', 'Akun "' . $user->nama_lengkap . '" berhasil disetujui dan diaktifkan!');
+    }
+
+    public function bulkSetujuiAkun(mixed $ids = []): void
+    {
+        $target = is_array($ids) && !empty($ids) ? $ids : $this->selectedUsers;
+        if (empty($target)) {
+            return;
+        }
+
+        $count = Pengguna::whereIn('id', (array) $target)->update([
+            'status_aktif' => true,
+            'disetujui_pada' => now(),
+            'disetujui_oleh' => auth()->id(),
+        ]);
+
+        session()->flash('pesan', $count . ' akun pengguna berhasil disetujui dan diaktifkan secara massal!');
+        $this->selectedUsers = [];
+    }
+
     public function hapus(string $id): void
     {
         $user = Pengguna::findOrFail($id);
@@ -434,6 +465,7 @@ class PenggunaKelola extends Component
             'penggunaList' => $this->getFilteredQuery()->paginate($this->perPage),
             'totalPengguna' => Pengguna::count(),
             'totalAktif' => Pengguna::where('status_aktif', true)->count(),
+            'totalPending' => Pengguna::where('status_aktif', false)->whereNull('disetujui_pada')->count(),
             'totalNonAktif' => Pengguna::where('status_aktif', false)->count(),
             'totalAdmin' => Pengguna::whereNotNull('peran_id')->count(),
         ]);

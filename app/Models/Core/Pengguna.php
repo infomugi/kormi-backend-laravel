@@ -48,6 +48,26 @@ class Pengguna extends Authenticatable
         return $this->belongsTo(Peran::class, 'peran_id');
     }
 
+    public function kecamatan(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Master\Kecamatan::class, 'kecamatan_id');
+    }
+
+    public function desa(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Master\DesaKelurahan::class, 'desa_kelurahan_id');
+    }
+
+    public function duta(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Kormi\DutaOlahraga::class, 'duta_id');
+    }
+
+    public function partisipasi(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\Kormi\PartisipasiAktivitas::class, 'pengguna_id');
+    }
+
     public function isSuperAdmin(): bool
     {
         $slug = $this->peran?->slug;
@@ -67,6 +87,16 @@ class Pengguna extends Authenticatable
     public function isEditorBerita(): bool
     {
         return $this->peran?->slug === 'editor-berita';
+    }
+
+    public function isDutaOlahraga(): bool
+    {
+        return $this->peran?->slug === 'duta-olahraga' || !empty($this->duta_id);
+    }
+
+    public function isPegiatOlahraga(): bool
+    {
+        return $this->peran?->slug === 'pegiat-olahraga';
     }
 
     public function hasRole(string ...$roles): bool

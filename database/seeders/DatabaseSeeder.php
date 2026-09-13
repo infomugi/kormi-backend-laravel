@@ -60,6 +60,24 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $peranDuta = Peran::updateOrCreate(
+            ['slug' => 'duta-olahraga'],
+            [
+                'nama_peran' => 'Duta Olahraga Desa',
+                'deskripsi' => 'Fasilitator penggerak olahraga desa & pencatat kegiatan massal masyarakat',
+                'hak_akses' => ['partisipasi_log', 'duta'],
+            ]
+        );
+
+        $peranPegiat = Peran::updateOrCreate(
+            ['slug' => 'pegiat-olahraga'],
+            [
+                'nama_peran' => 'Masyarakat / Pegiat Olahraga',
+                'deskripsi' => 'Masyarakat pencatat aktivitas olahraga mandiri',
+                'hak_akses' => [],
+            ]
+        );
+
         $admin = Pengguna::updateOrCreate(
             ['email' => 'admin@kormibdg.id'],
             [

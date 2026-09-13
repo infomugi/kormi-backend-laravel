@@ -54,6 +54,16 @@ class DutaOlahraga extends ModelDasar
         return $this->belongsTo(DesaKelurahan::class, 'desa_kelurahan_id');
     }
 
+    public function partisipasi(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PartisipasiAktivitas::class, 'duta_id');
+    }
+
+    public function pengguna(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\Core\Pengguna::class, 'duta_id');
+    }
+
     public function getFotoDutaUrlAttribute(): ?string
     {
         $val = $this->attributes['foto_url'] ?? null;
