@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Models\Berita;
-use App\Models\Inorga;
-use App\Models\Event;
-use App\Models\Sapras;
-use App\Models\PengaturanSitus;
+use App\Models\Content\Berita;
+use App\Models\Kormi\Inorga;
+use App\Models\Kormi\Event;
+use App\Models\Kormi\Sapras;
+use App\Models\Core\PengaturanSitus;
 
 /*
 |--------------------------------------------------------------------------

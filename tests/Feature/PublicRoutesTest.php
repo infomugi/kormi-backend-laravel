@@ -37,14 +37,14 @@ class PublicRoutesTest extends TestCase
 
     public function test_berita_detail_page_renders_successfully(): void
     {
-        $berita = \App\Models\Berita::where('status_publikasi', 'published')->first();
+        $berita = \App\Models\Content\Berita::where('status_publikasi', 'published')->first();
         if (! $berita) {
-            $kategori = \App\Models\KategoriBerita::firstOrCreate(
+            $kategori = \App\Models\Content\KategoriBerita::firstOrCreate(
                 ['slug' => 'kegiatan'],
                 ['nama_kategori' => 'Kegiatan', 'deskripsi' => 'Berita kegiatan']
             );
-            $penulis = \App\Models\Pengguna::first();
-            $berita = \App\Models\Berita::create([
+            $penulis = \App\Models\Core\Pengguna::first();
+            $berita = \App\Models\Content\Berita::create([
                 'judul' => 'Persiapan Menuju FORKAB 2026',
                 'slug' => 'persiapan-menuju-forkab-2026-rapat-koordinasi-wilayah',
                 'ringkasan' => 'Rapat koordinasi persiapan FORKAB',

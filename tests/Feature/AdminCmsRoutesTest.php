@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\Pengguna;
+use App\Models\Core\Pengguna;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -33,7 +33,7 @@ class AdminCmsRoutesTest extends TestCase
     {
         $regEmail = 'calon_admin_' . time() . '@kormibdg.id';
 
-        \Livewire\Livewire::test(\App\Livewire\Admin\Auth\Daftar::class)
+        \Livewire\Livewire::test(\App\Livewire\Backend\Auth\Daftar::class)
             ->set('nama_lengkap', 'Calon Pengguna KORMI')
             ->set('email', $regEmail)
             ->set('nomor_telepon', '08123456789')
@@ -50,7 +50,7 @@ class AdminCmsRoutesTest extends TestCase
         $this->assertFalse(\Illuminate\Support\Facades\Auth::check());
 
         // Attempting to login should be blocked because status_aktif is false
-        \Livewire\Livewire::test(\App\Livewire\Admin\Auth\Masuk::class)
+        \Livewire\Livewire::test(\App\Livewire\Backend\Auth\Masuk::class)
             ->set('email', $regEmail)
             ->set('kata_sandi', 'password123')
             ->call('login')
@@ -62,7 +62,7 @@ class AdminCmsRoutesTest extends TestCase
         $user->update(['status_aktif' => true]);
 
         // Now user can successfully login
-        \Livewire\Livewire::test(\App\Livewire\Admin\Auth\Masuk::class)
+        \Livewire\Livewire::test(\App\Livewire\Backend\Auth\Masuk::class)
             ->set('email', $regEmail)
             ->set('kata_sandi', 'password123')
             ->call('login')

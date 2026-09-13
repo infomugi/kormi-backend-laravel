@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\LogAktivitas;
+use App\Models\Core\LogAktivitas;
 use Illuminate\Database\Eloquent\Model;
 
 class AktivitasObserver

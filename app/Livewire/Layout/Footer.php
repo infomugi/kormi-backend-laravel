@@ -8,7 +8,7 @@ class Footer extends Component
 {
     public function render()
     {
-        $settings = \App\Models\PengaturanSitus::pluck('nilai_pengaturan', 'kunci_pengaturan')->toArray();
+        $settings = \App\Models\Core\PengaturanSitus::pluck('nilai_pengaturan', 'kunci_pengaturan')->toArray();
 
         return view('livewire.layout.footer', [
             'alamatKantor' => $settings['kontak_alamat'] ?? 'Komplek Stadion Si Jalak Harupat, Soreang, Kutawaringin, Kab. Bandung',

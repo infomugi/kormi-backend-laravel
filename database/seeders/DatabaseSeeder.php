@@ -3,19 +3,19 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Kecamatan;
-use App\Models\DesaKelurahan;
-use App\Models\DutaOlahraga;
-use App\Models\KomisiInorga;
-use App\Models\Inorga;
-use App\Models\KategoriUnduhan;
-use App\Models\Unduhan;
-use App\Models\KategoriBerita;
-use App\Models\Berita;
-use App\Models\GaleriAlbum;
-use App\Models\GaleriFoto;
-use App\Models\Peran;
-use App\Models\Pengguna;
+use App\Models\Master\Kecamatan;
+use App\Models\Master\DesaKelurahan;
+use App\Models\Kormi\DutaOlahraga;
+use App\Models\Kormi\KomisiInorga;
+use App\Models\Kormi\Inorga;
+use App\Models\Content\KategoriUnduhan;
+use App\Models\Content\Unduhan;
+use App\Models\Content\KategoriBerita;
+use App\Models\Content\Berita;
+use App\Models\Content\GaleriAlbum;
+use App\Models\Content\GaleriFoto;
+use App\Models\Core\Peran;
+use App\Models\Core\Pengguna;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -799,11 +799,11 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($saprasList as $sp) {
-            \App\Models\Sapras::create($sp);
+            \App\Models\Kormi\Sapras::create($sp);
         }
 
         // 15. Data SDI (Sumber Daya Insani) Program, Jadwal, & Peserta
-        $progPelatih = \App\Models\SdiProgram::create([
+        $progPelatih = \App\Models\Kormi\SdiProgram::create([
             'judul_program' => 'Pelatihan Pelatih & Instruktur Olahraga Tradisional',
             'slug' => 'pelatihan-pelatih-instruktur-olahraga-tradisional',
             'sasaran_peserta' => 'Pelatih Inorga & Guru Olahraga',
@@ -811,7 +811,7 @@ class DatabaseSeeder extends Seeder
             'jenis_sertifikasi' => 'Sertifikat Kompetensi KORMI',
         ]);
 
-        $progWasit = \App\Models\SdiProgram::create([
+        $progWasit = \App\Models\Kormi\SdiProgram::create([
             'judul_program' => 'Bimbingan Teknis Wasit & Juri FOTRADKAB',
             'slug' => 'bimtek-wasit-juri-fotradkab',
             'sasaran_peserta' => 'Wasit Cabang Olahraga Tradisional',
@@ -819,7 +819,7 @@ class DatabaseSeeder extends Seeder
             'jenis_sertifikasi' => 'Lisensi Wasit Daerah',
         ]);
 
-        $jadwal1 = \App\Models\SdiJadwal::create([
+        $jadwal1 = \App\Models\Kormi\SdiJadwal::create([
             'program_id' => $progPelatih->id,
             'nama_angkatan' => 'Angkatan I - Tahun 2026',
             'tanggal_mulai' => '2026-07-15',
@@ -830,7 +830,7 @@ class DatabaseSeeder extends Seeder
             'status_pendaftaran' => 'dibuka',
         ]);
 
-        $jadwal2 = \App\Models\SdiJadwal::create([
+        $jadwal2 = \App\Models\Kormi\SdiJadwal::create([
             'program_id' => $progWasit->id,
             'nama_angkatan' => 'Angkatan II - Tahun 2026',
             'tanggal_mulai' => '2026-08-20',
@@ -871,7 +871,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 16. Data APMO (Anugerah Prestasi Masyarakat Olahraga)
-        $apmo2025 = \App\Models\ApmoTahun::create([
+        $apmo2025 = \App\Models\Kormi\ApmoTahun::create([
             'tahun' => 2025,
             'tema_acara' => 'Bangkit Bersama Olahraga Rekreasi Menuju Kabupaten Bandung BEDAS',
             'tanggal_penganugerahan' => '2025-12-20',
@@ -879,7 +879,7 @@ class DatabaseSeeder extends Seeder
             'deskripsi' => 'Apresiasi tertinggi tahunan bagi insan olahraga masyarakat.',
         ]);
 
-        $apmo2024 = \App\Models\ApmoTahun::create([
+        $apmo2024 = \App\Models\Kormi\ApmoTahun::create([
             'tahun' => 2024,
             'tema_acara' => 'Kebugaran Masyarakat untuk Indonesia Maju',
             'tanggal_penganugerahan' => '2024-12-18',
@@ -923,7 +923,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($penerima2025 as $p) {
-            \App\Models\ApmoPenerima::create($p);
+            \App\Models\Kormi\ApmoPenerima::create($p);
         }
 
         // 17. Log Aktivitas

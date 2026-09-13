@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Pengguna;
-use App\Models\Peran;
+use App\Models\Core\Pengguna;
+use App\Models\Core\Peran;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -151,7 +151,7 @@ class TieredRoleAccessTest extends TestCase
         $this->actingAs($admin, 'web');
 
         // Test Livewire Peran Component
-        \Livewire\Livewire::test(\App\Livewire\Admin\Pengguna\PeranKelola::class)
+        \Livewire\Livewire::test(\App\Livewire\Backend\Pengguna\PeranKelola::class)
             ->call('bukaFormTambah')
             ->set('nama_peran', 'Staff Publikasi Wilayah')
             ->set('slug', 'staff-publikasi-wilayah')
