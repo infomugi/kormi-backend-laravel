@@ -52,9 +52,30 @@
             @endforeach
         </div>
 
-        <div class="flex items-center gap-5">
-            <button @click="$wire.toggleMenu()" class="lg:hidden p-2 text-slate-600" aria-label="Toggle menu">
-                <i data-lucide="menu" class="w-8 h-8"></i>
+        <div class="flex items-center gap-3">
+            @auth
+                <!-- User Account & Logout in Desktop Navbar -->
+                <div class="hidden lg:flex items-center gap-2 pl-3 border-l border-slate-200">
+                    <a href="{{ route('admin.dashboard') }}" wire:navigate class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 hover:bg-emerald-100 text-xs font-black uppercase tracking-wider transition-colors">
+                        <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 text-emerald-600"></i>
+                        <span>CMS</span>
+                    </a>
+                    <form action="{{ route('admin.keluar') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" title="Keluar / Logout" class="inline-flex items-center justify-center p-1.5 rounded-full text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+                </div>
+            @else
+                <a href="{{ route('login') }}" class="hidden lg:inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black uppercase tracking-wider shadow-sm hover:shadow-md transition-all active:scale-95">
+                    <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                    <span>Masuk</span>
+                </a>
+            @endauth
+
+            <button @click="$wire.toggleMenu()" class="lg:hidden p-2 text-slate-600 cursor-pointer" aria-label="Toggle menu">
+                <i data-lucide="menu" class="w-7 h-7"></i>
             </button>
         </div>
     </div>
@@ -109,5 +130,40 @@
                 </div>
             @endforeach
         </div>
+
+        @auth
+            <!-- Mobile Auth Actions -->
+            <div class="mt-8 pt-6 border-t border-slate-100 space-y-3">
+                <div class="flex items-center gap-3 px-1 py-1">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm uppercase">
+                        {{ substr(auth()->user()->name ?? 'U', 0, 2) }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold text-slate-800 truncate">{{ auth()->user()->name }}</p>
+                        <p class="text-[11px] font-semibold text-slate-400 truncate">{{ auth()->user()->email }}</p>
+                    </div>
+                </div>
+
+                <a href="{{ route('admin.dashboard') }}" wire:navigate @click="$wire.toggleMenu()" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 font-bold text-sm transition-colors">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-emerald-600"></i>
+                    <span>Buka Panel CMS</span>
+                </a>
+
+                <form action="{{ route('admin.keluar') }}" method="POST" class="w-full">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-sm transition-colors cursor-pointer">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span>Keluar (Logout)</span>
+                    </button>
+                </form>
+            </div>
+        @else
+            <div class="mt-8 pt-6 border-t border-slate-100">
+                <a href="{{ route('login') }}" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm shadow-sm transition-all">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                    <span>Masuk (Login)</span>
+                </a>
+            </div>
+        @endauth
     </div>
 </nav>

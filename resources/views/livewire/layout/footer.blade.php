@@ -1,4 +1,4 @@
-<footer id="footer" class="bg-slate-900 text-slate-300 pt-16 pb-10 relative overflow-hidden border-t border-slate-800">
+<footer id="footer" class="{{ auth()->check() ? 'hidden md:block' : '' }} bg-slate-900 text-slate-300 pt-16 pb-10 relative overflow-hidden border-t border-slate-800">
     <!-- Top accent bar -->
     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-lime-400"></div>
     
@@ -82,12 +82,27 @@
             <p class="text-[11px] font-semibold text-slate-500">
                 &copy; {{ date('Y') }} <span class="text-slate-400 font-bold">KORMI Kabupaten Bandung</span>. Hak cipta dilindungi.
             </p>
-            <div class="flex items-center gap-4 text-[11px] text-slate-500">
+            <div class="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4 text-[11px] text-slate-500">
                 <a href="{{ route('visimisi') }}" wire:navigate class="hover:text-slate-400 transition-colors">Tentang Kami</a>
                 <span>•</span>
                 <a href="{{ route('kontak') }}" wire:navigate class="hover:text-slate-400 transition-colors">Kontak</a>
                 <span>•</span>
-                <a href="{{ route('login') }}" class="text-emerald-500 hover:text-emerald-400 font-bold transition-colors">Portal Admin</a>
+                @auth
+                    <a href="{{ route('admin.dashboard') }}" wire:navigate class="text-emerald-400 hover:text-emerald-300 font-bold transition-colors flex items-center gap-1">
+                        <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <span>•</span>
+                    <form action="{{ route('admin.keluar') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="text-rose-400 hover:text-rose-300 font-bold transition-colors cursor-pointer flex items-center gap-1">
+                            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                            <span>Keluar</span>
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="text-emerald-500 hover:text-emerald-400 font-bold transition-colors">Portal Admin</a>
+                @endauth
             </div>
         </div>
     </div>
