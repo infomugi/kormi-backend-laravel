@@ -94,10 +94,15 @@ class Masuk extends Component
             }
 
             session()->regenerate();
-            return $this->redirectIntended(default: route('admin.dashboard'), navigate: false);
+            return $this->redirectIntended(default: $this->tujuanSetelahMasuk($user), navigate: false);
         } catch (\Throwable $e) {
             $this->addError('email', 'Gagal memproses autentikasi: ' . $e->getMessage());
         }
+    }
+
+    protected function tujuanSetelahMasuk(\App\Models\Core\Pengguna $user): string
+    {
+        return route('admin.dashboard');
     }
 
     public function render()

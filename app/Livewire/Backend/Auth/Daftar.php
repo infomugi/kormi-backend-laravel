@@ -74,10 +74,15 @@ class Daftar extends Component
             ]);
 
             session()->flash('status', 'Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan (approval) dari Administrator KORMI sebelum dapat digunakan untuk masuk.');
-            return $this->redirect(route('login'), navigate: false);
+            return $this->redirect($this->tujuanSetelahDaftar(), navigate: false);
         } catch (\Throwable $e) {
             $this->addError('email', 'Gagal mendaftarkan akun baru: ' . $e->getMessage());
         }
+    }
+
+    protected function tujuanSetelahDaftar(): string
+    {
+        return route('login');
     }
 
     public function render()

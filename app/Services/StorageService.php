@@ -46,9 +46,20 @@ class StorageService
             throw new \InvalidArgumentException('Format berkas gambar tidak valid atau tidak diizinkan. Hanya diperbolehkan JPG, PNG, WEBP, dan GIF.');
         }
 
-        // 2. Anti-Shell / Anti-Backdoor Scanner (Cek Payload PHP/Executable di dalam konten gambar)
+        // 2. Pastikan struktur gambar benar-benar valid (bukan berkas rusak / header palsu)
+        $infoGambar = @getimagesize($realPath);
+        $tipeGambarValid = [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP, IMAGETYPE_GIF];
+
+        if ($infoGambar === false || !in_array($infoGambar[2] ?? null, $tipeGambarValid, true)) {
+            throw new \InvalidArgumentException('Berkas gambar rusak atau strukturnya tidak valid.');
+        }
+
+        // 3. Anti-Shell / Anti-Backdoor Scanner (hanya tag eksekusi PHP yang berbahaya).
+        // Pola seperti eval()/system()/<script>/<% %> sengaja tidak dipakai untuk gambar karena
+        // data biner JPEG/PNG/WEBP yang terkompresi dapat memuat urutan byte acak yang menyerupai
+        // pola tersebut sehingga foto normal ikut tertolak (false positive).
         $content = file_get_contents($realPath);
-        if ($this->containsExecutablePayload($content)) {
+        if ($this->containsPhpPayload($content)) {
             throw new \InvalidArgumentException('Berkas ditolak karena mengandung pola kode berbahaya / skrip tidak sah.');
         }
 
@@ -97,7 +108,7 @@ class StorageService
         }
 
         $content = file_get_contents($realPath);
-        if ($this->containsExecutablePayload($content)) {
+        if ($this->containsPhpPayload($content)) {
             throw new \InvalidArgumentException('Berkas ditolak karena mengandung kode berbahaya.');
         }
 
@@ -115,28 +126,21 @@ class StorageService
     }
 
     /**
-     * Periksa apakah konten berkas mengandung payload shell/backdoor PHP/ASP/JSP/CGI atau tag eksekusi berbahaya.
+     * Periksa apakah konten berkas mengandung tag pembuka PHP (indikator polyglot shell/backdoor).
+     *
+     * Sengaja hanya memindai tag PHP, bukan nama fungsi (eval/system/exec) atau pola `<% %>`,
+     * karena berkas biner yang sah (JPEG/PNG/WEBP/PDF/ZIP) dapat memuat urutan byte acak yang
+     * menyerupai pola tersebut dan menyebabkan penolakan palsu pada berkas normal.
      */
-    protected function containsExecutablePayload(string $content): bool
+    protected function containsPhpPayload(string $content): bool
     {
-        // Pola berbahaya umum pada polyglot image, webshell, backdoor
-        $suspiciousPatterns = [
+        $polaTagPhp = [
             '/<\?php/i',
             '/<\?=/i',
-            '/<script[\s\S]*?>/i',
-            '/eval\s*\(/i',
-            '/base64_decode\s*\(/i',
-            '/system\s*\(/i',
-            '/exec\s*\(/i',
-            '/shell_exec\s*\(/i',
-            '/passthru\s*\(/i',
-            '/proc_open\s*\(/i',
-            '/popen\s*\(/i',
             '/__halt_compiler\s*\(/i',
-            '/<%.*?%>/s', // ASP tags
         ];
 
-        foreach ($suspiciousPatterns as $pattern) {
+        foreach ($polaTagPhp as $pattern) {
             if (preg_match($pattern, $content)) {
                 return true;
             }

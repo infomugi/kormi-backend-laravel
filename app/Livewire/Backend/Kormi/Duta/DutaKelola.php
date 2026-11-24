@@ -2,10 +2,13 @@
 
 namespace App\Livewire\Backend\Kormi\Duta;
 
-use App\Models\Master\DesaKelurahan;
+use App\Models\Core\Pengguna;
+use App\Models\Core\Peran;
 use App\Models\Kormi\DutaOlahraga;
+use App\Models\Master\DesaKelurahan;
 use App\Models\Master\Kecamatan;
 use App\Services\StorageService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -27,6 +30,7 @@ class DutaKelola extends Component
     public string $kategoriDipilih = 'Semua';
     public string $statusDipilih = 'Semua';
     public string $unggulanDipilih = 'Semua';
+    public string $pendaftaranDipilih = 'Semua';
     public string $sortField = 'nama_lengkap';
     public string $sortDirection = 'asc';
     public int $perPage = 12;
@@ -111,6 +115,7 @@ class DutaKelola extends Component
     public function updatedKategoriDipilih(): void   { $this->resetPage(); $this->resetSelection(); }
     public function updatedStatusDipilih(): void     { $this->resetPage(); $this->resetSelection(); }
     public function updatedUnggulanDipilih(): void   { $this->resetPage(); $this->resetSelection(); }
+    public function updatedPendaftaranDipilih(): void { $this->resetPage(); $this->resetSelection(); }
     public function updatedPerPage(): void           { $this->resetPage(); }
 
     public function sortBy(string $field): void
@@ -132,6 +137,7 @@ class DutaKelola extends Component
             ->when($this->kategoriDipilih !== 'Semua', fn($q) => $q->where('kategori_duta', $this->kategoriDipilih))
             ->when($this->statusDipilih !== 'Semua', fn($q) => $q->where('status_aktif', $this->statusDipilih === 'aktif'))
             ->when($this->unggulanDipilih !== 'Semua', fn($q) => $q->where('status_unggulan', $this->unggulanDipilih === 'ya'))
+            ->when($this->pendaftaranDipilih !== 'Semua', fn($q) => $q->where('status_pendaftaran', $this->pendaftaranDipilih))
             ->when($this->cari, fn($q) => $q->where(function ($sub) {
                 $sub->where('nama_lengkap', 'like', '%' . $this->cari . '%')
                     ->orWhere('gelar_prestasi', 'like', '%' . $this->cari . '%')
@@ -161,7 +167,13 @@ class DutaKelola extends Component
 
     public function resetSemuaFilter(): void
     {
-        $this->reset(['cari', 'kecamatanDipilih', 'tahunDipilih', 'kategoriDipilih', 'statusDipilih', 'unggulanDipilih']);
+        $this->reset(['cari', 'kecamatanDipilih', 'tahunDipilih', 'kategoriDipilih', 'statusDipilih', 'unggulanDipilih', 'pendaftaranDipilih']);
+        $this->kecamatanDipilih = 'Semua';
+        $this->tahunDipilih = 'Semua';
+        $this->kategoriDipilih = 'Semua';
+        $this->statusDipilih = 'Semua';
+        $this->unggulanDipilih = 'Semua';
+        $this->pendaftaranDipilih = 'Semua';
         $this->resetPage();
         $this->resetSelection();
     }
@@ -294,11 +306,175 @@ class DutaKelola extends Component
     public function toggleAktif(string $id): void
     {
         $d = DutaOlahraga::findOrFail($id);
+
+        if ($d->sedangMenunggu()) {
+            session()->flash('error', 'Setujui pendaftaran terlebih dahulu sebelum mengubah status keaktifan duta.');
+            return;
+        }
+
         $d->status_aktif = !$d->status_aktif;
         $d->save();
 
         $status = $d->status_aktif ? 'Aktif' : 'Non-Aktif';
         session()->flash('pesan', "Status keaktifan {$d->nama_lengkap} diubah menjadi {$status}.");
+    }
+
+    // ==========================================
+    // VERIFIKASI PENDAFTARAN MANDIRI
+    // ==========================================
+
+    /**
+     * Otorisasi level komponen untuk aksi verifikasi pendaftaran.
+     */
+    protected function pastikanPengelolaDuta(): void
+    {
+        abort_unless(auth()->check() && auth()->user()->hasRole('super-admin', 'admin-korcam'), 403);
+    }
+
+    /**
+     * Ambil akun pemilik pendaftaran (deferred linking saat submit).
+     */
+    protected function akunPendaftarDuta(DutaOlahraga $duta): ?Pengguna
+    {
+        return $duta->akunPendaftar
+            ?? Pengguna::where('duta_id', $duta->id)->first();
+    }
+
+    /**
+     * Peran duta-olahraga, dipakai saat menautkan akun pendaftar.
+     */
+    protected function peranDuta(): Peran
+    {
+        return Peran::firstOrCreate(
+            ['slug' => 'duta-olahraga'],
+            [
+                'nama_peran' => 'Duta Olahraga Desa',
+                'deskripsi'  => 'Duta Olahraga Desa/Kelurahan',
+            ]
+        );
+    }
+
+    public function setujuiPendaftaran(string $id): void
+    {
+        $this->pastikanPengelolaDuta();
+
+        $duta = DutaOlahraga::find($id);
+
+        if (! $duta) {
+            session()->flash('error', 'Data pendaftaran duta tidak ditemukan.');
+            return;
+        }
+
+        if (! $duta->sedangMenunggu()) {
+            session()->flash('error', 'Pendaftaran "' . $duta->nama_lengkap . '" sudah diproses sebelumnya.');
+            return;
+        }
+
+        $adminId = auth()->id();
+
+        DB::transaction(function () use ($duta, $adminId) {
+            $duta->update([
+                'status_pendaftaran' => DutaOlahraga::STATUS_DISETUJUI,
+                'status_aktif'       => true,
+                'disetujui_pada'     => now(),
+                'disetujui_oleh'     => $adminId,
+                'catatan_verifikasi' => null,
+            ]);
+
+            // Penautan akun ditunda sampai approval: aktifkan & tautkan akun pendaftar.
+            $akun = $this->akunPendaftarDuta($duta);
+
+            if (! $akun) {
+                return;
+            }
+
+            $dataAkun = [
+                'duta_id'        => $duta->id,
+                'status_aktif'   => true,
+                'disetujui_pada' => now(),
+                'disetujui_oleh' => $adminId,
+            ];
+
+            // Hanya promotekan peran warga/pegiat; jangan turunkan peran admin.
+            $slugPeran = $akun->peran?->slug;
+
+            if ($akun->peran_id === null || $slugPeran === 'pegiat-olahraga') {
+                $dataAkun['peran_id'] = $this->peranDuta()->id;
+            }
+
+            $akun->update($dataAkun);
+        });
+
+        session()->flash('pesan', 'Pendaftaran duta "' . $duta->nama_lengkap . '" berhasil disetujui dan akun terkait telah diaktifkan.');
+    }
+
+    public function tolakPendaftaran(string $id): void
+    {
+        $this->pastikanPengelolaDuta();
+
+        $duta = DutaOlahraga::find($id);
+
+        if (! $duta) {
+            session()->flash('error', 'Data pendaftaran duta tidak ditemukan.');
+            return;
+        }
+
+        if (! $duta->sedangMenunggu()) {
+            session()->flash('error', 'Pendaftaran "' . $duta->nama_lengkap . '" sudah diproses sebelumnya.');
+            return;
+        }
+
+        $akunDihapus = false;
+
+        DB::transaction(function () use ($duta, &$akunDihapus) {
+            $duta->update([
+                'status_pendaftaran' => DutaOlahraga::STATUS_DITOLAK,
+                'status_aktif'       => false,
+                'catatan_verifikasi' => 'Ditolak oleh administrator',
+                'disetujui_pada'     => null,
+                'disetujui_oleh'     => null,
+            ]);
+
+            $akun = $this->akunPendaftarDuta($duta);
+
+            if (! $akun) {
+                return;
+            }
+
+            $otomatisDibuat = ! $akun->status_aktif && $akun->disetujui_pada === null;
+
+            if ($otomatisDibuat) {
+                // Akun hasil pendaftaran tamu: hapus permanen agar email bebas
+                // dipakai untuk mendaftar ulang.
+                $duta->update(['pengguna_id' => null]);
+                $akun->forceDelete();
+                $akunDihapus = true;
+
+                return;
+            }
+
+            // Akun yang sudah aktif sebelum mendaftar: cukup lepaskan tautan.
+            $dataAkun = ['duta_id' => null];
+
+            if ($akun->peran?->slug === 'duta-olahraga') {
+                $dataAkun['peran_id'] = Peran::firstOrCreate(
+                    ['slug' => 'pegiat-olahraga'],
+                    [
+                        'nama_peran' => 'Masyarakat / Pegiat Olahraga',
+                        'deskripsi'  => 'Masyarakat pencatat aktivitas olahraga mandiri',
+                    ]
+                )->id;
+            }
+
+            $akun->update($dataAkun);
+        });
+
+        $pesan = 'Pendaftaran duta "' . $duta->nama_lengkap . '" ditolak dan data tidak akan tampil di direktori publik. ';
+        $pesan .= $akunDihapus
+            ? 'Akun yang dibuat otomatis telah dihapus sehingga email tersebut dapat digunakan untuk mendaftar ulang.'
+            : 'Tautan akun pendaftar telah dilepaskan sehingga dapat mendaftar ulang.';
+
+        session()->flash('pesan', $pesan);
     }
 
     public function duplikatDuta(string $id): void
@@ -309,6 +485,11 @@ class DutaKelola extends Component
         $duplikat->id = (string) Str::uuid();
         $duplikat->nama_lengkap = '[Salinan] ' . $sumber->nama_lengkap;
         $duplikat->status_unggulan = false;
+        $duplikat->status_pendaftaran = DutaOlahraga::STATUS_DISETUJUI;
+        $duplikat->pengguna_id = null;
+        $duplikat->disetujui_pada = now();
+        $duplikat->disetujui_oleh = auth()->id();
+        $duplikat->catatan_verifikasi = null;
         $duplikat->save();
 
         session()->flash('pesan', "Data Duta \"{$sumber->nama_lengkap}\" berhasil disalin!");
@@ -334,12 +515,33 @@ class DutaKelola extends Component
     {
         if (empty($this->selectedDuta)) return;
 
-        DutaOlahraga::whereIn('id', $this->selectedDuta)->update([
+        // Pendaftaran yang masih menunggu tidak boleh diubah keaktifannya
+        // lewat aksi massal (harus disetujui terlebih dahulu).
+        $idsEligible = DutaOlahraga::whereIn('id', $this->selectedDuta)
+            ->where('status_pendaftaran', '!=', DutaOlahraga::STATUS_MENUNGGU)
+            ->pluck('id')
+            ->all();
+
+        if (empty($idsEligible)) {
+            session()->flash('error', 'Pendaftaran yang masih menunggu harus disetujui terlebih dahulu.');
+            return;
+        }
+
+        DutaOlahraga::whereIn('id', $idsEligible)->update([
             'status_aktif' => $status,
         ]);
 
         $label = $status ? 'diaktifkan' : 'dinonaktifkan';
-        session()->flash('pesan', count($this->selectedDuta) . " data duta berhasil {$label}!");
+        $jumlah = count($idsEligible);
+        $dilewati = count($this->selectedDuta) - $jumlah;
+
+        $pesan = "{$jumlah} data duta berhasil {$label}!";
+
+        if ($dilewati > 0) {
+            $pesan .= " {$dilewati} pendaftaran yang masih menunggu dilewati dan harus disetujui terlebih dahulu.";
+        }
+
+        session()->flash('pesan', $pesan);
         $this->resetSelection();
     }
 
@@ -427,6 +629,10 @@ class DutaKelola extends Component
             session()->flash('pesan', 'Data Duta Olahraga ' . $this->nama_lengkap . ' berhasil diperbarui!');
         } else {
             $data['id'] = (string) Str::uuid();
+            // Data yang dibuat langsung oleh admin dianggap sudah diverifikasi.
+            $data['status_pendaftaran'] = DutaOlahraga::STATUS_DISETUJUI;
+            $data['disetujui_pada'] = now();
+            $data['disetujui_oleh'] = auth()->id();
             DutaOlahraga::create($data);
             session()->flash('pesan', 'Duta Olahraga baru berhasil ditambahkan!');
         }
@@ -504,6 +710,7 @@ class DutaKelola extends Component
         $totalKecamatanTerwakili = DutaOlahraga::distinct('kecamatan_id')->count('kecamatan_id');
         $dutaTahunIni = DutaOlahraga::where('tahun_pemilihan', 2026)->count();
         $dutaUnggulanCount = DutaOlahraga::where('status_unggulan', true)->count();
+        $pendaftaranMenunggu = DutaOlahraga::menunggu()->count();
         $tahunList = DutaOlahraga::distinct()->orderByDesc('tahun_pemilihan')->pluck('tahun_pemilihan');
 
         return view('livewire.backend.kormi.duta.duta-kelola', [
@@ -514,6 +721,7 @@ class DutaKelola extends Component
             'totalKecamatanTerwakili' => $totalKecamatanTerwakili,
             'dutaTahunIni'            => $dutaTahunIni,
             'dutaUnggulanCount'       => $dutaUnggulanCount,
+            'pendaftaranMenunggu'     => $pendaftaranMenunggu,
             'tahunList'               => $tahunList,
         ]);
     }

@@ -19,9 +19,17 @@ class DutaOlahragaIndex extends Component
 
     public function render()
     {
+        return view('livewire.frontend.kormi.tentang.duta-olahraga-index', $this->dataTampilan())
+            ->layout('components.layouts.app', ['title' => 'Duta Olahraga - KORMI Kabupaten Bandung']);
+    }
+
+    protected function dataTampilan(): array
+    {
         $kecamatanList = Kecamatan::orderBy('nama_kecamatan')->get();
-        
+
         $dutaList = DutaOlahraga::with(['kecamatan', 'desaKelurahan'])
+            ->where('status_aktif', true)
+            ->where('status_pendaftaran', DutaOlahraga::STATUS_DISETUJUI)
             ->when($this->kecamatanDipilih !== '', fn($q) => $q->where('kecamatan_id', $this->kecamatanDipilih))
             ->when($this->cari !== '', function ($q) {
                 $q->where(function ($sub) {
@@ -33,9 +41,9 @@ class DutaOlahragaIndex extends Component
             ->orderBy('nama_lengkap')
             ->paginate(12);
 
-        return view('livewire.frontend.kormi.tentang.duta-olahraga-index', [
+        return [
             'kecamatanList' => $kecamatanList,
             'dutaList' => $dutaList,
-        ])->layout('components.layouts.app', ['title' => 'Duta Olahraga - KORMI Kabupaten Bandung']);
+        ];
     }
 }

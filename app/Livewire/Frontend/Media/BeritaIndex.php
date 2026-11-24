@@ -31,7 +31,7 @@ class BeritaIndex extends Component
         $this->resetPage();
     }
 
-    public function render()
+    protected function dataTampilan(): array
     {
         $kategoriList = KategoriBerita::orderBy('nama_kategori')->get();
 
@@ -58,10 +58,16 @@ class BeritaIndex extends Component
             ->where('status_unggulan', true)
             ->first() ?? Berita::with('kategori')->where('status_publikasi', 'published')->first();
 
-        return view('livewire.frontend.media.berita-index', [
+        return [
             'kategoriList' => $kategoriList,
             'beritaList' => $beritaList,
             'beritaUtama' => $beritaUtama,
-        ])->layout('components.layouts.app');
+        ];
+    }
+
+    public function render()
+    {
+        return view('livewire.frontend.media.berita-index', $this->dataTampilan())
+            ->layout('components.layouts.app');
     }
 }

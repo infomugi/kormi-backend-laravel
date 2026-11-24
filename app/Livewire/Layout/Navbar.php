@@ -61,6 +61,7 @@ class Navbar extends Component
                 ['name' => 'Keolahragaan', 'sub' => [
                     ['name' => 'Direktori Inorga (Induk Olahraga)', 'link' => route('inorga'), 'external' => false],
                     ['name' => 'Duta Olahraga Masyarakat', 'link' => route('dutaolahraga'), 'external' => false],
+                    ['name' => 'Pendaftaran Duta Olahraga', 'link' => route('dutaolahraga.daftar'), 'external' => false],
                     ['name' => 'Pelatihan & Sertifikasi SDI', 'link' => route('sdi'), 'external' => false],
                     ['name' => 'Sarana & Prasarana (Sapras)', 'link' => route('sapras'), 'external' => false],
                 ]],

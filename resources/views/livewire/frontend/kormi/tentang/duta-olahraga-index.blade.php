@@ -22,6 +22,25 @@
             <p class="text-xs sm:text-sm text-slate-300 font-medium max-w-xl mx-auto leading-relaxed opacity-85 mt-2">
                 Mengenal sosok penggerak, motivator, dan pegiat olahraga masyarakat di 280 Desa dan Kelurahan dari 31 Kecamatan se-Kabupaten Bandung.
             </p>
+
+            {{-- CTA Pendaftaran Duta --}}
+            <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+                <a
+                    href="{{ route('dutaolahraga.daftar') }}"
+                    wire:navigate
+                    class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 active:scale-98 text-emerald-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-500/25 transition-all"
+                >
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    <span>Daftar Menjadi Duta</span>
+                </a>
+                <a
+                    href="#direktori-duta"
+                    class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider border border-white/20 backdrop-blur-md transition-all"
+                >
+                    <i data-lucide="users" class="w-4 h-4 text-emerald-300"></i>
+                    <span>Lihat Direktori Duta</span>
+                </a>
+            </div>
         </div>
 
         <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
@@ -75,7 +94,7 @@
     </section>
 
     {{-- 3. CONTENT DUTA OLAHRAGA GRID --}}
-    <section class="py-12 bg-slate-50/50 min-h-[50vh]">
+    <section id="direktori-duta" class="py-12 bg-slate-50/50 min-h-[50vh]">
         <div class="container mx-auto px-6 max-w-7xl">
             {{-- Result Indicator --}}
             <div class="flex items-center justify-between gap-4 mb-6">

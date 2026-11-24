@@ -54,13 +54,13 @@ if (app()->environment('local', 'development')) {
 }
 
 Route::prefix('admin')->group(function () {
-    Route::get('/masuk', Masuk::class)->name('login');
+    Route::get('/masuk', Masuk::class)->name('admin.masuk');
     Route::get('/login', Masuk::class);
-    Route::get('/daftar', Daftar::class)->name('admin.daftar');
-    Route::get('/register', Daftar::class);
-    Route::get('/lupa-password', LupaPassword::class)->name('admin.lupa-password');
-    Route::get('/forgot-password', LupaPassword::class);
-    Route::get('/reset-password', LupaPassword::class);
+    Route::get('/daftar', Daftar::class)->name('admin.daftar')->middleware('arahkan.mobile:mobile.daftar');
+    Route::get('/register', Daftar::class)->middleware('arahkan.mobile:mobile.daftar');
+    Route::get('/lupa-password', LupaPassword::class)->name('admin.lupa-password')->middleware('arahkan.mobile:mobile.lupa-password');
+    Route::get('/forgot-password', LupaPassword::class)->middleware('arahkan.mobile:mobile.lupa-password');
+    Route::get('/reset-password', LupaPassword::class)->middleware('arahkan.mobile:mobile.lupa-password');
     
     Route::post('/masuk', function () {
         request()->validate([

@@ -4,7 +4,9 @@ namespace App\Livewire\Backend\Pengguna;
 
 use App\Models\Core\Pengguna;
 use App\Models\Core\Peran;
+use App\Models\Kormi\DutaOlahraga;
 use App\Services\StorageService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
@@ -412,14 +414,66 @@ class PenggunaKelola extends Component
         $this->selectedUsers = [];
     }
 
+    /**
+     * Setujui akun sekaligus sinkronkan pendaftaran Duta Olahraga yang masih menunggu.
+     *
+     * Penautan akun (duta_id + peran) dilakukan di sini karena alur pendaftaran
+     * publik menunda penautan sampai approval administrator.
+     */
+    protected function setujuiAkunPengguna(Pengguna $user, ?string $adminId): void
+    {
+        $duta = DutaOlahraga::where('pengguna_id', $user->id)
+            ->where('status_pendaftaran', DutaOlahraga::STATUS_MENUNGGU)
+            ->first();
+
+        if (! $duta && ! empty($user->duta_id)) {
+            $duta = DutaOlahraga::where('id', $user->duta_id)
+                ->where('status_pendaftaran', DutaOlahraga::STATUS_MENUNGGU)
+                ->first();
+        }
+
+        $dataAkun = [
+            'status_aktif'   => true,
+            'disetujui_pada' => now(),
+            'disetujui_oleh' => $adminId,
+        ];
+
+        if ($duta) {
+            $duta->update([
+                'status_pendaftaran' => DutaOlahraga::STATUS_DISETUJUI,
+                'status_aktif'       => true,
+                'disetujui_pada'     => now(),
+                'disetujui_oleh'     => $adminId,
+                'catatan_verifikasi' => null,
+            ]);
+
+            $dataAkun['duta_id'] = $duta->id;
+
+            // Hanya promosikan peran warga/pegiat agar peran admin tidak turun.
+            $slugPeran = $user->peran?->slug;
+
+            if ($user->peran_id === null || $slugPeran === 'pegiat-olahraga') {
+                $dataAkun['peran_id'] = Peran::firstOrCreate(
+                    ['slug' => 'duta-olahraga'],
+                    [
+                        'nama_peran' => 'Duta Olahraga Desa',
+                        'deskripsi'  => 'Duta Olahraga Desa/Kelurahan',
+                    ]
+                )->id;
+            }
+        }
+
+        $user->update($dataAkun);
+    }
+
     public function setujuiAkun(string $id): void
     {
         $user = Pengguna::findOrFail($id);
-        $user->update([
-            'status_aktif' => true,
-            'disetujui_pada' => now(),
-            'disetujui_oleh' => auth()->id(),
-        ]);
+        $adminId = auth()->id();
+
+        DB::transaction(function () use ($user, $adminId) {
+            $this->setujuiAkunPengguna($user, $adminId);
+        });
 
         session()->flash('pesan', 'Akun "' . $user->nama_lengkap . '" berhasil disetujui dan diaktifkan!');
     }
@@ -431,13 +485,16 @@ class PenggunaKelola extends Component
             return;
         }
 
-        $count = Pengguna::whereIn('id', (array) $target)->update([
-            'status_aktif' => true,
-            'disetujui_pada' => now(),
-            'disetujui_oleh' => auth()->id(),
-        ]);
+        $adminId = auth()->id();
+        $users = Pengguna::whereIn('id', (array) $target)->get();
 
-        session()->flash('pesan', $count . ' akun pengguna berhasil disetujui dan diaktifkan secara massal!');
+        DB::transaction(function () use ($users, $adminId) {
+            foreach ($users as $user) {
+                $this->setujuiAkunPengguna($user, $adminId);
+            }
+        });
+
+        session()->flash('pesan', $users->count() . ' akun pengguna berhasil disetujui dan diaktifkan secara massal!');
         $this->selectedUsers = [];
     }
 

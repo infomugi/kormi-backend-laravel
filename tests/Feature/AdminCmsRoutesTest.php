@@ -12,7 +12,7 @@ class AdminCmsRoutesTest extends TestCase
     public function test_guest_is_redirected_to_login_when_accessing_admin_pages(): void
     {
         $response = $this->get('/admin');
-        $response->assertRedirect('/admin/masuk');
+        $response->assertRedirect('/login');
     }
 
     public function test_login_page_renders_successfully(): void
@@ -42,7 +42,7 @@ class AdminCmsRoutesTest extends TestCase
             ->set('setuju_syarat', true)
             ->call('daftar')
             ->assertHasNoErrors()
-            ->assertRedirect('/admin/masuk');
+            ->assertRedirect('/login');
 
         $user = Pengguna::where('email', $regEmail)->first();
         $this->assertNotNull($user);

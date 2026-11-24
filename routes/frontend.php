@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 // Livewire Frontend
+use App\Livewire\Frontend\Auth\Masuk;
 use App\Livewire\Frontend\Beranda;
 use App\Livewire\Frontend\Kontak;
 use App\Livewire\Frontend\Kormi\Tentang\Sejarah;
@@ -10,6 +11,7 @@ use App\Livewire\Frontend\Kormi\Tentang\VisiMisi;
 use App\Livewire\Frontend\Kormi\Tentang\Pengurus;
 use App\Livewire\Frontend\Kormi\Tentang\Kordik;
 use App\Livewire\Frontend\Kormi\Tentang\DutaOlahragaIndex;
+use App\Livewire\Frontend\Kormi\Tentang\DutaOlahragaDaftar;
 use App\Livewire\Frontend\Kormi\Tentang\Proker;
 use App\Livewire\Frontend\Kormi\Inorga\InorgaIndex;
 use App\Livewire\Frontend\Kormi\Event\Fotradkab;
@@ -30,6 +32,24 @@ use App\Livewire\Frontend\Unduhan\UnduhanIndex;
 
 Route::get('/', Beranda::class)->name('beranda');
 
+// Autentikasi publik (kloning tampilan /admin/masuk)
+Route::get('/login', Masuk::class)->name('login')->middleware('arahkan.mobile:mobile.login');
+
+// Halaman versi mobile (tanpa navbar/footer situs)
+Route::prefix('mobile')->group(function () {
+    Route::get('/beranda', \App\Livewire\Mobile\Beranda::class)->name('mobile.beranda');
+    Route::get('/direktori-duta', \App\Livewire\Mobile\DirektoriDuta::class)->name('mobile.direktori-duta');
+    Route::get('/login', \App\Livewire\Mobile\Masuk::class)->name('mobile.login');
+    Route::get('/lupa-password', \App\Livewire\Mobile\LupaPassword::class)->name('mobile.lupa-password');
+    Route::get('/daftar', \App\Livewire\Mobile\Daftar::class)->name('mobile.daftar');
+    Route::get('/daftar-duta', \App\Livewire\Mobile\DaftarDuta::class)->name('mobile.daftar-duta');
+    Route::get('/berita', \App\Livewire\Mobile\Berita::class)->name('mobile.berita');
+    Route::get('/berita/{slug}', \App\Livewire\Mobile\BeritaDetail::class)->name('mobile.berita.detail');
+    Route::get('/layanan', \App\Livewire\Mobile\Layanan::class)->name('mobile.layanan')->middleware('auth');
+    Route::get('/profil', \App\Livewire\Mobile\Profil::class)->name('mobile.profil')->middleware('auth');
+    Route::get('/dashboard', \App\Livewire\Mobile\Dashboard::class)->name('mobile.dashboard')->middleware('auth');
+});
+
 // 1. Tentang Kami
 Route::prefix('tentang')->group(function () {
     Route::get('/sejarah', Sejarah::class)->name('sejarah');
@@ -49,6 +69,13 @@ Route::get('/kordikecamatan', Kordik::class);
 Route::get('/koordinator-kecamatan', Kordik::class);
 Route::get('/duta-olahraga', DutaOlahragaIndex::class);
 Route::get('/dutaolahraga', DutaOlahragaIndex::class);
+
+// Pendaftaran Duta Olahraga (publik, wizard multistep)
+Route::middleware(['arahkan.mobile:mobile.daftar-duta', 'throttle:30,1'])->group(function () {
+    Route::get('/duta-olahraga/daftar', DutaOlahragaDaftar::class)->name('dutaolahraga.daftar');
+    Route::get('/tentang/duta-olahraga/daftar', DutaOlahragaDaftar::class);
+    Route::get('/daftar-duta', DutaOlahragaDaftar::class);
+});
 Route::get('/proker', Proker::class);
 Route::get('/program-kerja', Proker::class);
 

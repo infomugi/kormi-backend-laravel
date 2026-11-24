@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
         $middleware->alias([
             'peran' => \App\Http\Middleware\CekPeran::class,
+            'arahkan.mobile' => \App\Http\Middleware\ArahkanPerangkatMobile::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

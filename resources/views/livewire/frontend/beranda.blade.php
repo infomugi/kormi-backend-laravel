@@ -583,33 +583,58 @@
     <!-- ========================================================== -->
     <!-- 10. MODUL KONTAK & KEMITRAAN KOMUNITAS                     -->
     <!-- ========================================================== -->
-    <section class="py-16 bg-slate-50 relative overflow-hidden">
-        <div class="container mx-auto px-6 max-w-5xl">
-            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 p-8 sm:p-12 text-white shadow-2xl border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-8">
-                <!-- Ambient glow in card -->
-                <div class="absolute -right-20 -top-20 w-80 h-80 bg-emerald-500/15 blur-3xl rounded-full pointer-events-none"></div>
-                <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-teal-500/10 blur-3xl rounded-full pointer-events-none"></div>
-
-                <div class="relative z-10 space-y-3 text-left max-w-xl">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black tracking-wider uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                        <i data-lucide="users" class="w-3.5 h-3.5"></i> Sinergi Bersama KORMI
-                    </span>
-                    <h2 class="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white leading-tight">
-                        Punya Komunitas Olahraga Rekreasi?
-                    </h2>
-                    <p class="text-slate-300 text-xs sm:text-sm leading-relaxed font-normal">
-                        Daftarkan komunitas Anda menjadi bagian dari INORGA KORMI Kabupaten Bandung atau jalin koordinasi dengan KORCAM di wilayah kecamatan Anda.
-                    </p>
+    <section class="py-16 sm:py-20 bg-slate-50 relative overflow-hidden">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="relative overflow-hidden rounded-3xl bg-slate-950 border border-slate-800 shadow-2xl shadow-slate-900/20">
+                <!-- Ambient background layers -->
+                <div class="absolute inset-0 pointer-events-none">
+                    <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_70%_65%_at_35%_50%,#000_35%,transparent_100%)]"></div>
+                    <div class="absolute -top-24 -right-20 w-80 h-80 bg-emerald-500/20 blur-[110px] rounded-full"></div>
+                    <div class="absolute -bottom-28 -left-20 w-80 h-80 bg-teal-500/15 blur-[110px] rounded-full"></div>
+                    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent"></div>
                 </div>
 
-                <div class="relative z-10 flex flex-col sm:flex-row md:flex-col gap-3 shrink-0 w-full sm:w-auto">
-                    <a href="{{ route('kontak') }}" wire:navigate class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-white rounded-full font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-950/40 transition-all flex items-center justify-center gap-2">
-                        <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
-                        <span>Hubungi Sekretariat</span>
-                    </a>
-                    <a href="{{ route('kordikecamatan') }}" wire:navigate class="px-6 py-3 bg-white/10 hover:bg-white/15 border border-white/20 text-white rounded-full font-bold text-xs uppercase tracking-wider transition-all text-center">
-                        Daftar KORCAM
-                    </a>
+                <div class="relative z-10 grid lg:grid-cols-12 items-center gap-8 lg:gap-12 p-7 sm:p-10 lg:p-12">
+                    <!-- Copy -->
+                    <div class="lg:col-span-7 space-y-4 text-left">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">
+                            <i data-lucide="users" class="w-3.5 h-3.5"></i> Sinergi Bersama KORMI
+                        </span>
+
+                        <h2 class="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-white leading-[1.15]">
+                            Punya Komunitas<br class="hidden sm:block" />
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-lime-300">Olahraga Rekreasi?</span>
+                        </h2>
+
+                        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl">
+                            Daftarkan komunitas Anda menjadi bagian dari INORGA KORMI Kabupaten Bandung atau jalin koordinasi dengan KORCAM di wilayah kecamatan Anda.
+                        </p>
+                    </div>
+
+                    <!-- Dua jalur aksi -->
+                    <div class="lg:col-span-5 space-y-3">
+                        <a href="{{ route('kontak') }}" wire:navigate class="group flex items-center gap-3.5 rounded-2xl bg-emerald-400 hover:bg-emerald-300 p-4 transition-all duration-300 shadow-lg shadow-emerald-950/40 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+                            <span class="w-11 h-11 rounded-xl bg-emerald-950/10 text-emerald-950 flex items-center justify-center shrink-0">
+                                <i data-lucide="message-square" class="w-5 h-5"></i>
+                            </span>
+                            <span class="flex-1 min-w-0 text-left">
+                                <span class="block text-[13px] font-black uppercase tracking-wide text-emerald-950 leading-tight">Hubungi Sekretariat</span>
+                                <span class="block text-[10px] font-semibold text-emerald-950/80 mt-1 leading-snug">Konsultasi pendaftaran &amp; informasi</span>
+                            </span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 text-emerald-950/70 shrink-0 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+
+                        <a href="{{ route('kordikecamatan') }}" wire:navigate class="group flex items-center gap-3.5 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 hover:border-white/25 p-4 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+                            <span class="w-11 h-11 rounded-xl bg-white/10 text-emerald-300 flex items-center justify-center shrink-0">
+                                <i data-lucide="map-pin" class="w-5 h-5"></i>
+                            </span>
+                            <span class="flex-1 min-w-0 text-left">
+                                <span class="block text-[13px] font-black uppercase tracking-wide text-white leading-tight">Daftar KORCAM</span>
+                                <span class="block text-[10px] font-semibold text-slate-400 mt-1 leading-snug">Koordinasi tingkat kecamatan</span>
+                            </span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 text-slate-400 shrink-0 group-hover:translate-x-1 group-hover:text-emerald-300 transition-all"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

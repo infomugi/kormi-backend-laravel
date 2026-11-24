@@ -15,7 +15,7 @@ use App\Models\Kormi\Sapras;
 
 class Beranda extends Component
 {
-    public function render()
+    protected function dataTampilan(): array
     {
         $kegiatanGrid = [
             [
@@ -143,7 +143,9 @@ class Beranda extends Component
         // 5. Statistik & Metrik KORMI
         $stats = [
             'totalInorga' => Inorga::count(),
-            'totalDuta' => DutaOlahraga::count(),
+            'totalDuta' => DutaOlahraga::where('status_aktif', true)
+                ->where('status_pendaftaran', DutaOlahraga::STATUS_DISETUJUI)
+                ->count(),
             'totalKecamatan' => Kecamatan::count(),
             'totalSapras' => Sapras::count(),
             'totalUnduhan' => Unduhan::count(),
@@ -151,14 +153,20 @@ class Beranda extends Component
             'totalPesertaWarga' => \App\Models\Kormi\PartisipasiAktivitas::valid()->sum('jumlah_peserta'),
         ];
 
-        return view('livewire.frontend.beranda', [
+        return [
             'kegiatanGrid' => $kegiatanGrid,
             'beritaList' => $beritaList,
             'komisiList' => $komisiList,
             'eventList' => $eventList,
             'galeriList' => $galeriList,
             'stats' => $stats,
-        ])->layout('components.layouts.app');
+        ];
+    }
+
+    public function render()
+    {
+        return view('livewire.frontend.beranda', $this->dataTampilan())
+            ->layout('components.layouts.app');
     }
 }
 

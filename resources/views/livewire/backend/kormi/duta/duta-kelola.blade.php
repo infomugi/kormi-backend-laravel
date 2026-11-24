@@ -15,6 +15,21 @@
         </div>
     @endif
 
+    <!-- FLASH ERROR NOTIFICATION -->
+    @if(session()->has('error'))
+        <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200/80 text-rose-800 text-xs sm:text-sm font-bold flex items-center justify-between shadow-xs animate-in fade-in slide-in-from-top-2 duration-200">
+            <div class="flex items-center gap-3">
+                <div class="w-7 h-7 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                    <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                </div>
+                <span>{{ session('error') }}</span>
+            </div>
+            <button type="button" @click="$el.parentElement.remove()" class="text-rose-500 hover:text-rose-800 p-1.5 rounded-lg transition-colors cursor-pointer">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+    @endif
+
     @if($mode === 'tabel')
         <!-- ========================================== -->
         <!-- VIEW MODE: TABEL DAFTAR DUTA OLAHRAGA     -->
@@ -93,6 +108,30 @@
             </div>
 
             <!-- 3. FILTER & SEARCH TOOLBAR -->
+            @if($pendaftaranMenunggu > 0 && $pendaftaranDipilih !== 'menunggu')
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-amber-50 border border-amber-200/90 shadow-xs">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                            <i data-lucide="clock" class="w-4 h-4"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-black text-amber-900">
+                                {{ $pendaftaranMenunggu }} pendaftaran Duta Olahraga menunggu verifikasi
+                            </p>
+                            <p class="text-[11px] text-amber-700/90 font-medium">Setujui atau tolak pendaftaran agar akun &amp; profil dapat dipublikasikan.</p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        wire:click="$set('pendaftaranDipilih', 'menunggu')"
+                        class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-[11px] uppercase tracking-wider transition-colors cursor-pointer shrink-0"
+                    >
+                        <i data-lucide="search-check" class="w-3.5 h-3.5"></i>
+                        <span>Tinjau Pendaftaran</span>
+                    </button>
+                </div>
+            @endif
+
             <x-table.filter-bar 
                 search-placeholder="Cari nama duta, profesi, gelar, instagram, desa/kecamatan..." 
                 search-model="cari"
@@ -122,6 +161,14 @@
                 </x-slot:top>
 
                 <x-slot:actions>
+                    <!-- Filter Status Pendaftaran -->
+                    <select wire:model.live="pendaftaranDipilih" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer {{ $pendaftaranDipilih === 'menunggu' ? 'border-amber-400 text-amber-800 bg-amber-50/70' : '' }}">
+                        <option value="Semua">Status Pendaftaran: Semua</option>
+                        <option value="menunggu">Menunggu Verifikasi</option>
+                        <option value="disetujui">Disetujui</option>
+                        <option value="ditolak">Ditolak</option>
+                    </select>
+
                     <!-- Filter Kategori -->
                     <select wire:model.live="kategoriDipilih" class="px-3 py-2 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all cursor-pointer">
                         <option value="Semua">Semua Kategori</option>
@@ -235,7 +282,7 @@
             @if($tampilanMode === 'tabel')
                 <!-- FULL-WIDTH DATA TABLE -->
                 <x-table.card>
-                    <x-table.table loading-target="cari, kecamatanDipilih, tahunDipilih, kategoriDipilih, statusDipilih, unggulanDipilih, sortField, sortDirection, perPage, gotoPage, nextPage, previousPage">
+                    <x-table.table loading-target="cari, kecamatanDipilih, tahunDipilih, kategoriDipilih, statusDipilih, unggulanDipilih, pendaftaranDipilih, sortField, sortDirection, perPage, gotoPage, nextPage, previousPage">
                         <x-table.thead>
                             <tr>
                                 <x-table.th align="center" class="w-12 !px-4">
@@ -305,16 +352,32 @@
                                             </div>
 
                                             <div class="min-w-0 flex-1 space-y-0.5">
-                                                <x-table.editable-cell 
-                                                    :model-id="$d->id" 
-                                                    field="nama_lengkap" 
-                                                    :value="$d->nama_lengkap"
-                                                    placeholder="Nama lengkap duta..."
-                                                >
-                                                    <span class="font-black text-slate-900 text-xs sm:text-sm hover:text-indigo-600 line-clamp-1 leading-tight transition-colors cursor-pointer block">
-                                                        {{ $d->nama_lengkap }}
-                                                    </span>
-                                                </x-table.editable-cell>
+                                                <div class="flex items-center gap-2 min-w-0">
+                                                    <div class="min-w-0 flex-1">
+                                                        <x-table.editable-cell 
+                                                            :model-id="$d->id" 
+                                                            field="nama_lengkap" 
+                                                            :value="$d->nama_lengkap"
+                                                            placeholder="Nama lengkap duta..."
+                                                        >
+                                                            <span class="font-black text-slate-900 text-xs sm:text-sm hover:text-indigo-600 line-clamp-1 leading-tight transition-colors cursor-pointer block">
+                                                                {{ $d->nama_lengkap }}
+                                                            </span>
+                                                        </x-table.editable-cell>
+                                                    </div>
+
+                                                    @if($d->status_pendaftaran === 'menunggu')
+                                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 shrink-0">
+                                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                                            Menunggu
+                                                        </span>
+                                                    @elseif($d->status_pendaftaran === 'ditolak')
+                                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200 shrink-0">
+                                                            <i data-lucide="x" class="w-2.5 h-2.5"></i>
+                                                            Ditolak
+                                                        </span>
+                                                    @endif
+                                                </div>
 
                                                 <div class="flex items-center gap-2 text-[11px] text-slate-400 font-medium">
                                                     @if($d->gelar_prestasi)
@@ -395,6 +458,32 @@
                                     <!-- Actions -->
                                     <x-table.td align="right">
                                         <div class="flex items-center justify-end gap-1">
+                                            @if($d->status_pendaftaran === 'menunggu')
+                                                <x-table.action-btn 
+                                                    size="pill"
+                                                    variant="success" 
+                                                    icon="check" 
+                                                    loading-target="setujuiPendaftaran"
+                                                    wire:click="setujuiPendaftaran('{{ $d->id }}')" 
+                                                    wire:confirm="Setujui pendaftaran duta {{ $d->nama_lengkap }}? Akun terkait akan ikut diaktifkan."
+                                                    title="Setujui Pendaftaran" 
+                                                >
+                                                    Setujui
+                                                </x-table.action-btn>
+
+                                                <x-table.action-btn 
+                                                    size="pill"
+                                                    variant="danger" 
+                                                    icon="x" 
+                                                    loading-target="tolakPendaftaran"
+                                                    wire:click="tolakPendaftaran('{{ $d->id }}')" 
+                                                    wire:confirm="Tolak pendaftaran duta {{ $d->nama_lengkap }}?"
+                                                    title="Tolak Pendaftaran" 
+                                                >
+                                                    Tolak
+                                                </x-table.action-btn>
+                                            @endif
+
                                             <x-table.action-btn 
                                                 size="sm"
                                                 variant="secondary" 
@@ -497,6 +586,20 @@
                                         <span>Kec. {{ $d->kecamatan->nama_kecamatan ?? '-' }}</span>
                                     </span>
                                     <h3 class="font-black text-slate-900 text-sm group-hover:text-indigo-600 transition-colors line-clamp-1 mt-1 cursor-pointer" wire:click="bukaPratinjau('{{ $d->id }}')">{{ $d->nama_lengkap }}</h3>
+
+                                    <div class="mt-1">
+                                        @if($d->status_pendaftaran === 'menunggu')
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                                Menunggu Verifikasi
+                                            </span>
+                                        @elseif($d->status_pendaftaran === 'ditolak')
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200">
+                                                <i data-lucide="x" class="w-2.5 h-2.5"></i>
+                                                Ditolak
+                                            </span>
+                                        @endif
+                                    </div>
                                     <p class="text-xs text-slate-500 font-medium line-clamp-1">{{ $d->desaKelurahan->nama_desa_kelurahan ? 'Desa ' . $d->desaKelurahan->nama_desa_kelurahan : 'Kader Kecamatan' }}</p>
                                     
                                     @if($d->gelar_prestasi || $d->prestasi)
@@ -508,6 +611,31 @@
                             <div class="flex items-center justify-between pt-4 mt-4 border-t border-slate-100 text-xs">
                                 <span class="text-[10px] font-bold text-slate-400 truncate max-w-[110px]">{{ $d->nomor_telepon ?: ($d->akun_instagram ? '@'.$d->akun_instagram : 'Tanpa Kontak') }}</span>
                                 <div class="flex items-center gap-1.5">
+                                    @if($d->status_pendaftaran === 'menunggu')
+                                        <x-table.action-btn 
+                                            size="pill"
+                                            variant="success" 
+                                            icon="check" 
+                                            loading-target="setujuiPendaftaran"
+                                            wire:click="setujuiPendaftaran('{{ $d->id }}')" 
+                                            wire:confirm="Setujui pendaftaran duta {{ $d->nama_lengkap }}? Akun terkait akan ikut diaktifkan."
+                                            title="Setujui Pendaftaran" 
+                                        >
+                                            Setujui
+                                        </x-table.action-btn>
+                                        <x-table.action-btn 
+                                            size="pill"
+                                            variant="danger" 
+                                            icon="x" 
+                                            loading-target="tolakPendaftaran"
+                                            wire:click="tolakPendaftaran('{{ $d->id }}')" 
+                                            wire:confirm="Tolak pendaftaran duta {{ $d->nama_lengkap }}?"
+                                            title="Tolak Pendaftaran" 
+                                        >
+                                            Tolak
+                                        </x-table.action-btn>
+                                    @endif
+
                                     <x-table.action-btn 
                                         size="sm"
                                         variant="secondary" 
@@ -952,7 +1080,37 @@
                             <span class="text-[10px] text-slate-400 font-bold uppercase block">Status</span>
                             <span class="font-bold {{ $pratinjauDuta->status_aktif ? 'text-emerald-600' : 'text-slate-400' }}">{{ $pratinjauDuta->status_aktif ? 'Aktif' : 'Non-Aktif' }}</span>
                         </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Status Pendaftaran</span>
+                            @if($pratinjauDuta->status_pendaftaran === 'menunggu')
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                    Menunggu
+                                </span>
+                            @elseif($pratinjauDuta->status_pendaftaran === 'ditolak')
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200">
+                                    <i data-lucide="x" class="w-2.5 h-2.5"></i>
+                                    Ditolak
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <i data-lucide="check" class="w-2.5 h-2.5"></i>
+                                    Disetujui
+                                </span>
+                            @endif
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Disetujui Pada</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauDuta->disetujui_pada ? $pratinjauDuta->disetujui_pada->format('d/m/Y H:i') : '-' }}</span>
+                        </div>
                     </div>
+
+                    @if($pratinjauDuta->status_pendaftaran === 'ditolak' && $pratinjauDuta->catatan_verifikasi)
+                        <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-start gap-2">
+                            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                            <span>{{ $pratinjauDuta->catatan_verifikasi }}</span>
+                        </div>
+                    @endif
 
                     @if($pratinjauDuta->deskripsi_prestasi || $pratinjauDuta->prestasi)
                         <div class="space-y-1.5">
@@ -965,15 +1123,38 @@
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                    <button 
-                        type="button" 
-                        wire:click="bukaFormEdit('{{ $pratinjauDuta->id }}')" 
-                        class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
-                    >
-                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                        <span>Edit Biodata</span>
-                    </button>
+                <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        @if($pratinjauDuta->status_pendaftaran === 'menunggu')
+                            <button 
+                                type="button" 
+                                wire:click="setujuiPendaftaran('{{ $pratinjauDuta->id }}')" 
+                                wire:confirm="Setujui pendaftaran duta {{ $pratinjauDuta->nama_lengkap }}? Akun terkait akan ikut diaktifkan."
+                                class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                            >
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                                <span>Setujui</span>
+                            </button>
+                            <button 
+                                type="button" 
+                                wire:click="tolakPendaftaran('{{ $pratinjauDuta->id }}')" 
+                                wire:confirm="Tolak pendaftaran duta {{ $pratinjauDuta->nama_lengkap }}?"
+                                class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                            >
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                <span>Tolak</span>
+                            </button>
+                        @endif
+
+                        <button 
+                            type="button" 
+                            wire:click="bukaFormEdit('{{ $pratinjauDuta->id }}')" 
+                            class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                        >
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                            <span>Edit Biodata</span>
+                        </button>
+                    </div>
 
                     <button 
                         type="button" 

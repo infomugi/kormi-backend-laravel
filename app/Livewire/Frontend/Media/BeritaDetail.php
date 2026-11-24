@@ -15,7 +15,7 @@ class BeritaDetail extends Component
         $this->slug = $slug;
     }
 
-    public function render()
+    protected function dataTampilan(): array
     {
         $berita = Berita::with('kategori', 'penulis')
             ->where('slug', $this->slug)
@@ -32,9 +32,17 @@ class BeritaDetail extends Component
             ->limit(3)
             ->get();
 
-        return view('livewire.frontend.media.berita-detail', [
+        return [
             'berita' => $berita,
             'beritaTerkait' => $beritaTerkait,
-        ])->layout('components.layouts.app', ['title' => $berita->judul . ' - KORMI Kabupaten Bandung']);
+        ];
+    }
+
+    public function render()
+    {
+        $data = $this->dataTampilan();
+
+        return view('livewire.frontend.media.berita-detail', $data)
+            ->layout('components.layouts.app', ['title' => $data['berita']->judul . ' - KORMI Kabupaten Bandung']);
     }
 }

@@ -2,16 +2,19 @@
 
 namespace App\Models\Kormi;
 
-use App\Models\Master\DesaKelurahan;
-
-use App\Models\Master\Kecamatan;
-
 use App\Models\Core\ModelDasar;
-
+use App\Models\Core\Pengguna;
+use App\Models\Master\DesaKelurahan;
+use App\Models\Master\Kecamatan;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DutaOlahraga extends ModelDasar
 {
+    public const STATUS_MENUNGGU = 'menunggu';
+    public const STATUS_DISETUJUI = 'disetujui';
+    public const STATUS_DITOLAK = 'ditolak';
+
     protected $table = 'kormi_duta_olahraga';
 
     protected $fillable = [
@@ -35,6 +38,11 @@ class DutaOlahraga extends ModelDasar
         'foto_url',
         'status_aktif',
         'status_unggulan',
+        'status_pendaftaran',
+        'disetujui_pada',
+        'disetujui_oleh',
+        'catatan_verifikasi',
+        'pengguna_id',
     ];
 
     protected $casts = [
@@ -42,7 +50,29 @@ class DutaOlahraga extends ModelDasar
         'status_aktif'    => 'boolean',
         'status_unggulan' => 'boolean',
         'tanggal_lahir'   => 'date',
+        'disetujui_pada'  => 'datetime',
     ];
+
+    /**
+     * Hanya data yang sudah disetujui administrator.
+     */
+    public function scopeDisetujui(Builder $query): Builder
+    {
+        return $query->where('status_pendaftaran', self::STATUS_DISETUJUI);
+    }
+
+    /**
+     * Data pendaftaran yang masih menunggu verifikasi.
+     */
+    public function scopeMenunggu(Builder $query): Builder
+    {
+        return $query->where('status_pendaftaran', self::STATUS_MENUNGGU);
+    }
+
+    public function sedangMenunggu(): bool
+    {
+        return $this->status_pendaftaran === self::STATUS_MENUNGGU;
+    }
 
     public function kecamatan(): BelongsTo
     {
@@ -62,6 +92,19 @@ class DutaOlahraga extends ModelDasar
     public function pengguna(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(\App\Models\Core\Pengguna::class, 'duta_id');
+    }
+
+    /**
+     * Akun pengguna pemilik pendaftaran (diisi sejak submit, ditautkan saat disetujui).
+     */
+    public function akunPendaftar(): BelongsTo
+    {
+        return $this->belongsTo(Pengguna::class, 'pengguna_id');
+    }
+
+    public function disetujuiOleh(): BelongsTo
+    {
+        return $this->belongsTo(Pengguna::class, 'disetujui_oleh');
     }
 
     public function getFotoDutaUrlAttribute(): ?string

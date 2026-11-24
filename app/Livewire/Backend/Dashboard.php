@@ -31,7 +31,10 @@ class Dashboard extends Component
         $totalBerita = Berita::count();
         $totalUnduhan = Unduhan::count();
         $totalInorga = Inorga::count();
-        $totalDuta = DutaOlahraga::count();
+        // Pendaftar yang belum disetujui tidak boleh menggelembungkan total duta.
+        $totalDuta = DutaOlahraga::where('status_aktif', true)
+            ->where('status_pendaftaran', DutaOlahraga::STATUS_DISETUJUI)
+            ->count();
         $totalKecamatan = Kecamatan::count();
         $totalViews = Berita::sum('jumlah_dilihat') ?: 0;
         $totalSapras = Sapras::count();
