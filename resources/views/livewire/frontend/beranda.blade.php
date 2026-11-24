@@ -43,16 +43,17 @@
 
                 <!-- Action Hub Buttons -->
                 <div class="flex flex-wrap justify-center items-center gap-3.5 pt-4">
-                    <a href="{{ route('partisipasi.catat') }}" wire:navigate class="px-7 py-3.5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-full font-black text-xs shadow-xl shadow-emerald-950/50 hover:shadow-emerald-500/30 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 flex items-center gap-2.5 uppercase tracking-wider group border border-emerald-400/30">
+                    <a href="{{ route('partisipasi.catat') }}" wire:navigate class="h-12 px-7 inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-full font-black text-xs leading-none shadow-xl shadow-emerald-950/50 hover:shadow-emerald-500/30 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 uppercase tracking-wider whitespace-nowrap group border border-emerald-400/30">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i>
                         <span>Catat Olahraga Warga</span>
                     </a>
-                    <a href="{{ route('inorga') }}" wire:navigate class="px-6 py-3.5 bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 text-white rounded-full font-bold text-xs backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 uppercase tracking-wider flex items-center gap-2">
-                        <i data-lucide="award" class="w-3.5 h-3.5 text-lime-400"></i>
+                    <a href="{{ route('inorga') }}" wire:navigate class="h-12 px-6 inline-flex items-center justify-center gap-2.5 bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 text-white rounded-full font-bold text-xs leading-none backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 uppercase tracking-wider whitespace-nowrap">
+                        <i data-lucide="award" class="w-4 h-4 text-lime-400"></i>
                         <span>Direktori INORGA</span>
                     </a>
-                    <a href="#modul-terpadu" class="px-5 py-3.5 hover:text-emerald-400 text-slate-300 hover:bg-white/5 rounded-full font-bold text-xs transition-all uppercase tracking-wider">
-                        Jelajahi Fitur
+                    <a href="#modul-terpadu" class="h-12 px-6 inline-flex items-center justify-center gap-2 border border-transparent hover:border-white/15 text-slate-300 hover:text-emerald-400 hover:bg-white/5 rounded-full font-bold text-xs leading-none transition-all duration-300 uppercase tracking-wider whitespace-nowrap">
+                        <span>Jelajahi Fitur</span>
+                        <i data-lucide="arrow-down" class="w-4 h-4"></i>
                     </a>
                 </div>
             </div>
