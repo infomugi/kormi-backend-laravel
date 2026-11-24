@@ -29,7 +29,7 @@
 
             <div class="max-w-4xl space-y-5">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[10px] font-black tracking-[0.2em] uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 backdrop-blur-md">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <!-- <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> -->
                     <span>Portal Resmi Komite Olahraga Masyarakat Indonesia</span>
                 </div>
                 
