@@ -17,12 +17,14 @@
 
         <div class="container mx-auto px-6 relative z-10 text-center flex flex-col items-center">
             <!-- Official Header Badge with Glow -->
-            <div class="inline-flex items-center gap-3 sm:gap-4 px-4 py-2 rounded-full bg-white/[0.07] border border-white/15 backdrop-blur-2xl shadow-[0_0_30px_rgba(16,185,129,0.15)] mb-6 hover:border-emerald-400/40 hover:bg-white/[0.1] transition-all duration-300">
-                <img src="{{ asset('assets/image/logo-kab-bandung.png') }}" class="h-6 sm:h-7 object-contain drop-shadow" alt="Logo Kab Bandung" />
-                <div class="w-px h-4 bg-white/20"></div>
-                <img src="{{ asset('assets/image/logo-bedas.png') }}" class="h-6 sm:h-7 object-contain drop-shadow" alt="Logo Bedas" />
-                <div class="w-px h-4 bg-white/20"></div>
-                <img src="{{ asset('assets/image/logo-kormi.png') }}" class="h-6 sm:h-7 object-contain drop-shadow" alt="Logo Kormi" />
+            <div class="inline-flex items-center gap-4 sm:gap-5 px-5 py-2.5 rounded-full bg-white/[0.07] border border-white/15 backdrop-blur-2xl shadow-[0_0_30px_rgba(16,185,129,0.15)] mb-6 hover:border-emerald-400/40 hover:bg-white/[0.1] transition-all duration-300">
+                <img src="{{ asset('assets/image/logo-kab-bandung.png') }}" class="h-9 sm:h-12 object-contain drop-shadow" alt="Logo Kab Bandung" />
+                <div class="w-px h-6 sm:h-8 bg-white/20"></div>
+                <img src="{{ asset('assets/image/logo-bedas.png') }}" class="h-9 sm:h-12 object-contain drop-shadow" alt="Logo Bedas" />
+                <div class="w-px h-6 sm:h-8 bg-white/20"></div>
+                <img src="{{ asset('assets/image/logo-kormi.png') }}" class="h-9 sm:h-12 object-contain drop-shadow" alt="Logo Kormi" />
+                <div class="w-px h-6 sm:h-8 bg-white/20"></div>
+                <img src="{{ asset('assets/image/indonesiaaktifputih.png') }}" class="h-9 sm:h-12 object-contain drop-shadow" alt="Logo Indonesia Aktif" />
             </div>
 
             <div class="max-w-4xl space-y-5">
