@@ -6,7 +6,7 @@
         <!-- Ambient background with refined particle mesh glow -->
         <div class="absolute inset-0 z-0 pointer-events-none">
             <img src="{{ asset('assets/image/hero-bg.jpg') }}" class="w-full h-full object-cover opacity-20 scale-105" alt="Hero Background" onerror="this.style.display='none'" />
-            <div class="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/85 to-slate-950"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-75/70 via-slate-950/85 to-slate-700"></div>
             <!-- Concentrated glow spotlights -->
             <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] bg-emerald-500/20 blur-[150px] rounded-full"></div>
             <div class="absolute bottom-10 right-10 w-[400px] h-[400px] bg-lime-400/15 blur-[130px] rounded-full"></div>
