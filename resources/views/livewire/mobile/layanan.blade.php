@@ -42,13 +42,6 @@
                 <span class="kd-chip kd-chip--dark">{{ count($modulCms) }} modul</span>
             </div>
 
-            <div class="kd-success-actions" style="margin-bottom: 14px;">
-                <a href="{{ route('admin.dashboard') }}" class="kd-btn-primary">
-                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-                    <span>Buka Dashboard CMS</span>
-                </a>
-            </div>
-
             <div class="kd-modules">
                 @foreach($modulCms as $item)
                     <a href="{{ route($item['route']) }}" wire:navigate class="kd-module">
@@ -61,6 +54,21 @@
                 @endforeach
             </div>
         @endif
+
+        <div class="kd-subhead" style="margin-top: 20px;">
+            <h4>Survei &amp; Angket</h4>
+            <span class="kd-chip">1 angket</span>
+        </div>
+
+        <div class="kd-modules">
+            <a href="{{ route('mobile.angket') }}" wire:navigate class="kd-module" style="grid-column: 1 / -1;">
+                <span class="kd-module-icon"><i data-lucide="clipboard-list"></i></span>
+                <span>
+                    <span class="kd-module-name">Angket APMO</span>
+                    <span class="kd-module-desc">Survei kebiasaan &amp; fasilitas olahraga masyarakat</span>
+                </span>
+            </a>
+        </div>
 
         <div class="kd-subhead" style="margin-top: 20px;">
             <h4>Informasi Publik</h4>

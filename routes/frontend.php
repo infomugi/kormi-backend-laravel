@@ -45,9 +45,14 @@ Route::prefix('mobile')->group(function () {
     Route::get('/daftar-duta', \App\Livewire\Mobile\DaftarDuta::class)->name('mobile.daftar-duta');
     Route::get('/berita', \App\Livewire\Mobile\Berita::class)->name('mobile.berita');
     Route::get('/berita/{slug}', \App\Livewire\Mobile\BeritaDetail::class)->name('mobile.berita.detail');
+    Route::get('/angket', \App\Livewire\Mobile\Angket::class)->name('mobile.angket');
     Route::get('/layanan', \App\Livewire\Mobile\Layanan::class)->name('mobile.layanan')->middleware('auth');
+    Route::get('/absensi', \App\Livewire\Mobile\Absensi::class)->name('mobile.absensi')->middleware('auth');
     Route::get('/profil', \App\Livewire\Mobile\Profil::class)->name('mobile.profil')->middleware('auth');
+    Route::get('/laporan', \App\Livewire\Mobile\Laporan::class)->name('mobile.laporan')->middleware('auth');
     Route::get('/dashboard', \App\Livewire\Mobile\Dashboard::class)->name('mobile.dashboard')->middleware('auth');
+    Route::get('/persetujuan', \App\Livewire\Mobile\Persetujuan::class)->name('mobile.persetujuan')->middleware('auth');
+    Route::get('/apmo/wilayah', \App\Livewire\Mobile\ApmoWilayah::class)->name('mobile.apmo.wilayah')->middleware('auth');
 });
 
 // 1. Tentang Kami

@@ -25,6 +25,7 @@ class Layanan extends Component
             'event' => ['nama' => 'Event & FORKAB', 'desc' => 'Agenda festival olahraga', 'icon' => 'flag', 'route' => 'admin.event'],
             'klasemen' => ['nama' => 'Klasemen Medali', 'desc' => 'Perolehan medali kecamatan', 'icon' => 'trophy', 'route' => 'admin.klasemen'],
             'partisipasi' => ['nama' => 'Partisipasi APMO', 'desc' => 'Verifikasi aktivitas warga', 'icon' => 'activity', 'route' => 'admin.partisipasi.log'],
+            'survei' => ['nama' => 'Monitoring Survei APMO', 'desc' => 'Cakupan isian per kecamatan & desa', 'icon' => 'radar', 'route' => 'mobile.apmo.wilayah'],
             'pengguna' => ['nama' => 'Pengguna', 'desc' => 'Akun dan hak akses', 'icon' => 'user-cog', 'route' => 'admin.pengguna'],
             'pengaturan' => ['nama' => 'Pengaturan Situs', 'desc' => 'Konfigurasi portal KORMI', 'icon' => 'settings', 'route' => 'admin.pengaturan'],
         ];
@@ -40,6 +41,7 @@ class Layanan extends Component
         $layananPartisipasi = [];
 
         if ($user->isDutaOlahraga() || $user->isPegiatOlahraga()) {
+            $layananPartisipasi[] = ['nama' => 'Absensi Harian', 'desc' => 'Absen masuk & pulang dengan foto dan GPS', 'icon' => 'clipboard-check', 'route' => 'mobile.absensi'];
             $layananPartisipasi[] = ['nama' => 'Catat Aktivitas', 'desc' => 'Catat sesi olahraga untuk APMO', 'icon' => 'clipboard-pen', 'route' => 'partisipasi.catat'];
             $layananPartisipasi[] = ['nama' => 'Riwayat Aktivitas', 'desc' => 'Status verifikasi dan badge APMO', 'icon' => 'history', 'route' => 'partisipasi.riwayat'];
 

@@ -4,7 +4,7 @@ namespace App\Livewire\Backend\Pengguna;
 
 use App\Models\Core\Pengguna;
 use App\Models\Core\Peran;
-use App\Models\Kormi\DutaOlahraga;
+use App\Services\PersetujuanPendaftaran;
 use App\Services\StorageService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -422,48 +422,7 @@ class PenggunaKelola extends Component
      */
     protected function setujuiAkunPengguna(Pengguna $user, ?string $adminId): void
     {
-        $duta = DutaOlahraga::where('pengguna_id', $user->id)
-            ->where('status_pendaftaran', DutaOlahraga::STATUS_MENUNGGU)
-            ->first();
-
-        if (! $duta && ! empty($user->duta_id)) {
-            $duta = DutaOlahraga::where('id', $user->duta_id)
-                ->where('status_pendaftaran', DutaOlahraga::STATUS_MENUNGGU)
-                ->first();
-        }
-
-        $dataAkun = [
-            'status_aktif'   => true,
-            'disetujui_pada' => now(),
-            'disetujui_oleh' => $adminId,
-        ];
-
-        if ($duta) {
-            $duta->update([
-                'status_pendaftaran' => DutaOlahraga::STATUS_DISETUJUI,
-                'status_aktif'       => true,
-                'disetujui_pada'     => now(),
-                'disetujui_oleh'     => $adminId,
-                'catatan_verifikasi' => null,
-            ]);
-
-            $dataAkun['duta_id'] = $duta->id;
-
-            // Hanya promosikan peran warga/pegiat agar peran admin tidak turun.
-            $slugPeran = $user->peran?->slug;
-
-            if ($user->peran_id === null || $slugPeran === 'pegiat-olahraga') {
-                $dataAkun['peran_id'] = Peran::firstOrCreate(
-                    ['slug' => 'duta-olahraga'],
-                    [
-                        'nama_peran' => 'Duta Olahraga Desa',
-                        'deskripsi'  => 'Duta Olahraga Desa/Kelurahan',
-                    ]
-                )->id;
-            }
-        }
-
-        $user->update($dataAkun);
+        app(PersetujuanPendaftaran::class)->setujuiAkun($user, $adminId);
     }
 
     public function setujuiAkun(string $id): void

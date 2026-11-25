@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'KORMI Kabupaten Bandung' }}</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('assets/image/favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/image/logo-kormi.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

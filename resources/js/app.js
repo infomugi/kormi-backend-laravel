@@ -5,12 +5,14 @@ import flatpickr from 'flatpickr';
 import { Indonesian } from 'flatpickr/dist/l10n/id.js';
 import { compressImageClientSide } from './image-compressor';
 import { markdownToHtml, htmlToMarkdown } from './markdown-converter';
+import { daftarkanAbsensiKamera } from './absensi-kamera';
 
 window.flatpickr = flatpickr;
 flatpickr.localize(Indonesian);
 window.compressImageClientSide = compressImageClientSide;
 window.markdownToHtml = markdownToHtml;
 window.htmlToMarkdown = htmlToMarkdown;
+daftarkanAbsensiKamera();
 
 window.kormiEditor = function(initialContent = '') {
     return {

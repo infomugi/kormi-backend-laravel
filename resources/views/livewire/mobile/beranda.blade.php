@@ -64,6 +64,20 @@
                 </a>
             </div>
 
+            <div class="kd-subhead" style="margin-top: 20px;">
+                <h4>Survei &amp; Angket</h4>
+            </div>
+
+            <div class="kd-modules">
+                <a href="{{ route('mobile.angket') }}" wire:navigate class="kd-module" style="grid-column: 1 / -1;">
+                    <span class="kd-module-icon"><i data-lucide="clipboard-list"></i></span>
+                    <span>
+                        <span class="kd-module-name">Angket APMO</span>
+                        <span class="kd-module-desc">Isi angket kebiasaan &amp; fasilitas olahraga Anda</span>
+                    </span>
+                </a>
+            </div>
+
             <div class="kd-subhead">
                 <h4>Berita Terkini</h4>
                 <a href="{{ route('berita') }}" wire:navigate>Semua warta</a>

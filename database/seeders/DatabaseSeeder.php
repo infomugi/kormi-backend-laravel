@@ -200,6 +200,9 @@ class DatabaseSeeder extends Seeder
             $kecamatanDbMap[$namaKec] = $kec;
         }
 
+        // 5b. Referensi 280 Desa/Kelurahan se-Kabupaten Bandung
+        $this->call(WilayahKabupatenBandungSeeder::class);
+
         // 6. Data Duta Olahraga Desa Riil
         $dataDuta = [
             ["Egi Septiana", "Patrolsari", "Arjasari"],
@@ -246,8 +249,8 @@ class DatabaseSeeder extends Seeder
             ["Fikri Padilah", "Margaasih", "Cicalengka"],
             ["Erisya Nurul Fauzia", "Nagrog", "Cicalengka"],
             ["Vianti Putri Lestari", "Narawita", "Cicalengka"],
-            ["Ilham Nurzaman", "Penenjoan", "Cicalengka"],
-            ["Muhamad Rukhiat Sofia Ramdani", "Tanjung Wangi", "Cicalengka"],
+            ["Ilham Nurzaman", "Panenjoan", "Cicalengka"],
+            ["Muhamad Rukhiat Sofia Ramdani", "Tanjungwangi", "Cicalengka"],
             ["Mohammad Nabil Fadilah", "Tenjolaya", "Cicalengka"],
             ["Annisa Maulidasawa", "Waluya", "Cicalengka"],
             ["Putri Widia Ramdani", "Cihanyir", "Cikancung"],
@@ -296,7 +299,7 @@ class DatabaseSeeder extends Seeder
             ["Seka Sundari", "Cikoneng", "Ciparay"],
             ["Zaenal Arifin", "Ciparay", "Ciparay"],
             ["Luthfi Hidayatulloh", "Gunungleutik", "Ciparay"],
-            ["Aura Lia Anggraeni", "Mangunraharja", "Ciparay"],
+            ["Aura Lia Anggraeni", "Manggungharja", "Ciparay"],
             ["Rifad Insan Kamil", "Mekarlaksana", "Ciparay"],
             ["Rizqi Syahrul Mubarok", "Mekarsari", "Ciparay"],
             ["Arman Mulyanudin A", "Pakutandang", "Ciparay"],

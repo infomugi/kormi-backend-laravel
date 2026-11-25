@@ -163,11 +163,14 @@ class MobileProfilTest extends TestCase
         $user = $this->penggunaUji();
         $this->actingAs($user);
 
-        $this->get('/mobile/profil')
+        $this->get('/mobile/profil?tab=data')
             ->assertOk()
             ->assertSee('Ubah Data Akun')
             ->assertSee('Nama Lengkap')
-            ->assertSee('Pilih Foto Profil')
+            ->assertSee('Pilih Foto Profil');
+
+        $this->get('/mobile/profil?tab=keamanan')
+            ->assertOk()
             ->assertSee('Ganti Kata Sandi')
             ->assertSee('Kata Sandi Saat Ini')
             ->assertSee('Perbarui Kata Sandi');

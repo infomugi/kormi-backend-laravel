@@ -161,12 +161,16 @@ class MobileRoutesTest extends TestCase
             ->get('/mobile/dashboard')
             ->assertOk()
             ->assertSee('kd-mobile', false)
-            ->assertSee('Dashboard Duta Olahraga');
+            ->assertSee('Absensi hari ini')
+            ->assertSee('Survei APMO');
 
         $admin = Pengguna::whereHas('peran', fn ($q) => $q->where('slug', 'super-admin'))->firstOrFail();
         $this->actingAs($admin)
             ->get('/mobile/dashboard')
-            ->assertOk();
+            ->assertOk()
+            ->assertDontSee('Absensi hari ini')
+            ->assertDontSee('Isi Survei Sekarang')
+            ->assertDontSee('Perbarui Jawaban Survei');
     }
 
     public function test_login_mobile_peran_admin_mengarahkan_ke_dashboard_mobile(): void
@@ -207,22 +211,39 @@ class MobileRoutesTest extends TestCase
     {
         $harapan = [
             'admin@kormibdg.id' => ['Super Admin', 'admin.galeri'],
-            'admin.korcam@kormibdg.id' => ['Admin KORCAM', 'admin.duta'],
-            'admin.inorga@kormibdg.id' => ['Admin INORGA', 'admin.inorga'],
-            'editor.berita@kormibdg.id' => ['Editor Konten', 'admin.berita'],
+            'admin.korcam@kormibdg.id' => ['Korcam', 'admin.duta'],
+            'admin.inorga@kormibdg.id' => ['Inorga', 'admin.inorga'],
+            'editor.berita@kormibdg.id' => ['Editor', 'admin.berita'],
         ];
 
-        foreach ($harapan as $email => [$roleLabel, $routeName]) {
+        foreach ($harapan as $email => [$badgePeran, $routeName]) {
             $user = Pengguna::where('email', $email)->firstOrFail();
 
             $this->actingAs($user)
                 ->get('/mobile/dashboard')
                 ->assertOk()
                 ->assertSee('kd-mobile', false)
-                ->assertSee('Dashboard ' . $roleLabel)
-                ->assertSee('Buka Dashboard CMS')
+                ->assertSee($badgePeran)
+                ->assertSee('Ringkasan data')
+                ->assertDontSee('Buka Dashboard CMS')
                 ->assertSee(route($routeName), false)
                 ->assertSee('kd-tabbar', false);
+        }
+
+        $super = Pengguna::where('email', 'admin@kormibdg.id')->firstOrFail();
+
+        $this->actingAs($super)
+            ->get('/mobile/dashboard')
+            ->assertOk()
+            ->assertSee('Monitoring APMO')
+            ->assertSee('Survei APMO')
+            ->assertSee(route('mobile.apmo.wilayah'), false);
+
+        foreach (['admin.korcam@kormibdg.id', 'admin.inorga@kormibdg.id', 'editor.berita@kormibdg.id'] as $email) {
+            $this->actingAs(Pengguna::where('email', $email)->firstOrFail())
+                ->get('/mobile/dashboard')
+                ->assertOk()
+                ->assertDontSee(route('mobile.apmo.wilayah'), false);
         }
     }
 
@@ -254,15 +275,16 @@ class MobileRoutesTest extends TestCase
             ->get('/mobile/dashboard')
             ->assertOk()
             ->assertSee('kd-mobile', false)
-            ->assertSee('Dashboard Pegiat Olahraga')
-            ->assertSee('Catat Aktivitas Olahraga')
-            ->assertSee('Riwayat Aktivitas')
+            ->assertDontSee('Absensi hari ini')
+            ->assertDontSee('Survei APMO')
+            ->assertSee('Catat Aktivitas')
+            ->assertSee('Riwayat APMO')
             ->assertSee(route('partisipasi.catat'), false)
             ->assertSee(route('partisipasi.riwayat'), false)
             ->assertSee('kd-tabbar', false);
     }
 
-    public function test_menu_bawah_setelah_login_berisi_dashboard_layanan_berita_profil(): void
+    public function test_menu_bawah_pegiat_tanpa_absensi_dan_apmo(): void
     {
         $warga = Pengguna::where('email', 'warga@kormibdg.id')->firstOrFail();
 
@@ -271,17 +293,42 @@ class MobileRoutesTest extends TestCase
             ->assertOk()
             ->getContent();
 
-        $tabbar = str($html)->between('<nav class="kd-tabbar"', '</nav>')->toString();
+        $tabbar = str($html)->between('<nav class="kd-tabbar', '</nav>')->toString();
 
-        $this->assertStringContainsString('>Dashboard<', $tabbar);
-        $this->assertStringContainsString('>Layanan<', $tabbar);
-        $this->assertStringContainsString('>Berita<', $tabbar);
+        $this->assertStringContainsString('>Beranda<', $tabbar);
+        $this->assertStringContainsString('>Laporan<', $tabbar);
         $this->assertStringContainsString('>Profil<', $tabbar);
+        $this->assertStringNotContainsString('>APMO<', $tabbar);
+        $this->assertStringNotContainsString('>Absensi<', $tabbar);
+        $this->assertStringNotContainsString('kd-tab--fab', $tabbar);
         $this->assertStringNotContainsString('>Direktori<', $tabbar);
         $this->assertStringNotContainsString('>Masuk<', $tabbar);
-        $this->assertStringContainsString(route('mobile.layanan'), $tabbar);
-        $this->assertStringContainsString(route('mobile.berita'), $tabbar);
+        $this->assertStringContainsString('kd-tab is-active', $tabbar);
+        $this->assertStringNotContainsString(route('mobile.angket'), $tabbar);
+        $this->assertStringNotContainsString(route('mobile.absensi'), $tabbar);
+        $this->assertStringContainsString(route('mobile.laporan'), $tabbar);
         $this->assertStringContainsString(route('mobile.profil'), $tabbar);
+    }
+
+    public function test_menu_bawah_duta_berisi_absensi_dan_apmo(): void
+    {
+        $duta = Pengguna::where('email', 'duta.olahraga@kormibdg.id')->firstOrFail();
+
+        $html = $this->actingAs($duta)
+            ->get('/mobile/dashboard')
+            ->assertOk()
+            ->getContent();
+
+        $tabbar = str($html)->between('<nav class="kd-tabbar', '</nav>')->toString();
+
+        $this->assertStringContainsString('>Beranda<', $tabbar);
+        $this->assertStringContainsString('>APMO<', $tabbar);
+        $this->assertStringContainsString('>Absensi<', $tabbar);
+        $this->assertStringContainsString('>Laporan<', $tabbar);
+        $this->assertStringContainsString('>Profil<', $tabbar);
+        $this->assertStringContainsString('kd-tab--fab', $tabbar);
+        $this->assertStringContainsString(route('mobile.angket'), $tabbar);
+        $this->assertStringContainsString(route('mobile.absensi'), $tabbar);
     }
 
     public function test_menu_bawah_pengunjung_tetap_beranda_direktori_daftar_masuk(): void
@@ -303,6 +350,7 @@ class MobileRoutesTest extends TestCase
     {
         $this->get('/mobile/layanan')->assertRedirect('/login');
         $this->get('/mobile/profil')->assertRedirect('/login');
+        $this->get('/mobile/laporan')->assertRedirect('/login');
     }
 
     public function test_halaman_mobile_layanan_tampil_sesuai_peran(): void
@@ -322,7 +370,7 @@ class MobileRoutesTest extends TestCase
             ->get('/mobile/layanan')
             ->assertOk()
             ->assertSee('Kelola Organisasi')
-            ->assertSee('Buka Dashboard CMS')
+            ->assertDontSee('Buka Dashboard CMS')
             ->assertSee(route('admin.duta'), false)
             ->assertDontSee('Layanan Partisipasi');
     }
@@ -333,10 +381,12 @@ class MobileRoutesTest extends TestCase
         $this->actingAs($warga)
             ->get('/mobile/profil')
             ->assertOk()
-            ->assertSee('Akun Saya')
+            ->assertSee('Profil')
+            ->assertSee('Ubah Data')
+            ->assertSee('Keamanan')
             ->assertSee($warga->nama_lengkap)
             ->assertSee($warga->email)
-            ->assertSee('Detail Akun')
+            ->assertSee('Informasi Akun')
             ->assertSee('Keluar dari Akun')
             ->assertSee(route('admin.keluar'), false);
 
@@ -344,7 +394,7 @@ class MobileRoutesTest extends TestCase
         $this->actingAs($korcam)
             ->get('/mobile/profil')
             ->assertOk()
-            ->assertSee('Buka Dashboard CMS');
+            ->assertDontSee('Buka Dashboard CMS');
     }
 
     public function test_halaman_mobile_berita_tampil_dan_detail(): void

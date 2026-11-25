@@ -19,6 +19,7 @@ use App\Livewire\Backend\Kormi\Event\EventKelola;
 use App\Livewire\Backend\Kormi\Sapras\SaprasKelola;
 use App\Livewire\Backend\Kormi\Sdi\SdiKelola;
 use App\Livewire\Backend\Kormi\Apmo\ApmoKelola;
+use App\Livewire\Backend\Kormi\Apmo\ApmoSurveiWilayah;
 use App\Livewire\Backend\Pengguna\PenggunaKelola;
 use App\Livewire\Backend\Pengguna\PeranKelola;
 use App\Livewire\Backend\Pengaturan\PengaturanKelola;
@@ -190,6 +191,7 @@ Route::prefix('admin')->group(function () {
         Route::middleware('peran:super-admin')->group(function () {
             Route::get('/sdi', SdiKelola::class)->name('admin.sdi');
             Route::get('/apmo', ApmoKelola::class)->name('admin.apmo');
+            Route::get('/apmo/wilayah', ApmoSurveiWilayah::class)->name('admin.apmo.wilayah')->middleware('arahkan.mobile:mobile.apmo.wilayah');
             Route::get('/partisipasi', PartisipasiKelola::class)->name('admin.partisipasi.log');
             Route::get('/partisipasi/statistik', PartisipasiStatistik::class)->name('admin.partisipasi.statistik');
             Route::get('/pengguna', PenggunaKelola::class)->name('admin.pengguna');

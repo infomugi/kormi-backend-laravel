@@ -378,17 +378,17 @@
                 <!-- Anugerah APMO -->
                 <div x-show="!menuSearch || 'anugerah apmo penghargaan tokoh penggerak apresiasi dedikasi piala insan'.includes(menuSearch.toLowerCase())" class="relative group">
                     <a href="{{ route('admin.apmo') }}" wire:navigate
-                        class="flex items-center rounded-xl font-bold text-xs sm:text-sm transition-all duration-150 relative overflow-hidden {{ request()->routeIs('admin.apmo*') ? 'bg-gradient-to-r from-emerald-500/30 to-lime-500/20 text-white font-extrabold shadow-md border border-lime-400/40 backdrop-blur-md' : 'text-emerald-100/80 hover:text-white hover:bg-white/[0.08]' }}"
+                        class="flex items-center rounded-xl font-bold text-xs sm:text-sm transition-all duration-150 relative overflow-hidden {{ request()->routeIs('admin.apmo') ? 'bg-gradient-to-r from-emerald-500/30 to-lime-500/20 text-white font-extrabold shadow-md border border-lime-400/40 backdrop-blur-md' : 'text-emerald-100/80 hover:text-white hover:bg-white/[0.08]' }}"
                         :class="sidebarExpanded ? 'px-3 py-2.5 gap-3' : 'w-11 h-11 justify-center mx-auto'">
-                        @if(request()->routeIs('admin.apmo*'))
+                        @if(request()->routeIs('admin.apmo'))
                             <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-5 bg-gradient-to-b from-lime-400 to-emerald-400 rounded-r-md shadow-sm shadow-lime-400/50"></div>
                         @endif
                         <div class="w-5 h-5 flex items-center justify-center shrink-0">
                             <i data-lucide="sparkles"
-                                class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 {{ request()->routeIs('admin.apmo*') ? 'text-lime-300' : 'text-emerald-300/80 group-hover:text-lime-300' }}"></i>
+                                class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 {{ request()->routeIs('admin.apmo') ? 'text-lime-300' : 'text-emerald-300/80 group-hover:text-lime-300' }}"></i>
                         </div>
                         <span x-show="sidebarExpanded" class="truncate whitespace-nowrap">Anugerah APMO</span>
-                        @if(request()->routeIs('admin.apmo*'))
+                        @if(request()->routeIs('admin.apmo'))
                             <span x-show="sidebarExpanded" class="ml-auto flex items-center">
                                 <span class="w-2 h-2 rounded-full bg-lime-400 shadow-sm shadow-lime-400 animate-pulse"></span>
                             </span>
@@ -450,6 +450,32 @@
                         class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 bg-slate-950/95 text-white text-xs font-bold rounded-xl shadow-2xl border border-emerald-500/30 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap backdrop-blur-md flex items-center gap-2">
                         <span class="w-1.5 h-1.5 rounded-full bg-lime-400"></span>
                         Statistik & Indeks APMO
+                    </div>
+                </div>
+
+                <!-- Monitoring Survei APMO per Wilayah -->
+                <div x-show="!menuSearch || 'monitoring survei angket apmo wilayah kecamatan desa kelurahan cakupan keterisian input belum terisi partisipasi'.includes(menuSearch.toLowerCase())" class="relative group">
+                    <a href="{{ route('admin.apmo.wilayah') }}" wire:navigate
+                        class="flex items-center rounded-xl font-bold text-xs sm:text-sm transition-all duration-150 relative overflow-hidden {{ request()->routeIs('admin.apmo.wilayah*') ? 'bg-gradient-to-r from-emerald-500/30 to-lime-500/20 text-white font-extrabold shadow-md border border-lime-400/40 backdrop-blur-md' : 'text-emerald-100/80 hover:text-white hover:bg-white/[0.08]' }}"
+                        :class="sidebarExpanded ? 'px-3 py-2.5 gap-3' : 'w-11 h-11 justify-center mx-auto'">
+                        @if(request()->routeIs('admin.apmo.wilayah*'))
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-5 bg-gradient-to-b from-lime-400 to-emerald-400 rounded-r-md shadow-sm shadow-lime-400/50"></div>
+                        @endif
+                        <div class="w-5 h-5 flex items-center justify-center shrink-0">
+                            <i data-lucide="radar"
+                                class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 {{ request()->routeIs('admin.apmo.wilayah*') ? 'text-lime-300' : 'text-emerald-300/80 group-hover:text-lime-300' }}"></i>
+                        </div>
+                        <span x-show="sidebarExpanded" class="truncate whitespace-nowrap">Monitoring Survei APMO</span>
+                        @if(request()->routeIs('admin.apmo.wilayah*'))
+                            <span x-show="sidebarExpanded" class="ml-auto flex items-center">
+                                <span class="w-2 h-2 rounded-full bg-lime-400 shadow-sm shadow-lime-400 animate-pulse"></span>
+                            </span>
+                        @endif
+                    </a>
+                    <div x-show="!sidebarExpanded"
+                        class="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 bg-slate-950/95 text-white text-xs font-bold rounded-xl shadow-2xl border border-emerald-500/30 opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-150 z-50 whitespace-nowrap backdrop-blur-md flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-lime-400"></span>
+                        Monitoring Survei APMO
                     </div>
                 </div>
                 @endif

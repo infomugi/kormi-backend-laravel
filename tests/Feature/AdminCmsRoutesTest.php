@@ -97,6 +97,7 @@ class AdminCmsRoutesTest extends TestCase
             '/admin/sapras',
             '/admin/sdi',
             '/admin/apmo',
+            '/admin/apmo/wilayah',
             '/admin/pengguna',
             '/admin/sejarah',
             '/admin/visi-misi',

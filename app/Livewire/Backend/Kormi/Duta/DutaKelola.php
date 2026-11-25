@@ -2,13 +2,11 @@
 
 namespace App\Livewire\Backend\Kormi\Duta;
 
-use App\Models\Core\Pengguna;
-use App\Models\Core\Peran;
 use App\Models\Kormi\DutaOlahraga;
 use App\Models\Master\DesaKelurahan;
 use App\Models\Master\Kecamatan;
+use App\Services\PersetujuanPendaftaran;
 use App\Services\StorageService;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -331,29 +329,6 @@ class DutaKelola extends Component
         abort_unless(auth()->check() && auth()->user()->hasRole('super-admin', 'admin-korcam'), 403);
     }
 
-    /**
-     * Ambil akun pemilik pendaftaran (deferred linking saat submit).
-     */
-    protected function akunPendaftarDuta(DutaOlahraga $duta): ?Pengguna
-    {
-        return $duta->akunPendaftar
-            ?? Pengguna::where('duta_id', $duta->id)->first();
-    }
-
-    /**
-     * Peran duta-olahraga, dipakai saat menautkan akun pendaftar.
-     */
-    protected function peranDuta(): Peran
-    {
-        return Peran::firstOrCreate(
-            ['slug' => 'duta-olahraga'],
-            [
-                'nama_peran' => 'Duta Olahraga Desa',
-                'deskripsi'  => 'Duta Olahraga Desa/Kelurahan',
-            ]
-        );
-    }
-
     public function setujuiPendaftaran(string $id): void
     {
         $this->pastikanPengelolaDuta();
@@ -370,40 +345,7 @@ class DutaKelola extends Component
             return;
         }
 
-        $adminId = auth()->id();
-
-        DB::transaction(function () use ($duta, $adminId) {
-            $duta->update([
-                'status_pendaftaran' => DutaOlahraga::STATUS_DISETUJUI,
-                'status_aktif'       => true,
-                'disetujui_pada'     => now(),
-                'disetujui_oleh'     => $adminId,
-                'catatan_verifikasi' => null,
-            ]);
-
-            // Penautan akun ditunda sampai approval: aktifkan & tautkan akun pendaftar.
-            $akun = $this->akunPendaftarDuta($duta);
-
-            if (! $akun) {
-                return;
-            }
-
-            $dataAkun = [
-                'duta_id'        => $duta->id,
-                'status_aktif'   => true,
-                'disetujui_pada' => now(),
-                'disetujui_oleh' => $adminId,
-            ];
-
-            // Hanya promotekan peran warga/pegiat; jangan turunkan peran admin.
-            $slugPeran = $akun->peran?->slug;
-
-            if ($akun->peran_id === null || $slugPeran === 'pegiat-olahraga') {
-                $dataAkun['peran_id'] = $this->peranDuta()->id;
-            }
-
-            $akun->update($dataAkun);
-        });
+        app(PersetujuanPendaftaran::class)->setujuiDuta($duta, auth()->id());
 
         session()->flash('pesan', 'Pendaftaran duta "' . $duta->nama_lengkap . '" berhasil disetujui dan akun terkait telah diaktifkan.');
     }
@@ -424,50 +366,7 @@ class DutaKelola extends Component
             return;
         }
 
-        $akunDihapus = false;
-
-        DB::transaction(function () use ($duta, &$akunDihapus) {
-            $duta->update([
-                'status_pendaftaran' => DutaOlahraga::STATUS_DITOLAK,
-                'status_aktif'       => false,
-                'catatan_verifikasi' => 'Ditolak oleh administrator',
-                'disetujui_pada'     => null,
-                'disetujui_oleh'     => null,
-            ]);
-
-            $akun = $this->akunPendaftarDuta($duta);
-
-            if (! $akun) {
-                return;
-            }
-
-            $otomatisDibuat = ! $akun->status_aktif && $akun->disetujui_pada === null;
-
-            if ($otomatisDibuat) {
-                // Akun hasil pendaftaran tamu: hapus permanen agar email bebas
-                // dipakai untuk mendaftar ulang.
-                $duta->update(['pengguna_id' => null]);
-                $akun->forceDelete();
-                $akunDihapus = true;
-
-                return;
-            }
-
-            // Akun yang sudah aktif sebelum mendaftar: cukup lepaskan tautan.
-            $dataAkun = ['duta_id' => null];
-
-            if ($akun->peran?->slug === 'duta-olahraga') {
-                $dataAkun['peran_id'] = Peran::firstOrCreate(
-                    ['slug' => 'pegiat-olahraga'],
-                    [
-                        'nama_peran' => 'Masyarakat / Pegiat Olahraga',
-                        'deskripsi'  => 'Masyarakat pencatat aktivitas olahraga mandiri',
-                    ]
-                )->id;
-            }
-
-            $akun->update($dataAkun);
-        });
+        $akunDihapus = app(PersetujuanPendaftaran::class)->tolakDuta($duta);
 
         $pesan = 'Pendaftaran duta "' . $duta->nama_lengkap . '" ditolak dan data tidak akan tampil di direktori publik. ';
         $pesan .= $akunDihapus
