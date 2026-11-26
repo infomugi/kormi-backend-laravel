@@ -102,12 +102,12 @@
         </section>
 
         {{-- Kartu survei APMO --}}
-        <section class="kd-home-apmo" aria-label="Survei APMO">
+        <section class="kd-home-apmo" aria-label="Survey APMO">
             <div class="kd-home-apmo-top">
                 <span class="kd-home-apmo-icon"><i data-lucide="clipboard-list"></i></span>
                 <span class="kd-home-apmo-copy">
                     <span class="kd-home-overline">Program APMO</span>
-                    <strong>Survei APMO</strong>
+                    <strong>Survey APMO</strong>
                 </span>
                 <span class="kd-chip">{{ $apmo['sudah'] ? 'Sudah diisi' : 'Belum diisi' }}</span>
             </div>
@@ -121,7 +121,7 @@
             </p>
 
             <a href="{{ route('mobile.angket') }}" wire:navigate class="kd-home-apmo-cta">
-                <span>{{ $apmo['sudah'] ? 'Perbarui Jawaban Survei' : 'Isi Survei Sekarang' }}</span>
+                <span>{{ $apmo['sudah'] ? 'Perbarui Jawaban Survey' : 'Isi Survey Sekarang' }}</span>
                 <i data-lucide="arrow-up-right"></i>
             </a>
             </section>
@@ -179,24 +179,6 @@
         </div>
 
         @if($isPengelola)
-            {{-- Ringkasan data peran --}}
-            <div class="kd-home-sect">
-                <h2>Ringkasan data</h2>
-                <span class="kd-chip kd-chip--dark">{{ count($modul) }} modul</span>
-            </div>
-
-            <div class="kd-stats">
-                @foreach($adminStats as $stat)
-                    <div class="kd-stat">
-                        <span class="kd-stat-icon"><i data-lucide="{{ $stat['icon'] }}"></i></span>
-                        <span>
-                            <span class="kd-stat-value">{{ $stat['value'] }}</span>
-                            <span class="kd-stat-label">{{ $stat['label'] }}</span>
-                        </span>
-                    </div>
-                @endforeach
-            </div>
-
             @if($isSuper)
                 {{-- Antrean persetujuan khusus Super Admin --}}
                 <div class="kd-home-sect">
@@ -247,22 +229,24 @@
                 @endif
             @endif
 
-            {{-- Modul pengelolaan --}}
-            <div class="kd-home-sect">
-                <h2>Kelola organisasi</h2>
-                <a href="{{ route('mobile.layanan') }}" wire:navigate>Semua menu</a>
-            </div>
+            @if(! $isSuper)
+                {{-- Modul pengelolaan --}}
+                <div class="kd-home-sect">
+                    <h2>Kelola organisasi</h2>
+                    <a href="{{ route('mobile.layanan') }}" wire:navigate>Semua menu</a>
+                </div>
 
-            <div class="kd-modules">
-                @foreach(array_slice($modul, 0, 9) as $item)
-                    <a href="{{ route($item['route']) }}" class="kd-module">
-                        <span class="kd-module-icon"><i data-lucide="{{ $item['icon'] }}"></i></span>
-                        <span>
-                            <span class="kd-module-name">{{ $item['label'] }}</span>
-                        </span>
-                    </a>
-                @endforeach
-            </div>
+                <div class="kd-modules">
+                    @foreach(array_slice($modul, 0, 9) as $item)
+                        <a href="{{ route($item['route']) }}" class="kd-module">
+                            <span class="kd-module-icon"><i data-lucide="{{ $item['icon'] }}"></i></span>
+                            <span>
+                                <span class="kd-module-name">{{ $item['label'] }}</span>
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
 
             {{-- Daftar terbaru sesuai peran --}}
             <div class="kd-home-sect">
@@ -321,36 +305,12 @@
                 </div>
             @else
                 <div class="kd-empty">
-                    <i data-lucide="activity"></i>
+                    <i data-lucide="clipboard-list"></i>
                     <strong>Belum ada aktivitas tercatat</strong>
-                    <p>Catat sesi olahraga pertama Anda dan kontribusikan pada APMO Kabupaten Bandung.</p>
-                    <a href="{{ route('partisipasi.catat') }}" wire:navigate class="kd-page-btn">Catat sekarang</a>
+                    <p>Isi Survey APMO sekarang dan kontribusikan data kebiasaan olahraga Anda untuk Kabupaten Bandung.</p>
+                    <a href="{{ route('mobile.angket') }}" wire:navigate class="kd-page-btn">Survey APMO sekarang</a>
                 </div>
             @endif
-        @endif
-
-        {{-- Kabar KORMI --}}
-        @if($berita->isNotEmpty())
-            <div class="kd-home-sect">
-                <h2>Kabar KORMI</h2>
-                <a href="{{ route('mobile.berita') }}" wire:navigate>Semua berita</a>
-            </div>
-
-            <div class="kd-home-news">
-                @foreach($berita as $kabar)
-                    <a href="{{ route('mobile.berita.detail', $kabar->slug) }}" wire:navigate class="kd-home-news-card">
-                        <img src="{{ $kabar->gambar_url }}" alt="{{ $kabar->judul }}" loading="lazy"
-                             onerror="this.src='https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=800'">
-                        <span class="kd-home-news-body">
-                            <span class="kd-home-news-title">{{ $kabar->judul }}</span>
-                            <span class="kd-home-news-meta">
-                                {{ \Carbon\Carbon::parse($kabar->tanggal_publikasi)->translatedFormat('d M Y') }}
-                                <span>· {{ $kabar->estimasi_menit_baca ?? 2 }} mnt baca</span>
-                            </span>
-                        </span>
-                    </a>
-                @endforeach
-            </div>
         @endif
 
         <div class="kd-home-foot">

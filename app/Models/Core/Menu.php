@@ -132,8 +132,8 @@ class Menu extends Model
             [
                 'nama' => 'Partisipasi Warga', 'tautan' => '#', 'icon' => 'activity', 'urutan' => 4,
                 'sub' => [
-                    ['nama' => 'Catat Aktivitas Olahraga', 'tautan' => '/partisipasi/catat', 'icon' => 'clipboard-pen', 'urutan' => 1],
-                    ['nama' => 'Riwayat & Badge APMO Saya', 'tautan' => '/partisipasi/riwayat', 'icon' => 'sparkles', 'urutan' => 2],
+                    ['nama' => 'Catat Aktivitas Olahraga', 'tautan' => '/mobile/beranda', 'icon' => 'clipboard-pen', 'urutan' => 1],
+                    ['nama' => 'Riwayat & Badge APMO Saya', 'tautan' => '/mobile/beranda', 'icon' => 'sparkles', 'urutan' => 2],
                     ['nama' => 'Tentang APMO & Indeks Partisipasi', 'tautan' => '/apmo', 'icon' => 'bar-chart-3', 'urutan' => 3],
                 ]
             ],
@@ -195,7 +195,7 @@ class Menu extends Model
             ['nama' => 'Berita & Warta Terkini', 'tautan' => '/berita', 'icon' => 'newspaper', 'urutan' => 2],
             ['nama' => 'Direktori Induk Olahraga (INORGA)', 'tautan' => '/inorga', 'icon' => 'layers', 'urutan' => 3],
             ['nama' => 'Klasemen Medali FORKAB', 'tautan' => '/forkab', 'icon' => 'trophy', 'urutan' => 4],
-            ['nama' => 'Partisipasi Warga (APMO)', 'tautan' => '/partisipasi/catat', 'icon' => 'activity', 'urutan' => 5],
+            ['nama' => 'Partisipasi Warga (APMO)', 'tautan' => '/mobile/beranda', 'icon' => 'activity', 'urutan' => 5],
             ['nama' => 'Hubungi KORMI Kab. Bandung', 'tautan' => '/kontak', 'icon' => 'phone', 'urutan' => 6],
             ['nama' => 'Portal CMS Pengurus', 'tautan' => '/admin/masuk', 'icon' => 'lock', 'urutan' => 7],
         ];

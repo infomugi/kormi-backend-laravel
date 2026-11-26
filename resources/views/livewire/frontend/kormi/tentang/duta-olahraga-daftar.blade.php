@@ -333,7 +333,22 @@
                                 <x-form.input name="akun_instagram" wire:model="akun_instagram" prefix="@" placeholder="nama_instagram" maxlength="100" />
                             </x-form.field>
 
-                            <x-form.field label="Pas Foto Duta" name="foto" badge="Opsional" hint="Format JPG, JPEG, PNG, atau WEBP. Ukuran maksimal 5 MB.">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <x-form.field label="Bank" name="nama_bank" badge="Opsional">
+                                    <x-form.select name="nama_bank" wire:model="nama_bank">
+                                        <option value="">Pilih bank</option>
+                                        @foreach($daftarBank as $bank)
+                                            <option value="{{ $bank }}">{{ $bank }}</option>
+                                        @endforeach
+                                    </x-form.select>
+                                </x-form.field>
+
+                                <x-form.field label="Nomor Rekening" name="nomor_rekening" badge="Opsional">
+                                    <x-form.input name="nomor_rekening" wire:model="nomor_rekening" icon="credit-card" placeholder="Contoh: 1234567890" inputmode="numeric" maxlength="25" />
+                                </x-form.field>
+                            </div>
+
+                            <x-form.field label="Pas Foto Duta" name="foto" badge="Opsional" hint="Format JPG, JPEG, PNG, atau WEBP. Otomatis dikompres ≤ 1 MB.">
                                 <div class="space-y-3">
                                     @if($foto)
                                         @php $ekstensiFoto = strtolower($foto->getClientOriginalExtension()); @endphp
@@ -352,7 +367,7 @@
                                     <label class="flex flex-col items-center justify-center gap-2 w-full px-4 py-6 rounded-2xl border-2 border-dashed border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50 transition-colors cursor-pointer text-center">
                                         <i data-lucide="image-plus" class="w-6 h-6 text-emerald-600"></i>
                                         <span class="text-xs font-black text-slate-800">{{ $foto ? 'Ganti Foto Duta' : 'Pilih Foto Duta' }}</span>
-                                        <span class="text-[10px] text-slate-400 font-semibold">JPG, JPEG, PNG, WEBP (Maks. 5 MB)</span>
+                                        <span class="text-[10px] text-slate-400 font-semibold">JPG, JPEG, PNG, WEBP — otomatis dikompres ≤ 1 MB</span>
                                         <input type="file" wire:model="foto" accept="image/jpeg,image/png,image/webp" class="sr-only">
                                     </label>
 
@@ -405,6 +420,10 @@
                                     <div class="min-w-0">
                                         <span class="text-[10px] text-slate-400 font-bold block">Kontak</span>
                                         <strong class="font-extrabold text-slate-900 block truncate">{{ $nomor_telepon ?: '-' }} &bull; {{ $email ?: '-' }}</strong>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <span class="text-[10px] text-slate-400 font-bold block">Bank / Rekening</span>
+                                        <strong class="font-extrabold text-slate-900 block truncate">{{ $nama_bank ?: '-' }} &bull; {{ $nomor_rekening ?: '-' }}</strong>
                                     </div>
                                     <div class="min-w-0">
                                         <span class="text-[10px] text-slate-400 font-bold block">Kategori Duta</span>

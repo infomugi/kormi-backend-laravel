@@ -2,7 +2,7 @@
     <div class="kd-success-check">
         <i data-lucide="check" class="stroke-[3]"></i>
     </div>
-    <span class="kd-success-tag">Angket Terkirim</span>
+    <span class="kd-success-tag">Survey Terkirim</span>
     <h2>Terima kasih, {{ $namaTersimpan ?: 'Responden' }}!</h2>
     <p class="kd-success-text">
         Jawaban Anda telah kami simpan untuk program <strong>APMO KORMI Kabupaten Bandung</strong>.
@@ -17,6 +17,10 @@
         <div class="kd-success-row">
             <i data-lucide="clock"></i>
             <p>Waktu pengisian: <strong>{{ $waktuTersimpan }}</strong></p>
+        </div>
+        <div class="kd-success-row">
+            <i data-lucide="camera"></i>
+            <p>Foto bukti: <strong>terlampir</strong></p>
         </div>
         <div class="kd-success-row">
             <i data-lucide="database"></i>
@@ -37,7 +41,7 @@
         @endauth
         <button type="button" wire:click="isiLagi" class="kd-btn-ghost">
             <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-            <span>Isi Angket Lagi</span>
+            <span>Isi Survey Lagi</span>
         </button>
     </div>
 </div>

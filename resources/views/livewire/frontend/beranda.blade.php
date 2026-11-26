@@ -43,7 +43,7 @@
 
                 <!-- Action Hub Buttons -->
                 <div class="flex flex-wrap justify-center items-center gap-3.5 pt-4">
-                    <a href="{{ route('partisipasi.catat') }}" wire:navigate class="h-12 px-7 inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-full font-black text-xs leading-none shadow-xl shadow-emerald-950/50 hover:shadow-emerald-500/30 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 uppercase tracking-wider whitespace-nowrap group border border-emerald-400/30">
+                    <a href="{{ route('mobile.beranda') }}" wire:navigate class="h-12 px-7 inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-full font-black text-xs leading-none shadow-xl shadow-emerald-950/50 hover:shadow-emerald-500/30 transition-all duration-300 hover:-translate-y-0.5 active:scale-95 uppercase tracking-wider whitespace-nowrap group border border-emerald-400/30">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i>
                         <span>Catat Olahraga Warga</span>
                     </a>
@@ -97,7 +97,7 @@
             </a>
 
             <!-- Metric 3: PARTISIPASI AKTIF WARGA -->
-            <a href="{{ route('partisipasi.riwayat') }}" wire:navigate class="group p-4 sm:p-4.5 rounded-2xl bg-slate-50/80 hover:bg-lime-50/70 border border-slate-200/70 hover:border-lime-300/90 transition-all duration-300 flex items-center gap-3.5 text-left hover:shadow-md">
+            <a href="{{ route('mobile.beranda') }}" wire:navigate class="group p-4 sm:p-4.5 rounded-2xl bg-slate-50/80 hover:bg-lime-50/70 border border-slate-200/70 hover:border-lime-300/90 transition-all duration-300 flex items-center gap-3.5 text-left hover:shadow-md">
                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-lime-500 to-emerald-600 flex items-center justify-center text-white shadow-md shadow-lime-500/25 group-hover:scale-110 group-hover:rotate-2 transition-transform shrink-0">
                     <i data-lucide="activity" class="w-5 h-5"></i>
                 </div>
@@ -149,22 +149,14 @@
                         </p>
                     </div>
 
-                    <div class="md:col-span-4 flex flex-col sm:flex-row md:flex-col gap-3">
+                    <div class="md:col-span-4 flex">
                         <a 
-                            href="{{ route('partisipasi.catat') }}" 
+                            href="{{ route('mobile.beranda') }}" 
                             wire:navigate
-                            class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:brightness-110 active:scale-98 text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-900/40 flex items-center justify-center gap-2"
+                            class="w-full px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:brightness-110 active:scale-98 text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-900/40 flex items-center justify-center gap-2"
                         >
-                            <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                            <span>Catat Sesi Sekarang</span>
-                        </a>
-                        <a 
-                            href="{{ route('partisipasi.riwayat') }}" 
-                            wire:navigate
-                            class="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 active:scale-98 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
-                        >
-                            <i data-lucide="award" class="w-4 h-4 text-amber-400"></i>
-                            <span>Riwayat & Capaian Saya</span>
+                            <i data-lucide="smartphone" class="w-4 h-4"></i>
+                            <span>Buka Aplikasi Mobile</span>
                         </a>
                     </div>
                 </div>

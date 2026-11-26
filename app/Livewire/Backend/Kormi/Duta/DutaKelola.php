@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Backend\Kormi\Duta;
 
+use App\Livewire\Frontend\Kormi\Tentang\DutaOlahragaDaftar;
 use App\Models\Kormi\DutaOlahraga;
 use App\Models\Master\DesaKelurahan;
 use App\Models\Master\Kecamatan;
 use App\Services\PersetujuanPendaftaran;
 use App\Services\StorageService;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -64,6 +66,8 @@ class DutaKelola extends Component
     public string $gelar_prestasi = '';
     public string $deskripsi_prestasi = '';
     public string $akun_instagram = '';
+    public string $nama_bank = '';
+    public string $nomor_rekening = '';
     public string $foto_url = '';    // path MinIO
     public $uploadFotoDuta = null;   // file upload sementara
     public bool $status_aktif = true;
@@ -92,6 +96,8 @@ class DutaKelola extends Component
             'gelar_prestasi'      => 'nullable|max:150',
             'deskripsi_prestasi'  => 'nullable',
             'akun_instagram'      => 'nullable|max:100',
+            'nama_bank'           => ['nullable', Rule::in(DutaOlahragaDaftar::DAFTAR_BANK)],
+            'nomor_rekening'      => 'nullable|digits_between:6,25',
             'status_aktif'        => 'boolean',
             'status_unggulan'     => 'boolean',
         ];
@@ -233,6 +239,8 @@ class DutaKelola extends Component
         $this->gelar_prestasi      = $d->gelar_prestasi ?? '';
         $this->deskripsi_prestasi  = $d->deskripsi_prestasi ?? ($d->prestasi ?? '');
         $this->akun_instagram      = $d->akun_instagram ?? '';
+        $this->nama_bank           = $d->nama_bank ?? '';
+        $this->nomor_rekening      = $d->nomor_rekening ?? '';
         $this->foto_url            = $d->foto_url ?? '';
         $this->status_aktif        = (bool) $d->status_aktif;
         $this->status_unggulan     = (bool) $d->status_unggulan;
@@ -485,6 +493,8 @@ class DutaKelola extends Component
             'nama_lengkap.min'        => 'Nama lengkap minimal 3 karakter.',
             'tahun_pemilihan.required'=> 'Tahun pemilihan wajib diisi.',
             'kategori_duta.required'  => 'Kategori duta wajib dipilih.',
+            'nama_bank.in'            => 'Bank yang dipilih tidak valid.',
+            'nomor_rekening.digits_between' => 'Nomor rekening harus berupa angka 6-25 digit.',
             'uploadFotoDuta.image'    => 'Berkas harus berupa gambar.',
             'uploadFotoDuta.mimes'    => 'Format gambar harus JPG, JPEG, PNG, atau WEBP.',
             'uploadFotoDuta.max'      => 'Ukuran foto maksimal 5 MB.',
@@ -518,6 +528,8 @@ class DutaKelola extends Component
             'gelar_prestasi'      => trim($this->gelar_prestasi) ?: null,
             'deskripsi_prestasi'  => trim($this->deskripsi_prestasi) ?: null,
             'akun_instagram'      => trim(str_replace('@', '', $this->akun_instagram)) ?: null,
+            'nama_bank'           => $this->nama_bank ?: null,
+            'nomor_rekening'      => trim($this->nomor_rekening) ?: null,
             'foto_url'            => $pathFoto,
             'status_aktif'        => (bool) $this->status_aktif,
             'status_unggulan'     => (bool) $this->status_unggulan,
@@ -590,6 +602,8 @@ class DutaKelola extends Component
         $this->gelar_prestasi      = '';
         $this->deskripsi_prestasi  = '';
         $this->akun_instagram      = '';
+        $this->nama_bank           = '';
+        $this->nomor_rekening      = '';
         $this->foto_url            = '';
         $this->uploadFotoDuta      = null;
         $this->status_aktif        = true;
@@ -622,6 +636,7 @@ class DutaKelola extends Component
             'dutaUnggulanCount'       => $dutaUnggulanCount,
             'pendaftaranMenunggu'     => $pendaftaranMenunggu,
             'tahunList'               => $tahunList,
+            'daftarBank'              => DutaOlahragaDaftar::DAFTAR_BANK,
         ]);
     }
 }

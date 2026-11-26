@@ -44,6 +44,8 @@ class Profil extends Component
     public ?string $duta_desa_kelurahan_id = null;
     public string $duta_alamat = '';
     public string $duta_instagram = '';
+    public string $duta_nama_bank = '';
+    public string $duta_nomor_rekening = '';
     public string $duta_gelar_prestasi = '';
     public string $duta_deskripsi_prestasi = '';
     public $foto_duta_baru = null;
@@ -79,6 +81,8 @@ class Profil extends Component
         'duta_alamat.min' => 'Alamat domisili minimal 10 karakter.',
         'duta_alamat.max' => 'Alamat domisili maksimal 500 karakter.',
         'duta_instagram.max' => 'Nama akun Instagram maksimal 100 karakter.',
+        'duta_nama_bank.in' => 'Bank yang dipilih tidak valid.',
+        'duta_nomor_rekening.digits_between' => 'Nomor rekening harus berupa angka 6-25 digit.',
         'duta_gelar_prestasi.max' => 'Gelar prestasi maksimal 150 karakter.',
         'duta_deskripsi_prestasi.max' => 'Deskripsi prestasi maksimal 1500 karakter.',
         'foto_duta_baru.image' => 'Berkas foto harus berupa gambar.',
@@ -146,6 +150,8 @@ class Profil extends Component
                 ],
                 'duta_alamat' => 'nullable|min:10|max:500',
                 'duta_instagram' => 'nullable|max:100',
+                'duta_nama_bank' => ['nullable', Rule::in(DutaOlahragaDaftar::DAFTAR_BANK)],
+                'duta_nomor_rekening' => 'nullable|digits_between:6,25',
                 'duta_gelar_prestasi' => 'nullable|max:150',
                 'duta_deskripsi_prestasi' => 'nullable|max:1500',
                 'foto_duta_baru' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
@@ -231,6 +237,8 @@ class Profil extends Component
                 'desa_kelurahan_id' => $this->duta_desa_kelurahan_id,
                 'alamat_domisili' => trim(strip_tags($this->duta_alamat)) ?: null,
                 'akun_instagram' => $this->duta_instagram !== '' ? ltrim(strip_tags(trim($this->duta_instagram)), '@') : null,
+                'nama_bank' => $this->duta_nama_bank !== '' ? $this->duta_nama_bank : null,
+                'nomor_rekening' => trim($this->duta_nomor_rekening) !== '' ? trim($this->duta_nomor_rekening) : null,
                 'gelar_prestasi' => trim(strip_tags($this->duta_gelar_prestasi)) ?: null,
                 'deskripsi_prestasi' => trim(strip_tags($this->duta_deskripsi_prestasi)) ?: null,
                 'kategori_duta' => $this->duta_kategori,
@@ -364,6 +372,7 @@ class Profil extends Component
                 : collect();
             $data['daftarKategori'] = DutaOlahragaDaftar::KATEGORI_DUTA;
             $data['daftarPendidikan'] = DutaOlahragaDaftar::PENDIDIKAN_TERAKHIR;
+            $data['daftarBank'] = DutaOlahragaDaftar::DAFTAR_BANK;
         }
 
         return view('livewire.mobile.profil', $data);
@@ -409,6 +418,8 @@ class Profil extends Component
             $this->duta_desa_kelurahan_id = $user->desa_kelurahan_id ?: null;
             $this->duta_alamat = '';
             $this->duta_instagram = '';
+            $this->duta_nama_bank = '';
+            $this->duta_nomor_rekening = '';
             $this->duta_gelar_prestasi = '';
             $this->duta_deskripsi_prestasi = '';
             $this->foto_duta_baru = null;
@@ -426,6 +437,8 @@ class Profil extends Component
         $this->duta_desa_kelurahan_id = $duta->desa_kelurahan_id ?: null;
         $this->duta_alamat = (string) ($duta->alamat_domisili ?? '');
         $this->duta_instagram = (string) ($duta->akun_instagram ?? '');
+        $this->duta_nama_bank = (string) ($duta->nama_bank ?? '');
+        $this->duta_nomor_rekening = (string) ($duta->nomor_rekening ?? '');
         $this->duta_gelar_prestasi = (string) ($duta->gelar_prestasi ?? '');
         $this->duta_deskripsi_prestasi = (string) ($duta->deskripsi_prestasi ?? '');
         $this->foto_duta_baru = null;

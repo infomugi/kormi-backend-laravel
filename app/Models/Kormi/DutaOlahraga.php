@@ -27,6 +27,8 @@ class DutaOlahraga extends ModelDasar
         'gelar_prestasi',
         'deskripsi_prestasi',
         'akun_instagram',
+        'nama_bank',
+        'nomor_rekening',
         'nomor_telepon',
         'email',
         'jenis_kelamin',

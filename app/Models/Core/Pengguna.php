@@ -30,8 +30,12 @@ class Pengguna extends Authenticatable
     protected $casts = [
         'status_aktif' => 'boolean',
         'terakhir_masuk' => 'datetime',
+        'terakhir_aktif' => 'datetime',
         'kata_sandi' => 'hashed',
     ];
+
+    /** Jendela waktu (menit) untuk menganggap pengguna masih online. */
+    public const MENIT_ONLINE = 5;
 
     public function getAuthPasswordName()
     {
@@ -107,6 +111,12 @@ class Pengguna extends Authenticatable
 
         $userSlug = $this->peran?->slug;
         return in_array($userSlug, $roles, true);
+    }
+
+    public function isOnline(): bool
+    {
+        return $this->terakhir_aktif !== null
+            && $this->terakhir_aktif->gte(now()->subMinutes(self::MENIT_ONLINE));
     }
 
     public function punyaAkses(string $modulKey): bool

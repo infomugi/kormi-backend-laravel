@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
+        $middleware->web(append: [
+            \App\Http\Middleware\CatatAktivitasPengguna::class,
+        ]);
         $middleware->alias([
             'peran' => \App\Http\Middleware\CekPeran::class,
             'arahkan.mobile' => \App\Http\Middleware\ArahkanPerangkatMobile::class,

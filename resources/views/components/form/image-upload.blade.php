@@ -4,10 +4,10 @@
     'name' => 'uploadGambar',
     'inputId' => 'uploadDropzoneInput_' . rand(1000, 9999),
     'accept' => 'image/jpeg,image/png,image/webp',
-    'maxSizeMB' => 2,
+    'maxSizeMB' => 1,
     'placeholderText' => 'Seret & lepas foto di sini, atau telusuri berkas',
     'emptyTitle' => 'Unggah Foto Utama',
-    'emptySubtitle' => 'Format JPG, PNG, WEBP (Otomatis kompres jika > 2MB)',
+    'emptySubtitle' => 'Format JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB',
     'aspectRatio' => 'h-36 sm:h-44',
 ])
 
@@ -19,29 +19,33 @@
         async handleFiles(files) {
             if (!files || files.length === 0) return;
             let file = files[0];
+            this.compressionInfo = null;
 
-            if (file.type.startsWith('image/') && file.size > ({{ $maxSizeMB }} * 1024 * 1024)) {
+            if ((file.type || '').startsWith('image/') && window.compressImageClientSide) {
                 this.isCompressing = true;
-                const originalSize = file.size;
-                
+                const asli = file;
+
                 try {
-                    if (window.compressImageClientSide) {
-                        file = await window.compressImageClientSide(file, {
-                            maxSizeMB: {{ $maxSizeMB }},
-                            maxWidthOrHeight: 1920,
-                            initialQuality: 0.85
-                        });
-                        
-                        const savedPercent = Math.round((1 - (file.size / originalSize)) * 100);
-                        this.compressionInfo = `Telah dikompres ${savedPercent}% (${(originalSize/1024/1024).toFixed(1)}MB &rarr; ${(file.size/1024).toFixed(0)}KB)`;
+                    const hasil = await window.compressImageClientSide(asli, {
+                        maxSizeMB: {{ $maxSizeMB }},
+                        maxWidthOrHeight: 1600,
+                        initialQuality: 0.85
+                    });
+
+                    // Info hanya ditampilkan bila ukuran benar-benar berubah.
+                    if (hasil && hasil !== asli) {
+                        file = hasil;
+                        if (hasil.size < asli.size) {
+                            const savedPercent = Math.round((1 - (hasil.size / asli.size)) * 100);
+                            this.compressionInfo = `Telah dikompres ${savedPercent}% (${(asli.size/1024/1024).toFixed(1)}MB &rarr; ${(hasil.size/1024).toFixed(0)}KB)`;
+                        }
                     }
                 } catch (e) {
                     console.warn('Kompresi gagal, melanjutkan upload asli:', e);
+                    file = asli;
                 } finally {
                     this.isCompressing = false;
                 }
-            } else {
-                this.compressionInfo = null;
             }
 
             // Upload to Livewire

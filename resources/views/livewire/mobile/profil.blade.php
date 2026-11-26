@@ -153,6 +153,26 @@
                         </span>
                     </div>
 
+                    @if($duta->nama_bank)
+                        <div class="kd-item">
+                            <span class="kd-module-icon"><i data-lucide="landmark"></i></span>
+                            <span class="kd-item-body">
+                                <span class="kd-item-title">{{ $duta->nama_bank }}</span>
+                                <span class="kd-item-meta" style="text-transform: none;">Bank</span>
+                            </span>
+                        </div>
+                    @endif
+
+                    @if($duta->nomor_rekening)
+                        <div class="kd-item">
+                            <span class="kd-module-icon"><i data-lucide="credit-card"></i></span>
+                            <span class="kd-item-body">
+                                <span class="kd-item-title">{{ $duta->nomor_rekening }}</span>
+                                <span class="kd-item-meta" style="text-transform: none;">Nomor rekening</span>
+                            </span>
+                        </div>
+                    @endif
+
                     @if($duta->gelar_prestasi || $duta->deskripsi_prestasi)
                         <div class="kd-item">
                             <span class="kd-module-icon"><i data-lucide="trophy"></i></span>
@@ -274,7 +294,7 @@
                         <label class="kd-upload">
                             <i data-lucide="image-plus"></i>
                             <span class="kd-upload-title">{{ $foto_profil_baru ? 'Ganti Foto Profil' : 'Pilih Foto Profil' }}</span>
-                            <span class="kd-upload-sub">JPG, JPEG, PNG, WEBP (Maks. 5 MB)</span>
+                            <span class="kd-upload-sub">JPG, JPEG, PNG, WEBP — otomatis dikompres ≤ 1 MB</span>
                             <input type="file" id="m-profil-foto" wire:model="foto_profil_baru" accept="image/jpeg,image/png,image/webp" class="sr-only">
                         </label>
 
@@ -423,6 +443,31 @@
 
                         <div class="kd-group">
                             <div class="kd-label-row">
+                                <label class="kd-label" for="m-duta-bank">Bank <span class="kd-optional">Opsional</span></label>
+                            </div>
+                            <div class="kd-control">
+                                <select id="m-duta-bank" wire:model="duta_nama_bank" class="kd-select">
+                                    <option value="">Pilih bank</option>
+                                    @foreach($daftarBank as $bank)
+                                        <option value="{{ $bank }}">{{ $bank }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @error('duta_nama_bank')<p class="kd-error">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div class="kd-group">
+                            <div class="kd-label-row">
+                                <label class="kd-label" for="m-duta-rekening">Nomor Rekening <span class="kd-optional">Opsional</span></label>
+                            </div>
+                            <div class="kd-control">
+                                <input type="text" id="m-duta-rekening" wire:model="duta_nomor_rekening" class="kd-input" placeholder="Contoh: 1234567890" inputmode="numeric" autocomplete="off">
+                            </div>
+                            @error('duta_nomor_rekening')<p class="kd-error">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div class="kd-group">
+                            <div class="kd-label-row">
                                 <label class="kd-label" for="m-duta-gelar">Gelar Prestasi <span class="kd-optional">Opsional</span></label>
                             </div>
                             <div class="kd-control">
@@ -467,7 +512,7 @@
                             <label class="kd-upload">
                                 <i data-lucide="image-plus"></i>
                                 <span class="kd-upload-title">{{ $foto_duta_baru ? 'Ganti Foto Duta' : 'Pilih Foto Duta' }}</span>
-                                <span class="kd-upload-sub">JPG, JPEG, PNG, WEBP (Maks. 5 MB)</span>
+                                <span class="kd-upload-sub">JPG, JPEG, PNG, WEBP — otomatis dikompres ≤ 1 MB</span>
                                 <input type="file" id="m-duta-foto" wire:model="foto_duta_baru" accept="image/jpeg,image/png,image/webp" class="sr-only">
                             </label>
 

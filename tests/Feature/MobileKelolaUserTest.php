@@ -114,8 +114,9 @@ class MobileKelolaUserTest extends TestCase
             ->assertOk()
             ->assertSee('Kelola User')
             ->assertSee('Cari nama / email')
-            ->assertSee('Masuk sebagai')
-            ->assertSee('Akun Anda')
+            ->assertSee('Akses penuh')
+            ->assertSee('Filter peran pengguna')
+            ->assertSee('Masuk')
             ->assertSee($this->superAdmin->nama_lengkap);
 
         // Quick action hanya untuk superadmin.
@@ -133,7 +134,52 @@ class MobileKelolaUserTest extends TestCase
     }
 
     // ---------------------------------------------------------------
-    // 2. Filter peran & pencarian
+    // 2. Status online & login terakhir
+    // ---------------------------------------------------------------
+
+    public function test_baris_menampilkan_status_online_dan_login_terakhir(): void
+    {
+        $token = 'Zon' . substr(uniqid(), -7);
+
+        $online = $this->buatPengguna($token . ' Online Uji', $this->peranPegiat->id);
+        $online->forceFill([
+            'terakhir_masuk' => now()->subHours(2),
+            'terakhir_aktif' => now()->subMinute(),
+        ])->save();
+
+        $offline = $this->buatPengguna($token . ' Offline Uji', $this->peranEditor->id);
+        $offline->forceFill([
+            'terakhir_masuk' => now()->subDay(),
+            'terakhir_aktif' => now()->subHours(2),
+        ])->save();
+
+        $this->buatPengguna($token . ' Baru Uji', $this->peranPegiat->id);
+
+        $this->actingAs($this->superAdmin);
+
+        Livewire::test(KelolaUser::class)
+            ->set('cari', $token)
+            ->assertSee('Online')
+            ->assertSee('Offline')
+            ->assertSee('2 jam yang lalu')
+            ->assertSee('1 hari yang lalu')
+            ->assertSee('Belum pernah login');
+    }
+
+    public function test_middleware_mencatat_terakhir_aktif_saat_akses_halaman(): void
+    {
+        $this->actingAs($this->superAdmin);
+        $this->assertNull($this->superAdmin->terakhir_aktif);
+
+        $this->get(route('mobile.dashboard'))->assertOk();
+
+        $terbaru = $this->superAdmin->fresh();
+        $this->assertNotNull($terbaru->terakhir_aktif);
+        $this->assertTrue($terbaru->isOnline());
+    }
+
+    // ---------------------------------------------------------------
+    // 3. Filter peran & pencarian
     // ---------------------------------------------------------------
 
     public function test_filter_peran_dan_reset_ke_semua(): void
@@ -225,7 +271,7 @@ class MobileKelolaUserTest extends TestCase
     }
 
     // ---------------------------------------------------------------
-    // 3. Impersonasi
+    // 4. Impersonasi
     // ---------------------------------------------------------------
 
     public function test_impersonate_sukses_mengubah_sesi_dan_redirect_dashboard(): void
@@ -312,7 +358,7 @@ class MobileKelolaUserTest extends TestCase
     }
 
     // ---------------------------------------------------------------
-    // 4. Banner & keluar dari impersonasi
+    // 5. Banner & keluar dari impersonasi
     // ---------------------------------------------------------------
 
     public function test_banner_impersonasi_tampil_hanya_saat_mode_impersonasi(): void

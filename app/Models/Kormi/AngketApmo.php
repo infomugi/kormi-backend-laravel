@@ -49,6 +49,7 @@ class AngketApmo extends ModelDasar
         'alasan_tidak_olahraga',
         'alasan_lainnya',
         'fasilitas_olahraga',
+        'foto_bukti',
     ];
 
     protected $casts = [
@@ -73,5 +74,14 @@ class AngketApmo extends ModelDasar
     public function pengguna(): BelongsTo
     {
         return $this->belongsTo(Pengguna::class, 'pengguna_id');
+    }
+
+    public function getFotoBuktiUrlAttribute(): ?string
+    {
+        if (empty($this->foto_bukti)) {
+            return null;
+        }
+
+        return app(\App\Services\StorageService::class)->getTemporaryUrl($this->foto_bukti);
     }
 }

@@ -352,7 +352,7 @@
                             <label class="kd-upload">
                                 <i data-lucide="image-plus"></i>
                                 <span class="kd-upload-title">{{ $foto ? 'Ganti Foto Duta' : 'Pilih Foto Duta' }}</span>
-                                <span class="kd-upload-sub">JPG, JPEG, PNG, WEBP (Maks. 5 MB)</span>
+                                <span class="kd-upload-sub">JPG, JPEG, PNG, WEBP — otomatis dikompres ≤ 1 MB</span>
                                 <input type="file" wire:model="foto" accept="image/jpeg,image/png,image/webp" class="sr-only">
                             </label>
 

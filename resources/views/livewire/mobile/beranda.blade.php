@@ -72,7 +72,7 @@
                 <a href="{{ route('mobile.angket') }}" wire:navigate class="kd-module" style="grid-column: 1 / -1;">
                     <span class="kd-module-icon"><i data-lucide="clipboard-list"></i></span>
                     <span>
-                        <span class="kd-module-name">Angket APMO</span>
+                        <span class="kd-module-name">Survey APMO</span>
                         <span class="kd-module-desc">Isi angket kebiasaan &amp; fasilitas olahraga Anda</span>
                     </span>
                 </a>

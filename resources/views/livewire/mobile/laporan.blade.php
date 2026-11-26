@@ -113,8 +113,14 @@
 
                     <div class="kd-home-card">
                         @foreach($daftar as $baris)
-                            <div class="kd-item">
-                                <span class="kd-module-icon"><i data-lucide="clipboard-check"></i></span>
+                            <div class="kd-item" wire:key="isian-{{ $baris->id }}" @if($lingkup === 'saya') style="border-bottom: 0; padding-bottom: 6px;" @endif>
+                                @if($baris->foto_bukti_url)
+                                    <span class="kd-module-icon" style="overflow: hidden; padding: 0;">
+                                        <img src="{{ $baris->foto_bukti_url }}" alt="Foto bukti survey {{ $baris->nama_lengkap }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </span>
+                                @else
+                                    <span class="kd-module-icon"><i data-lucide="clipboard-check"></i></span>
+                                @endif
                                 <span class="kd-item-body">
                                     <span class="kd-item-title">{{ $baris->nama_lengkap }}</span>
                                     <span class="kd-item-meta">
@@ -133,6 +139,41 @@
                                     {{ $baris->melakukan_olahraga ? 'Olahraga' : 'Tidak' }}
                                 </span>
                             </div>
+
+                            @if($lingkup === 'saya')
+                                <div wire:key="aksi-{{ $baris->id }}" style="padding: 0 0 12px 46px;">
+                                    @if($hapusId === $baris->id)
+                                        <div class="kd-verify-actions">
+                                            <button type="button" wire:click="batalHapus" class="kd-verify-btn is-ghost">
+                                                <i data-lucide="x"></i>
+                                                <span>Batal</span>
+                                            </button>
+                                            <button type="button" wire:click="hapus('{{ $baris->id }}')"
+                                                    wire:loading.attr="disabled" wire:target="hapus"
+                                                    class="kd-verify-btn is-danger">
+                                                <i data-lucide="trash-2"></i>
+                                                <span wire:loading.remove wire:target="hapus">Hapus permanen</span>
+                                                <span wire:loading wire:target="hapus">Menghapus...</span>
+                                            </button>
+                                        </div>
+                                    @else
+                                        <div class="kd-verify-actions">
+                                            <a href="{{ route('mobile.angket.ubah', $baris) }}" wire:navigate class="kd-verify-btn is-ghost">
+                                                <i data-lucide="pencil"></i>
+                                                <span>Ubah</span>
+                                            </a>
+                                            <a href="{{ route('mobile.laporan.pdf', $baris) }}" class="kd-verify-btn is-pdf" title="Unduh hasil survey (PDF)">
+                                                <i data-lucide="file-down"></i>
+                                                <span>PDF</span>
+                                            </a>
+                                            <button type="button" wire:click="konfirmasiHapus('{{ $baris->id }}')" class="kd-verify-btn is-danger">
+                                                <i data-lucide="trash-2"></i>
+                                                <span>Hapus</span>
+                                            </button>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
                         @endforeach
                     </div>
 

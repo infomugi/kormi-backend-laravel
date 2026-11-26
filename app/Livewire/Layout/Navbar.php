@@ -66,8 +66,8 @@ class Navbar extends Component
                     ['name' => 'Sarana & Prasarana (Sapras)', 'link' => route('sapras'), 'external' => false],
                 ]],
                 ['name' => 'Partisipasi Warga', 'sub' => [
-                    ['name' => 'Catat Aktivitas Olahraga', 'link' => route('partisipasi.catat'), 'external' => false],
-                    ['name' => 'Riwayat & Badge APMO Saya', 'link' => route('partisipasi.riwayat'), 'external' => false],
+                    ['name' => 'Catat Aktivitas Olahraga', 'link' => route('mobile.beranda'), 'external' => false],
+                    ['name' => 'Riwayat & Badge APMO Saya', 'link' => route('mobile.beranda'), 'external' => false],
                     ['name' => 'Tentang APMO & Indeks Partisipasi', 'link' => route('apmo'), 'external' => false],
                 ]],
                 ['name' => 'Event', 'sub' => [

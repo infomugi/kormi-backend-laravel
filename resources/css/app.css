@@ -867,6 +867,30 @@ a [data-lucide] {
     margin-bottom: 2px;
 }
 
+.kd-upload-galeri {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 4px;
+    padding: 8px;
+    border-radius: 999px;
+    color: #5c5f59;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.kd-upload-galeri:active {
+    color: var(--kd-text);
+}
+
+.kd-upload-galeri svg {
+    width: 14px;
+    height: 14px;
+}
+
 .kd-upload-title {
     font-size: 12.5px;
     font-weight: 800;
@@ -3080,6 +3104,18 @@ a [data-lucide] {
     background: rgba(255, 255, 255, 0.16);
 }
 
+.kd-abs-cam-error {
+    margin: 0 16px 4px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: rgba(244, 63, 94, 0.12);
+    color: #fecdd3;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
 .kd-abs-cam-hint {
     margin: 0;
     padding: 0 18px 2px;
@@ -4013,34 +4049,39 @@ a [data-lucide] {
     color: #ffffff;
 }
 
-/* Tab bar dengan tombol utama Absensi */
+/* Tab bar aplikasi: seragam, presisi, Survey APMO diberi aksen */
 .kd-tabbar--app {
-    padding-top: 10px;
+    padding-top: 7px;
 }
 
-.kd-tab--fab {
-    position: relative;
+.kd-tabbar--app .kd-tab {
+    min-width: 0;
 }
 
-.kd-tab--fab .kd-tab-icon {
-    width: 54px;
-    height: 54px;
-    margin-top: -30px;
-    border-radius: 18px;
-    background: var(--kd-dark);
-    color: var(--kd-lime);
-    border: 4px solid #ffffff;
-    box-shadow: 0 12px 22px -10px rgba(29, 30, 27, 0.55);
+.kd-tabbar--app .kd-tab > span:not(.kd-tab-icon) {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.kd-tab--fab .kd-tab-icon svg {
-    width: 24px;
-    height: 24px;
+.kd-tabbar--app .kd-tab:not(.is-active):active .kd-tab-icon {
+    background: #f1f2ee;
 }
 
-.kd-tab--fab.is-active .kd-tab-icon {
+.kd-tab--accent {
+    color: var(--kd-text);
+    font-weight: 800;
+}
+
+.kd-tab--accent .kd-tab-icon {
     background: var(--kd-lime);
     color: var(--kd-dark);
+}
+
+.kd-tab--accent.is-active .kd-tab-icon {
+    background: var(--kd-dark);
+    color: var(--kd-lime);
 }
 
 /* ========================================================= */
@@ -5356,6 +5397,13 @@ a [data-lucide] {
     flex: 0.8;
 }
 
+.kd-verify-btn.is-pdf {
+    background: var(--kd-lime-soft);
+    border-color: #dcefa6;
+    color: #3f4a16;
+    text-decoration: none;
+}
+
 .kd-verify-btn.is-danger {
     background: #fff4f4;
     border-color: #ffd6d6;
@@ -5608,59 +5656,131 @@ a [data-lucide] {
    KELOLA USER MOBILE (SUPER ADMIN)
    ============================================================ */
 .kd-users {
-    background: #f6f7f3;
+    background: #ffffff;
 }
 
-.kd-users-body {
-    padding: 16px;
-    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+.kd-users-back {
+    margin-bottom: 12px;
+}
+
+.kd-account.kd-users-intro {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 12px;
 }
 
-.kd-users-search {
-    flex-shrink: 0;
+.kd-users-intro-copy {
+    flex: 1;
+    min-width: 0;
 }
 
-.kd-users-chips {
+.kd-users-intro-copy strong {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.35;
+    color: #1b1c19;
+    overflow: hidden;
+}
+
+.kd-users-intro-meta {
+    display: block;
+    margin-top: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #7a7d76;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.kd-users-avatar {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 15px;
+    background: #eff1ea;
+    color: #4d5c16;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.kd-users-avatar--lg {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    background: #1d1e1b;
+    color: #c6fa28;
+    font-size: 16px;
+}
+
+.kd-users-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.kd-users-search {
+    margin-top: 16px;
+}
+
+.kd-users-filter {
     display: flex;
     gap: 6px;
-    margin: -2px 0 0;
-    padding: 2px 2px 4px;
+    margin-top: 10px;
+    padding: 4px;
+    border-radius: 999px;
+    background: var(--kd-surface);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
 }
 
-.kd-users-chips::-webkit-scrollbar {
+.kd-users-filter::-webkit-scrollbar {
     display: none;
 }
 
-.kd-users-chip {
+.kd-users-filter-btn {
     flex-shrink: 0;
-    padding: 8px 13px;
-    border: 1px solid #e7e8e2;
+    min-height: 38px;
+    padding: 0 14px;
+    border: none;
     border-radius: 999px;
-    background: #ffffff;
-    color: #6b6f67;
+    background: transparent;
+    color: var(--kd-muted);
     font-family: inherit;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 800;
     letter-spacing: -0.1px;
     white-space: nowrap;
     cursor: pointer;
-    transition: background 0.18s var(--kd-ease), color 0.18s var(--kd-ease);
+    transition: background 0.2s var(--kd-ease), color 0.2s var(--kd-ease);
 }
 
-.kd-users-chip.is-active {
-    background: #1d1e1b;
-    border-color: #1d1e1b;
-    color: #c6fa28;
+.kd-users-filter-btn:not(.is-active):active {
+    background: #eceee9;
+}
+
+.kd-users-filter-btn:focus-visible {
+    outline: 2px solid var(--kd-dark);
+    outline-offset: 2px;
+}
+
+.kd-users-filter-btn.is-active {
+    background: var(--kd-dark);
+    color: var(--kd-lime);
+    box-shadow: 0 6px 14px rgba(29, 30, 27, 0.16);
 }
 
 .kd-users-count {
-    margin: 0;
+    margin: 14px 0 0;
     font-size: 10.5px;
     font-weight: 600;
     color: #7a7d76;
@@ -5674,44 +5794,18 @@ a [data-lucide] {
 .kd-users-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
 }
 
-.kd-users-card {
-    display: flex;
-    flex-direction: column;
-    gap: 11px;
-    padding: 14px;
-    background: #ffffff;
-    border: 1px solid #e7e8e2;
-    border-radius: 18px;
-}
-
-.kd-users-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-}
-
-.kd-users-avatar {
-    width: 42px;
-    height: 42px;
-    flex-shrink: 0;
+.kd-users-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 14px;
-    background: #eff1ea;
-    color: #4d5c16;
-    font-size: 13px;
-    font-weight: 800;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f1ee;
 }
 
-.kd-users-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.kd-users-row:last-child {
+    border-bottom: none;
 }
 
 .kd-users-copy {
@@ -5722,24 +5816,89 @@ a [data-lucide] {
     gap: 2px;
 }
 
-.kd-users-copy strong {
-    font-size: 13px;
+.kd-users-headline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.kd-users-headline strong {
+    flex: 1;
+    min-width: 0;
+    font-size: 12.5px;
     font-weight: 800;
     line-height: 1.35;
     color: #1b1c19;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.kd-users-headline .kd-chip {
+    flex-shrink: 0;
 }
 
 .kd-users-mail {
     font-size: 10.5px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.4;
     color: #7a7d76;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.kd-users-presence {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 3px 10px;
+    margin-top: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #7a7d76;
+}
+
+.kd-users-online {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 800;
+    color: #8a8d86;
+}
+
+.kd-users-online-dot {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #c3c6bf;
+}
+
+.kd-users-online.is-online {
+    color: #4d8a00;
+}
+
+.kd-users-online.is-online .kd-users-online-dot {
+    background: #6cc024;
+    box-shadow: 0 0 0 3px rgba(108, 192, 36, 0.16);
+}
+
+.kd-users-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+.kd-users-login svg {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
+    color: #a5a8a2;
 }
 
 .kd-users-tags {
@@ -5749,42 +5908,45 @@ a [data-lucide] {
     margin-top: 3px;
 }
 
-.kd-users-actions {
-    display: flex;
+.kd-users-tags .kd-chip {
+    white-space: normal;
 }
 
-.kd-users-btn {
-    width: 100%;
+.kd-users-open {
+    flex-shrink: 0;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 5px;
-    min-height: 38px;
-    padding: 8px 12px;
-    border: 1px solid #e7e8e2;
-    border-radius: 12px;
-    background: #ffffff;
-    color: #4a4e45;
+    gap: 4px;
+    min-height: 30px;
+    padding: 0 11px;
+    border: none;
+    border-radius: 999px;
+    background: var(--kd-dark);
+    color: #ffffff;
     font-family: inherit;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     cursor: pointer;
+    transition: transform 0.18s var(--kd-ease);
 }
 
-.kd-users-btn svg {
-    width: 13px;
-    height: 13px;
+.kd-users-open svg {
+    width: 12px;
+    height: 12px;
+    color: var(--kd-lime);
 }
 
-.kd-users-btn.is-primary {
-    background: #1d1e1b;
-    border-color: #1d1e1b;
-    color: #ffffff;
+.kd-users-open:active {
+    transform: scale(0.96);
 }
 
-.kd-users-btn:disabled {
+.kd-users-open:disabled {
     opacity: 0.55;
     cursor: not-allowed;
+}
+
+.kd-users .kd-empty {
+    margin-top: 10px;
 }
 
 /* Banner impersonasi pada layout mobile */
@@ -5857,4 +6019,40 @@ a [data-lucide] {
 
 .kd-impersonate-exit:active {
     background: #b6e81f;
+}
+
+/* ========================================================= */
+/* INDIKATOR KOMPRESI UNGGAHAN GAMBAR (GLOBAL)               */
+/* ========================================================= */
+.kd-kompres-indikator {
+    position: fixed;
+    left: 50%;
+    bottom: max(18px, env(safe-area-inset-bottom));
+    transform: translateX(-50%) translateY(6px);
+    z-index: 80;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    max-width: calc(100vw - 32px);
+    padding: 7px 13px;
+    border-radius: 999px;
+    background: rgba(15, 16, 13, 0.86);
+    color: #f4f5f0;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.05px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.16s ease, transform 0.16s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kd-kompres-indikator.is-aktif {
+    display: inline-flex;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }

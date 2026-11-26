@@ -14,6 +14,127 @@ window.markdownToHtml = markdownToHtml;
 window.htmlToMarkdown = htmlToMarkdown;
 daftarkanAbsensiKamera();
 
+// ---------- Kompresi otomatis input gambar ber-wire:model ----------
+// Input gambar polos (tanpa komponen image-upload) diintersepsi di fase capture,
+// dikompres berurutan, lalu event `change` di-dispatch ulang agar Livewire
+// menjalankan unggahan seperti biasa (spinner & temporaryUrl tetap bekerja).
+function pasangKompresiUnggahGambar() {
+    if (window.__kdKompresTerpasang) {
+        return;
+    }
+    window.__kdKompresTerpasang = true;
+
+    const adalahInputGambarWire = (el) => {
+        if (! (el instanceof HTMLInputElement) || el.type !== 'file') {
+            return false;
+        }
+        if (! el.files || el.files.length === 0) {
+            return false;
+        }
+        const accept = (el.getAttribute('accept') || '').toLowerCase();
+        if (! accept.includes('image/')) {
+            return false;
+        }
+        return ['wire:model', 'wire:model.live', 'wire:model.blur', 'wire:model.change', 'wire:model.lazy']
+            .some((nama) => el.hasAttribute(nama));
+    };
+
+    let chip = null;
+    let aktif = 0;
+    let timerSembunyi = null;
+
+    const pastikanChip = () => {
+        if (! chip) {
+            chip = document.createElement('div');
+            chip.className = 'kd-kompres-indikator';
+            chip.setAttribute('role', 'status');
+            chip.setAttribute('aria-live', 'polite');
+            document.body.appendChild(chip);
+        }
+        return chip;
+    };
+
+    const tampilkanChip = (teks) => {
+        clearTimeout(timerSembunyi);
+        const el = pastikanChip();
+        el.textContent = teks;
+        el.classList.add('is-aktif');
+    };
+
+    const sembunyikanChip = () => {
+        if (chip) {
+            chip.classList.remove('is-aktif');
+        }
+    };
+
+    const kompres = async (berkas) => {
+        if (! window.compressImageClientSide) {
+            return berkas;
+        }
+        try {
+            const hasil = await window.compressImageClientSide(berkas, {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1600,
+                initialQuality: 0.85,
+            });
+            return hasil || berkas;
+        } catch (e) {
+            return berkas;
+        }
+    };
+
+    document.addEventListener('change', async (event) => {
+        const input = event.target;
+        if (! input || event.__kompresiSelesai) {
+            return;
+        }
+        if (! adalahInputGambarWire(input)) {
+            return;
+        }
+
+        // Cegah listener Livewire di fase target berjalan sebelum kompresi selesai.
+        event.stopPropagation();
+
+        const asli = Array.from(input.files);
+        aktif += 1;
+        tampilkanChip(asli.length > 1 ? 'Mengompres foto 1/' + asli.length + '…' : 'Mengompres foto…');
+
+        try {
+            const hasil = [];
+            for (let i = 0; i < asli.length; i++) {
+                if (asli.length > 1) {
+                    tampilkanChip('Mengompres foto ' + (i + 1) + '/' + asli.length + '…');
+                }
+                let berkas = asli[i];
+                if ((berkas.type || '').startsWith('image/')) {
+                    berkas = await kompres(berkas);
+                }
+                hasil.push(berkas);
+            }
+
+            if (typeof DataTransfer !== 'undefined') {
+                const dt = new DataTransfer();
+                hasil.forEach((berkas) => dt.items.add(berkas));
+                input.files = dt.files;
+            }
+        } catch (e) {
+            // Bila penyalinan gagal, biarkan berkas asli pada input.
+        } finally {
+            // Dispatch ulang bertanda agar Livewire menerima event & tidak dikompres dua kali.
+            const ulang = new Event('change', { bubbles: true });
+            ulang.__kompresiSelesai = true;
+            input.dispatchEvent(ulang);
+
+            aktif = Math.max(0, aktif - 1);
+            if (aktif === 0) {
+                timerSembunyi = setTimeout(sembunyikanChip, 250);
+            }
+        }
+    }, true);
+}
+
+pasangKompresiUnggahGambar();
+
 window.kormiEditor = function(initialContent = '') {
     return {
         isFullscreen: false,
@@ -385,9 +506,26 @@ window.kormiEditor = function(initialContent = '') {
             this.isUploadingImage = true;
             const caption = prompt('Masukkan Keterangan / Caption Gambar (Opsional):', file.name.replace(/\.[^/.]+$/, "")) || 'Dokumentasi KORMI Kab. Bandung';
 
+            // Kompres gambar agar unggahan ringan (≤ 1 MB, sisi terpanjang 1600 px).
+            let berkas = file;
+            if (typeof window.compressImageClientSide === 'function') {
+                try {
+                    const terkompres = await window.compressImageClientSide(file, {
+                        maxSizeMB: 1,
+                        maxWidthOrHeight: 1600,
+                        initialQuality: 0.85,
+                    });
+                    if (terkompres) {
+                        berkas = terkompres;
+                    }
+                } catch (e) {
+                    berkas = file;
+                }
+            }
+
             try {
                 const formData = new FormData();
-                formData.append('foto', file);
+                formData.append('foto', berkas);
 
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
                                   document.querySelector('input[name="_token"]')?.value;

@@ -25,10 +25,18 @@ export function buatAbsensiKamera() {
         wajahTerdeteksi: false,
         modeKamera: 'user',
         _stream: null,
+        _tokenStream: 0,
         _detektor: null,
         _pemuatFaceApi: null,
+        _skripFaceApi: null,
         _intervalDeteksi: null,
         _deteksiSibuk: false,
+        _tokenDetektor: 0,
+        _gagalDeteksi: 0,
+        _deteksiPeringatanTampil: false,
+        _deteksiDimatikan: false,
+        _membukaKamera: false,
+        _sedangAmbilFoto: false,
         _pemicuFokus: null,
         _padaVisibilitas: null,
 
@@ -119,10 +127,15 @@ export function buatAbsensiKamera() {
             }
             this.fotoError = '';
             let hasil = file;
-            if (file.size > 2 * 1024 * 1024 && window.compressImageClientSide) {
+            if (window.compressImageClientSide) {
                 try {
-                    hasil = await window.compressImageClientSide(file, { maxSizeMB: 2, maxWidthOrHeight: 1600, initialQuality: 0.82 });
-                } catch (e) {}
+                    const terkompres = await window.compressImageClientSide(file, { maxSizeMB: 1, maxWidthOrHeight: 1600, initialQuality: 0.85 });
+                    if (terkompres) {
+                        hasil = terkompres;
+                    }
+                } catch (e) {
+                    hasil = file;
+                }
             }
             this.$wire.upload('foto', hasil, () => {}, () => {
                 this.fotoError = 'Foto gagal diunggah. Periksa koneksi lalu coba lagi.';
@@ -131,6 +144,12 @@ export function buatAbsensiKamera() {
 
         // ---------- Kamera langsung ----------
         async bukaKamera() {
+            // Cegah pemanggilan ganda (mis. klik beruntun atau overlay/stream masih aktif).
+            if (this._membukaKamera || (this.kameraTerbuka && this.kameraSiap)) {
+                return;
+            }
+
+            this._membukaKamera = true;
             this.izinKameraError = '';
             this.fotoError = '';
             this._pemicuFokus = document.activeElement;
@@ -142,30 +161,37 @@ export function buatAbsensiKamera() {
                 }
             });
 
-            if (! navigator.mediaDevices || ! navigator.mediaDevices.getUserMedia) {
-                this.kameraSiap = false;
-                this.izinKameraError = 'Browser ini belum mendukung kamera langsung. Gunakan kamera perangkat.';
-                return;
-            }
-
-            this.kameraSiap = false;
-            this.statusDeteksi = 'memuat';
-            this.wajahTerdeteksi = false;
-            this.jumlahWajah = 0;
-
             try {
-                await this.mulaiStream();
-            } catch (e) {
+                if (! navigator.mediaDevices || ! navigator.mediaDevices.getUserMedia) {
+                    this.kameraSiap = false;
+                    this.izinKameraError = 'Browser ini belum mendukung kamera langsung. Gunakan kamera perangkat.';
+                    return;
+                }
+
                 this.kameraSiap = false;
-                this.izinKameraError = (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError'))
-                    ? 'Izin kamera ditolak. Aktifkan izin kamera di browser, atau gunakan kamera perangkat.'
-                    : 'Kamera langsung tidak dapat dibuka. Gunakan kamera perangkat.';
+                this.statusDeteksi = 'memuat';
+                this.wajahTerdeteksi = false;
+                this.jumlahWajah = 0;
+
+                try {
+                    await this.mulaiStream();
+                } catch (e) {
+                    this.kameraSiap = false;
+                    this.izinKameraError = (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError'))
+                        ? 'Izin kamera ditolak. Aktifkan izin kamera di browser, atau gunakan kamera perangkat.'
+                        : 'Kamera langsung tidak dapat dibuka. Gunakan kamera perangkat.';
+                }
+            } finally {
+                this._membukaKamera = false;
             }
         },
 
         async mulaiStream() {
+            const tokenStream = ++this._tokenStream;
             this.hentikanStream();
-            this._stream = await navigator.mediaDevices.getUserMedia({
+
+            let stream;
+            const permintaan = navigator.mediaDevices.getUserMedia({
                 audio: false,
                 video: {
                     facingMode: this.modeKamera,
@@ -173,27 +199,75 @@ export function buatAbsensiKamera() {
                     height: { ideal: 1280 },
                 },
             });
+            try {
+                // Batasi getUserMedia agar tidak menggantung tanpa batas.
+                stream = await this._batasiWaktu(permintaan, 10000);
+            } catch (e) {
+                if (e && e.name === 'TimeoutError') {
+                    // Bila kamera akhirnya menyala setelah batas waktu, langsung matikan agar tidak menggantung.
+                    permintaan
+                        .then((s) => s.getTracks().forEach((track) => track.stop()))
+                        .catch(() => {});
+                    if (tokenStream === this._tokenStream) {
+                        this.kameraSiap = false;
+                        this.statusDeteksi = 'idle';
+                        this.izinKameraError = 'Kamera tidak merespons. Tutup lalu coba lagi, atau gunakan kamera perangkat.';
+                    }
+                    return;
+                }
+                throw e;
+            }
+
+            // Overlay bisa saja sudah ditutup (atau permintaan lebih baru dimulai) selagi menunggu izin.
+            if (tokenStream !== this._tokenStream || ! this.kameraTerbuka) {
+                stream.getTracks().forEach((track) => track.stop());
+                return;
+            }
+
+            this._stream = stream;
 
             const video = this.$refs.videoKamera;
-            if (! video) return;
+            if (! video) {
+                // Jangan berhenti senyap: matikan stream dan beri tahu pengguna.
+                this.hentikanStream();
+                this.statusDeteksi = 'idle';
+                this.izinKameraError = 'Pratinjau kamera tidak tersedia. Gunakan kamera perangkat.';
+                return;
+            }
 
             video.srcObject = this._stream;
 
             if (video.readyState >= 1) {
-                await this.siapkanVideo(video);
+                await this.siapkanVideo(video, tokenStream);
             } else {
                 await new Promise((resolve) => {
                     video.onloadedmetadata = resolve;
                     setTimeout(resolve, 2500);
                 });
-                await this.siapkanVideo(video);
+                await this.siapkanVideo(video, tokenStream);
             }
         },
 
-        async siapkanVideo(video) {
+        async siapkanVideo(video, tokenStream) {
+            let diputar = false;
             try {
-                await video.play();
-            } catch (e) {}
+                await this._batasiWaktu(video.play(), 3000);
+                diputar = true;
+            } catch (e) {
+                diputar = false;
+            }
+
+            // Bila overlay sudah ditutup atau ada permintaan stream yang lebih baru, jangan lanjutkan.
+            if (! this.kameraTerbuka || tokenStream !== this._tokenStream) {
+                return;
+            }
+
+            if (! diputar || video.readyState < 2 || ! video.videoWidth) {
+                this.kameraSiap = false;
+                this.izinKameraError = 'Pratinjau kamera tidak dapat ditampilkan. Tutup lalu coba lagi, atau gunakan kamera perangkat.';
+                return;
+            }
+
             this.kameraSiap = true;
             this.izinKameraError = '';
             this.siapkanDetektor();
@@ -233,9 +307,14 @@ export function buatAbsensiKamera() {
             const pemicu = this._pemicuFokus;
             this._pemicuFokus = null;
             this.kameraTerbuka = false;
+            // Lepas guard & batalkan permintaan stream/persiapan detektor yang mungkin masih berjalan.
+            this._membukaKamera = false;
+            this._tokenStream += 1;
+            this._tokenDetektor += 1;
             this._kunciScroll(false);
             this.tutupDeteksi();
             this.hentikanStream();
+            this._detektor = null;
             this.statusDeteksi = 'idle';
 
             if (kembalikanFokus && pemicu && document.contains(pemicu)) {
@@ -249,24 +328,74 @@ export function buatAbsensiKamera() {
 
         // ---------- Deteksi wajah ----------
         async siapkanDetektor() {
+            const token = ++this._tokenDetektor;
             this.statusDeteksi = 'memuat';
+            this._detektor = null;
+            this._gagalDeteksi = 0;
+            this._deteksiPeringatanTampil = false;
+            this._deteksiDimatikan = false;
 
+            const gagalTotal = () => {
+                if (token !== this._tokenDetektor) return;
+                this._detektor = null;
+                this.statusDeteksi = 'tidak-didukung';
+                this.wajahTerdeteksi = false;
+                this.jumlahWajah = 0;
+                this._peringatkanDeteksiSekali();
+            };
+
+            // Batas waktu total ±4 detik: jangan biarkan status menggantung di 'memuat'.
+            const batas = setTimeout(() => {
+                if (token === this._tokenDetektor && this.statusDeteksi === 'memuat') {
+                    gagalTotal();
+                }
+            }, 4000);
+
+            // 1) Detektor bawaan browser — verifikasi dengan satu siklus detect nyata.
             if ('FaceDetector' in window) {
                 try {
-                    this._detektor = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 2 });
+                    const probe = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 2 });
+                    const kanvas = document.createElement('canvas');
+                    kanvas.width = 64;
+                    kanvas.height = 64;
+                    kanvas.getContext('2d').fillRect(0, 0, 64, 64);
+                    // Konstruktor bisa sukses walau platform tidak mendukung; detect() yang menolak
+                    // (atau menggantung) dan wajib dibatasi waktu.
+                    await this._batasiWaktu(probe.detect(kanvas), 2500);
+                    clearTimeout(batas);
+                    if (token !== this._tokenDetektor || this.statusDeteksi !== 'memuat') return;
+                    this._detektor = probe;
                     this.statusDeteksi = 'aktif';
                     this.mulaiLoopDeteksi();
                     return;
-                } catch (e) {}
+                } catch (e) {
+                    // NotSupportedError / platform tidak tersedia -> fallback face-api.
+                }
             }
 
+            // 2) Fallback face-api (CDN) — probe juga agar 'aktif' hanya bila benar-benar berjalan.
             try {
-                await this.muatFaceApi();
+                const faceapi = await this.muatFaceApi();
+                if (token !== this._tokenDetektor || this.statusDeteksi !== 'memuat') {
+                    clearTimeout(batas);
+                    return;
+                }
+                const kanvas = document.createElement('canvas');
+                kanvas.width = 128;
+                kanvas.height = 128;
+                kanvas.getContext('2d').fillRect(0, 0, 128, 128);
+                await this._batasiWaktu(
+                    faceapi.detectAllFaces(kanvas, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 })),
+                    1500
+                );
+                clearTimeout(batas);
+                if (token !== this._tokenDetektor || this.statusDeteksi !== 'memuat') return;
                 this._detektor = 'faceapi';
                 this.statusDeteksi = 'aktif';
                 this.mulaiLoopDeteksi();
             } catch (e) {
-                this.statusDeteksi = 'tidak-didukung';
+                clearTimeout(batas);
+                gagalTotal();
             }
         },
 
@@ -274,12 +403,23 @@ export function buatAbsensiKamera() {
             if (window.faceapi && window.faceapi.nets?.tinyFaceDetector?.isLoaded) {
                 return Promise.resolve(window.faceapi);
             }
+            // Sudah ada pemuatan berjalan (termasuk elemen <script> yang masih dimuat): jangan append ganda.
             if (this._pemuatFaceApi) {
                 return this._pemuatFaceApi;
             }
 
             this._pemuatFaceApi = new Promise((resolve, reject) => {
-                const batas = setTimeout(() => reject(new Error('Batas waktu pemuatan detektor wajah terlampaui.')), 15000);
+                const bersihkanSkrip = () => {
+                    if (this._skripFaceApi) {
+                        this._skripFaceApi.remove();
+                        this._skripFaceApi = null;
+                    }
+                };
+
+                const batas = setTimeout(() => {
+                    bersihkanSkrip();
+                    reject(new Error('Batas waktu pemuatan detektor wajah terlampaui.'));
+                }, 15000);
                 const selesai = () => clearTimeout(batas);
 
                 const muatModel = async () => {
@@ -296,6 +436,7 @@ export function buatAbsensiKamera() {
                         resolve(window.faceapi);
                     } catch (e) {
                         selesai();
+                        bersihkanSkrip();
                         reject(e);
                     }
                 };
@@ -303,11 +444,15 @@ export function buatAbsensiKamera() {
                 const skrip = document.createElement('script');
                 skrip.src = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/dist/face-api.min.js';
                 skrip.async = true;
-                skrip.onload = muatModel;
+                skrip.onload = () => {
+                    muatModel();
+                };
                 skrip.onerror = () => {
                     selesai();
+                    bersihkanSkrip();
                     reject(new Error('Pustaka deteksi wajah gagal dimuat.'));
                 };
+                this._skripFaceApi = skrip;
                 document.head.appendChild(skrip);
             }).catch((e) => {
                 this._pemuatFaceApi = null;
@@ -319,12 +464,28 @@ export function buatAbsensiKamera() {
 
         mulaiLoopDeteksi() {
             this.tutupDeteksi();
+            this._gagalDeteksi = 0;
             this._intervalDeteksi = setInterval(() => this.jalankanDeteksi(), 400);
             this.jalankanDeteksi();
         },
 
+        _batasiWaktu(promise, ms, pesan = 'Batas waktu operasi terlampaui.') {
+            let timer;
+            const batas = new Promise((_, reject) => {
+                timer = setTimeout(() => {
+                    const galat = new Error(pesan);
+                    galat.name = 'TimeoutError';
+                    reject(galat);
+                }, ms);
+            });
+            return Promise.race([promise, batas]).finally(() => clearTimeout(timer));
+        },
+
         async jalankanDeteksi() {
             if (this._deteksiSibuk || ! this.kameraTerbuka || ! this.kameraSiap || ! this._detektor) {
+                return;
+            }
+            if (this.statusDeteksi !== 'aktif') {
                 return;
             }
             const video = this.$refs.videoKamera;
@@ -337,28 +498,117 @@ export function buatAbsensiKamera() {
                 let jumlah = 0;
                 if (this._detektor === 'faceapi') {
                     const faceapi = window.faceapi;
-                    if (! faceapi) return;
-                    const hasil = await faceapi.detectAllFaces(
-                        video,
-                        new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 })
+                    if (! faceapi) {
+                        this._catatGagalDeteksi();
+                        return;
+                    }
+                    const hasil = await this._batasiWaktu(
+                        faceapi.detectAllFaces(
+                            video,
+                            new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 })
+                        ),
+                        1500
                     );
                     jumlah = Array.isArray(hasil) ? hasil.length : 0;
                 } else {
-                    const hasil = await this._detektor.detect(video);
+                    const hasil = await this._batasiWaktu(this._detektor.detect(video), 1500);
                     jumlah = Array.isArray(hasil) ? hasil.length : 0;
                 }
+                this._gagalDeteksi = 0;
                 this.jumlahWajah = jumlah;
                 this.wajahTerdeteksi = jumlah > 0;
             } catch (e) {
-                // Deteksi gagal pada frame ini; biarkan status terakhir.
+                // Timeout frame bukan kegagalan permanen: lewati frame ini saja.
+                if (! (e && e.name === 'TimeoutError')) {
+                    this._catatGagalDeteksi();
+                }
             } finally {
                 this._deteksiSibuk = false;
             }
         },
 
-        ambilFoto() {
-            if (! this.kameraSiap || this.izinKameraError) return;
-            if (this.statusDeteksi === 'aktif' && ! this.wajahTerdeteksi) return;
+        _peringatkanDeteksiSekali() {
+            if (this._deteksiPeringatanTampil) {
+                return;
+            }
+            this._deteksiPeringatanTampil = true;
+            console.warn('[Absensi] Deteksi wajah tidak tersedia. Absensi tetap dapat dilanjutkan tanpa deteksi wajah.');
+        },
+
+        _catatGagalDeteksi() {
+            this._gagalDeteksi += 1;
+            if (this._gagalDeteksi < 3) {
+                return;
+            }
+            if (this._intervalDeteksi) {
+                clearInterval(this._intervalDeteksi);
+                this._intervalDeteksi = null;
+            }
+            this._detektor = null;
+            this._deteksiDimatikan = true;
+            this.statusDeteksi = 'tidak-didukung';
+            this.wajahTerdeteksi = false;
+            this.jumlahWajah = 0;
+            this._peringatkanDeteksiSekali();
+        },
+
+        _kanvasKeBlob(kanvas) {
+            return new Promise((resolve) => {
+                let selesai = false;
+                const lewatDataUrl = () => {
+                    if (selesai) {
+                        return;
+                    }
+                    selesai = true;
+                    try {
+                        const dataUrl = kanvas.toDataURL('image/jpeg', 0.9);
+                        const biner = atob((dataUrl.split(',')[1] || ''));
+                        const buffer = new Uint8Array(biner.length);
+                        for (let i = 0; i < biner.length; i++) {
+                            buffer[i] = biner.charCodeAt(i);
+                        }
+                        resolve(new Blob([buffer], { type: 'image/jpeg' }));
+                    } catch (e) {
+                        resolve(null);
+                    }
+                };
+
+                // toBlob dapat menggantung/null pada sebagian perangkat; fallback ke data URL.
+                const batas = setTimeout(lewatDataUrl, 1200);
+                try {
+                    kanvas.toBlob((blob) => {
+                        if (selesai) {
+                            return;
+                        }
+                        clearTimeout(batas);
+                        if (blob) {
+                            selesai = true;
+                            resolve(blob);
+                        } else {
+                            lewatDataUrl();
+                        }
+                    }, 'image/jpeg', 0.9);
+                } catch (e) {
+                    clearTimeout(batas);
+                    lewatDataUrl();
+                }
+            });
+        },
+
+        async ambilFoto() {
+            if (this._sedangAmbilFoto) {
+                return;
+            }
+            this.fotoError = '';
+
+            if (this.izinKameraError) {
+                this.fotoError = this.izinKameraError;
+                return;
+            }
+            if (! this.kameraSiap) {
+                this.fotoError = 'Kamera belum siap. Tunggu sebentar lalu coba lagi.';
+                return;
+            }
 
             const video = this.$refs.videoKamera;
             const lebar = video?.videoWidth;
@@ -368,27 +618,48 @@ export function buatAbsensiKamera() {
                 return;
             }
 
-            const kanvas = document.createElement('canvas');
-            kanvas.width = lebar;
-            kanvas.height = tinggi;
-            const ctx = kanvas.getContext('2d');
-            if (this.modeKamera === 'user') {
-                ctx.translate(lebar, 0);
-                ctx.scale(-1, 1);
-            }
-            ctx.drawImage(video, 0, 0, lebar, tinggi);
+            this._sedangAmbilFoto = true;
+            try {
+                const kanvas = document.createElement('canvas');
+                kanvas.width = lebar;
+                kanvas.height = tinggi;
+                const ctx = kanvas.getContext('2d');
+                if (this.modeKamera === 'user') {
+                    ctx.translate(lebar, 0);
+                    ctx.scale(-1, 1);
+                }
+                ctx.drawImage(video, 0, 0, lebar, tinggi);
 
-            kanvas.toBlob((blob) => {
+                const blob = await this._kanvasKeBlob(kanvas);
                 if (! blob) {
                     this.fotoError = 'Gagal mengambil foto. Coba lagi.';
                     return;
                 }
+
                 const file = new File([blob], 'absensi-' + Date.now() + '.jpg', { type: 'image/jpeg' });
                 this.tutupKamera();
-                this.$wire.upload('foto', file, () => {}, () => {
+
+                // Normalkan hasil kamera (≤ 1 MB / 1600 px); bila gagal, unggah apa adanya.
+                let berkas = file;
+                if (window.compressImageClientSide) {
+                    try {
+                        const terkompres = await window.compressImageClientSide(file, { maxSizeMB: 1, maxWidthOrHeight: 1600, initialQuality: 0.85 });
+                        if (terkompres) {
+                            berkas = terkompres;
+                        }
+                    } catch (e) {
+                        berkas = file;
+                    }
+                }
+
+                this.$wire.upload('foto', berkas, () => {}, () => {
                     this.fotoError = 'Foto gagal diunggah. Periksa koneksi lalu coba lagi.';
                 });
-            }, 'image/jpeg', 0.9);
+            } catch (e) {
+                this.fotoError = 'Gagal mengambil foto. Coba lagi.';
+            } finally {
+                this._sedangAmbilFoto = false;
+            }
         },
 
         bukaKameraPerangkat() {
@@ -404,13 +675,17 @@ export function buatAbsensiKamera() {
             if (this.izinKameraError) return 'Kamera tidak tersedia';
             if (this.statusDeteksi === 'memuat') return 'Menyiapkan deteksi wajah...';
             if (this.statusDeteksi === 'idle') return 'Menyiapkan kamera...';
-            if (this.statusDeteksi === 'tidak-didukung') return 'Deteksi wajah tidak tersedia di perangkat ini';
+            if (this.statusDeteksi === 'tidak-didukung') {
+                return this._deteksiDimatikan
+                    ? 'Deteksi wajah dinonaktifkan agar kamera tetap lancar'
+                    : 'Deteksi wajah tidak tersedia di perangkat ini';
+            }
             if (this.wajahTerdeteksi) {
                 return this.jumlahWajah > 1
                     ? this.jumlahWajah + ' wajah terdeteksi — pastikan hanya Anda'
                     : 'Wajah terdeteksi';
             }
-            return 'Posisikan wajah di dalam bingkai';
+            return 'Wajah belum terdeteksi — Anda tetap bisa memotret';
         },
     };
 }

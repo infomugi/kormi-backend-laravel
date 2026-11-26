@@ -3,18 +3,12 @@
 namespace App\Livewire\Mobile;
 
 use App\Models\Content\Berita;
-use App\Models\Content\GaleriFoto;
-use App\Models\Content\Unduhan;
 use App\Models\Core\Pengguna;
 use App\Models\Kormi\Absensi as AbsensiHarian;
 use App\Models\Kormi\AngketApmo;
 use App\Models\Kormi\DutaOlahraga;
 use App\Models\Kormi\Event;
-use App\Models\Kormi\Inorga;
-use App\Models\Kormi\KomisiInorga;
 use App\Models\Kormi\PartisipasiAktivitas;
-use App\Models\Kormi\Sapras;
-use App\Models\Master\Kecamatan;
 use App\Services\PersetujuanPendaftaran;
 use Carbon\Carbon;
 use Livewire\Attributes\Layout;
@@ -26,6 +20,7 @@ use Livewire\Component;
 class Dashboard extends Component
 {
     public ?string $pesanPersetujuan = null;
+
     public bool $galatPersetujuan = false;
 
     public function mount()
@@ -61,14 +56,12 @@ class Dashboard extends Component
                 'valid' => $aktivitas['stats']['valid'],
             ],
             'aksiCepat' => $this->aksiCepat($isPengelola, $isDuta, $user->isSuperAdmin()),
-            'berita' => Berita::orderByDesc('tanggal_publikasi')->limit(5)->get(),
             'isPengelola' => $isPengelola,
             'isDuta' => $isDuta,
         ];
 
         if ($isPengelola) {
             $admin = $this->dataAdmin($user);
-            $data['adminStats'] = $admin['stats'];
             $data['modul'] = $admin['modul'];
             $data['terbaruJudul'] = $admin['terbaruJudul'];
             $data['terbaruIcon'] = $admin['terbaruIcon'];
@@ -157,21 +150,25 @@ class Dashboard extends Component
 
     private function aksiCepat(bool $isPengelola, bool $isDuta, bool $isSuper = false): array
     {
+        if ($isSuper) {
+            return [
+                ['label' => 'Layanan', 'icon' => 'blocks', 'route' => 'mobile.layanan', 'tint' => 'slate'],
+                ['label' => 'Direktori', 'icon' => 'users', 'route' => 'mobile.direktori-duta', 'tint' => 'mint'],
+                ['label' => 'Monitoring APMO', 'icon' => 'radar', 'route' => 'mobile.apmo.wilayah', 'tint' => 'amber'],
+                ['label' => 'Kelola User', 'icon' => 'user-cog', 'route' => 'mobile.kelola-user', 'tint' => 'rose'],
+            ];
+        }
+
         $aksi = [];
 
         if ($isDuta) {
             $aksi[] = ['label' => 'Absensi', 'icon' => 'fingerprint', 'route' => 'mobile.absensi', 'tint' => 'lime'];
-            $aksi[] = ['label' => 'Survei APMO', 'icon' => 'clipboard-list', 'route' => 'mobile.angket', 'tint' => 'amber'];
+            $aksi[] = ['label' => 'Survey APMO', 'icon' => 'clipboard-list', 'route' => 'mobile.angket', 'tint' => 'amber'];
         }
 
         $aksi[] = $isPengelola
             ? ['label' => 'Kelola Situs', 'icon' => 'layout-grid', 'route' => 'admin.dashboard', 'tint' => 'sky']
             : ['label' => 'Catat Aktivitas', 'icon' => 'clipboard-pen', 'route' => 'partisipasi.catat', 'tint' => 'sky'];
-
-        if ($isSuper) {
-            $aksi[] = ['label' => 'Monitoring APMO', 'icon' => 'radar', 'route' => 'mobile.apmo.wilayah', 'tint' => 'amber'];
-            $aksi[] = ['label' => 'Kelola User', 'icon' => 'user-cog', 'route' => 'mobile.kelola-user', 'tint' => 'rose'];
-        }
 
         $aksi[] = $isPengelola
             ? ['label' => 'Unduhan', 'icon' => 'download', 'route' => 'admin.unduhan', 'tint' => 'violet']
@@ -213,9 +210,6 @@ class Dashboard extends Component
         $isEditor = $user->isEditorBerita();
         $isKorcam = $user->isAdminKorcam();
 
-        $dutaDisetujui = DutaOlahraga::where('status_aktif', true)
-            ->where('status_pendaftaran', DutaOlahraga::STATUS_DISETUJUI)
-            ->count();
         $dutaMenunggu = DutaOlahraga::menunggu()->count();
 
         $modulTersedia = [
@@ -223,7 +217,7 @@ class Dashboard extends Component
             'galeri' => ['label' => 'Galeri', 'icon' => 'camera', 'route' => 'admin.galeri'],
             'unduhan' => ['label' => 'Unduhan', 'icon' => 'download', 'route' => 'admin.unduhan'],
             'duta' => ['label' => 'Duta', 'icon' => 'users', 'route' => 'admin.duta'],
-            'survei' => ['label' => 'Survei APMO', 'icon' => 'radar', 'route' => 'mobile.apmo.wilayah'],
+            'survei' => ['label' => 'Survey APMO', 'icon' => 'radar', 'route' => 'mobile.apmo.wilayah'],
             'kordik' => ['label' => 'Kordik', 'icon' => 'map', 'route' => 'admin.kordik'],
             'sapras' => ['label' => 'Sapras', 'icon' => 'building-2', 'route' => 'admin.sapras'],
             'inorga' => ['label' => 'INORGA', 'icon' => 'award', 'route' => 'admin.inorga'],
@@ -237,13 +231,6 @@ class Dashboard extends Component
         if ($isSuper) {
             $akses = ['berita', 'galeri', 'unduhan', 'duta', 'survei', 'kordik', 'sapras', 'inorga', 'event', 'klasemen', 'partisipasi', 'pengguna', 'pengaturan'];
 
-            $stats = [
-                ['label' => 'Berita', 'value' => Berita::count(), 'icon' => 'newspaper'],
-                ['label' => 'Duta', 'value' => $dutaDisetujui, 'icon' => 'users'],
-                ['label' => 'INORGA', 'value' => Inorga::count(), 'icon' => 'award'],
-                ['label' => 'Partisipasi', 'value' => PartisipasiAktivitas::valid()->count(), 'icon' => 'activity'],
-            ];
-
             $terbaruJudul = 'Berita Terbaru';
             $terbaruIcon = 'newspaper';
             $terbaruLink = route('admin.berita');
@@ -255,13 +242,6 @@ class Dashboard extends Component
                 ])->all();
         } elseif ($isEditor) {
             $akses = ['berita', 'galeri', 'unduhan'];
-
-            $stats = [
-                ['label' => 'Berita', 'value' => Berita::count(), 'icon' => 'newspaper'],
-                ['label' => 'Galeri', 'value' => GaleriFoto::count(), 'icon' => 'camera'],
-                ['label' => 'Unduhan', 'value' => Unduhan::count(), 'icon' => 'download'],
-                ['label' => 'Dilihat', 'value' => number_format(Berita::sum('jumlah_dilihat') ?: 0), 'icon' => 'eye'],
-            ];
 
             $terbaruJudul = 'Berita Terbaru';
             $terbaruIcon = 'newspaper';
@@ -275,13 +255,6 @@ class Dashboard extends Component
         } elseif ($isKorcam) {
             $akses = ['duta', 'kordik', 'sapras'];
 
-            $stats = [
-                ['label' => 'Duta', 'value' => $dutaDisetujui, 'icon' => 'users'],
-                ['label' => 'Menunggu', 'value' => $dutaMenunggu, 'icon' => 'clock'],
-                ['label' => 'Kecamatan', 'value' => Kecamatan::count(), 'icon' => 'map-pin'],
-                ['label' => 'Sapras', 'value' => Sapras::count(), 'icon' => 'building-2'],
-            ];
-
             $terbaruJudul = 'Pendaftaran Duta Menunggu';
             $terbaruIcon = 'user-plus';
             $terbaruLink = route('admin.duta');
@@ -291,18 +264,11 @@ class Dashboard extends Component
                 ->get()
                 ->map(fn ($d) => [
                     'judul' => $d->nama_lengkap,
-                    'meta' => trim(($d->desaKelurahan?->nama_desa_kelurahan ?? '-') . ' · ' . ($d->kecamatan?->nama_kecamatan ?? '-')),
+                    'meta' => trim(($d->desaKelurahan?->nama_desa_kelurahan ?? '-').' · '.($d->kecamatan?->nama_kecamatan ?? '-')),
                     'url' => route('admin.duta'),
                 ])->all();
         } else {
             $akses = ['inorga', 'event', 'klasemen'];
-
-            $stats = [
-                ['label' => 'INORGA', 'value' => Inorga::count(), 'icon' => 'award'],
-                ['label' => 'Event', 'value' => Event::count(), 'icon' => 'flag'],
-                ['label' => 'Klub', 'value' => number_format(Inorga::sum('jumlah_klub_anggota') ?: 0), 'icon' => 'users'],
-                ['label' => 'Komisi', 'value' => KomisiInorga::count(), 'icon' => 'layers'],
-            ];
 
             $terbaruJudul = 'Event Terbaru';
             $terbaruIcon = 'flag';
@@ -311,7 +277,7 @@ class Dashboard extends Component
                 ->map(fn ($e) => [
                     'judul' => $e->judul_event,
                     'meta' => ($e->tanggal_mulai ? Carbon::parse($e->tanggal_mulai)->translatedFormat('d M Y') : '-')
-                        . ($e->lokasi_utama ? ' · ' . $e->lokasi_utama : ''),
+                        .($e->lokasi_utama ? ' · '.$e->lokasi_utama : ''),
                     'url' => route('admin.event'),
                 ])->all();
         }
@@ -328,7 +294,6 @@ class Dashboard extends Component
             : 0;
 
         return [
-            'stats' => $stats,
             'modul' => array_values(array_intersect_key($modulTersedia, array_flip($akses))),
             'terbaruJudul' => $terbaruJudul,
             'terbaruIcon' => $terbaruIcon,
@@ -352,7 +317,7 @@ class Dashboard extends Component
                 'jenis' => 'duta',
                 'id' => $d->id,
                 'judul' => $d->nama_lengkap,
-                'meta' => 'Duta · ' . collect([
+                'meta' => 'Duta · '.collect([
                     $d->desaKelurahan?->nama_desa_kelurahan,
                     $d->kecamatan?->nama_kecamatan,
                 ])->filter()->implode(' · '),
@@ -370,7 +335,7 @@ class Dashboard extends Component
                 'jenis' => 'akun',
                 'id' => $u->id,
                 'judul' => $u->nama_lengkap,
-                'meta' => 'Akun · ' . $u->email,
+                'meta' => 'Akun · '.$u->email,
                 'waktu' => $u->dibuat_pada,
             ]);
 
@@ -390,13 +355,14 @@ class Dashboard extends Component
         if (! $duta || ! $duta->sedangMenunggu()) {
             $this->galatPersetujuan = true;
             $this->pesanPersetujuan = 'Pendaftaran tersebut sudah diproses sebelumnya.';
+
             return;
         }
 
         app(PersetujuanPendaftaran::class)->setujuiDuta($duta, auth()->id());
 
         $this->galatPersetujuan = false;
-        $this->pesanPersetujuan = 'Pendaftaran "' . $duta->nama_lengkap . '" disetujui.';
+        $this->pesanPersetujuan = 'Pendaftaran "'.$duta->nama_lengkap.'" disetujui.';
     }
 
     public function setujuiAkun(string $id): void
@@ -408,13 +374,14 @@ class Dashboard extends Component
         if (! $akun || $akun->status_aktif) {
             $this->galatPersetujuan = true;
             $this->pesanPersetujuan = 'Akun tersebut sudah aktif atau tidak ditemukan.';
+
             return;
         }
 
         app(PersetujuanPendaftaran::class)->setujuiAkun($akun, auth()->id());
 
         $this->galatPersetujuan = false;
-        $this->pesanPersetujuan = 'Akun "' . $akun->nama_lengkap . '" diaktifkan.';
+        $this->pesanPersetujuan = 'Akun "'.$akun->nama_lengkap.'" diaktifkan.';
     }
 
     private function pastikanSuperAdmin(): void

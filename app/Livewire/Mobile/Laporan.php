@@ -25,6 +25,9 @@ class Laporan extends Component
     #[Url(as: 'lingkup')]
     public string $lingkup = 'saya';
 
+    /** ID isian yang sedang menunggu konfirmasi hapus (null = tidak ada). */
+    public ?string $hapusId = null;
+
     public function mount()
     {
         $user = auth()->user();
@@ -59,6 +62,34 @@ class Laporan extends Component
         }
 
         $this->lingkup = $lingkup;
+        $this->hapusId = null;
+        $this->resetPage();
+    }
+
+    public function konfirmasiHapus(string $id): void
+    {
+        $this->hapusId = $id;
+    }
+
+    public function batalHapus(): void
+    {
+        $this->hapusId = null;
+    }
+
+    public function hapus(string $id): void
+    {
+        $isian = AngketApmo::where('pengguna_id', auth()->id())->find($id);
+
+        if (! $isian) {
+            $this->hapusId = null;
+
+            return;
+        }
+
+        app(\App\Services\StorageService::class)->hapusFile($isian->foto_bukti);
+        $isian->delete();
+
+        $this->hapusId = null;
         $this->resetPage();
     }
 

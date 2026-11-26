@@ -46,10 +46,16 @@ Route::prefix('mobile')->group(function () {
     Route::get('/berita', \App\Livewire\Mobile\Berita::class)->name('mobile.berita');
     Route::get('/berita/{slug}', \App\Livewire\Mobile\BeritaDetail::class)->name('mobile.berita.detail');
     Route::get('/angket', \App\Livewire\Mobile\Angket::class)->name('mobile.angket');
+    Route::get('/angket/{isian}/ubah', \App\Livewire\Mobile\Angket::class)
+        ->name('mobile.angket.ubah')
+        ->middleware('auth');
     Route::get('/layanan', \App\Livewire\Mobile\Layanan::class)->name('mobile.layanan')->middleware('auth');
     Route::get('/absensi', \App\Livewire\Mobile\Absensi::class)->name('mobile.absensi')->middleware('auth');
     Route::get('/profil', \App\Livewire\Mobile\Profil::class)->name('mobile.profil')->middleware('auth');
     Route::get('/laporan', \App\Livewire\Mobile\Laporan::class)->name('mobile.laporan')->middleware('auth');
+    Route::get('/laporan/{isian}/pdf', \App\Http\Controllers\Mobile\LaporanApmoPdfController::class)
+        ->name('mobile.laporan.pdf')
+        ->middleware('auth');
     Route::get('/dashboard', \App\Livewire\Mobile\Dashboard::class)->name('mobile.dashboard')->middleware('auth');
     Route::get('/persetujuan', \App\Livewire\Mobile\Persetujuan::class)->name('mobile.persetujuan')->middleware('auth');
     Route::get('/kelola-user', \App\Livewire\Mobile\KelolaUser::class)->name('mobile.kelola-user')->middleware(['auth', 'peran:super-admin']);

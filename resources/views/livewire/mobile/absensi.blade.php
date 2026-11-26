@@ -165,7 +165,7 @@
                         <span class="kd-abs-launch-face" aria-hidden="true"><i data-lucide="scan-face"></i></span>
                         <span class="kd-abs-launch-text">
                             <strong>Ambil foto selfie</strong>
-                            <span>Wajah terdeteksi otomatis sebelum foto diambil</span>
+                            <span>Deteksi wajah membantu memastikan wajah terlihat jelas</span>
                         </span>
                         <span class="kd-abs-launch-cta">
                             <i data-lucide="camera"></i>
@@ -382,6 +382,9 @@
                 </div>
             </div>
 
+            <p class="kd-abs-cam-error" role="alert" x-show="fotoError" style="display: none;"
+               x-text="fotoError"></p>
+
             <footer class="kd-abs-cam-foot">
                 <button type="button" class="kd-abs-cam-tool" @click="gantiKamera()"
                         :disabled="! kameraSiap || !! izinKameraError" aria-label="Ganti kamera depan atau belakang">
@@ -390,7 +393,7 @@
 
                 <button type="button" class="kd-abs-cam-shutter" @click="ambilFoto()"
                         :class="wajahTerdeteksi ? 'is-ready' : ''"
-                        :disabled="! kameraSiap || !! izinKameraError || (statusDeteksi === 'aktif' && ! wajahTerdeteksi)"
+                        :disabled="! kameraSiap || !! izinKameraError"
                         aria-label="Ambil foto kehadiran">
                     <span class="kd-abs-cam-shutter-ring"></span>
                 </button>

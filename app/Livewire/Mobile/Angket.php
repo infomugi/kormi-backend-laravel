@@ -5,15 +5,20 @@ namespace App\Livewire\Mobile;
 use App\Models\Kormi\AngketApmo;
 use App\Models\Master\DesaKelurahan;
 use App\Models\Master\Kecamatan;
+use App\Services\StorageService;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Layout('components.layouts.mobile')]
-#[Title('Angket APMO - KORMI Kabupaten Bandung')]
+#[Title('Survey APMO - KORMI Kabupaten Bandung')]
 class Angket extends Component
 {
+    use WithFileUploads;
+
     public const OPSI_PEKERJAAN = [
         'pelajar' => 'Pelajar/Mahasiswa',
         'pns_tni_polri_bumn' => 'PNS/TNI/POLRI/BUMN',
@@ -79,8 +84,15 @@ class Angket extends Component
 
     public bool $selesai = false;
 
+    /** ID baris kormi_angket_apmo yang sedang diubah (null = pengisian baru). */
+    #[Locked]
+    public ?string $isianId = null;
+
     public string $namaTersimpan = '';
     public string $waktuTersimpan = '';
+
+    /** Foto selfie bukti survey yang baru diunggah. */
+    public $foto_bukti = null;
 
     // Bagian 1: identitas responden
     public string $nama_lengkap = '';
@@ -202,10 +214,24 @@ class Angket extends Component
         'alasan_tidak_olahraga.required' => 'Pilih alasan tidak berolahraga.',
         'alasan_lainnya.required_if' => 'Sebutkan alasan Anda.',
         'alasan_lainnya.max' => 'Sebutan alasan maksimal 100 karakter.',
+        'foto_bukti.required' => 'Ambil atau unggah foto selfie sebagai bukti survey.',
+        'foto_bukti.image' => 'Foto bukti survey harus berupa gambar.',
+        'foto_bukti.max' => 'Ukuran foto bukti survey maksimal 10 MB.',
     ];
 
-    public function mount(): void
+    public function mount(?string $isian = null): void
     {
+        if ($isian !== null) {
+            abort_unless(auth()->check(), 404);
+
+            $catatan = AngketApmo::where('pengguna_id', auth()->id())->findOrFail($isian);
+
+            $this->isianId = $catatan->id;
+            $this->isiDariCatatan($catatan);
+
+            return;
+        }
+
         $user = auth()->user();
 
         if ($user) {
@@ -218,6 +244,65 @@ class Angket extends Component
             $this->kecamatan_id = $user->kecamatan_id ?: null;
             $this->desa_kelurahan_id = $user->desa_kelurahan_id ?: null;
         }
+    }
+
+    /**
+     * Isi ulang seluruh properti formulir dari baris APMO yang sudah tersimpan.
+     * Wilayah disimpan sebagai snapshot nama, jadi dicari balik ke master.
+     */
+    private function isiDariCatatan(AngketApmo $a): void
+    {
+        $kecamatanId = Kecamatan::where('nama_kecamatan', $a->kecamatan)->value('id');
+        $desaId = $kecamatanId
+            ? DesaKelurahan::where('kecamatan_id', $kecamatanId)
+                ->where('nama_desa_kelurahan', $a->desa)
+                ->value('id')
+            : null;
+
+        $this->kecamatan_id = $kecamatanId ? (string) $kecamatanId : null;
+        $this->desa_kelurahan_id = $desaId ? (string) $desaId : null;
+
+        $this->nama_lengkap = (string) ($a->nama_lengkap ?? '');
+        $this->usia = $a->usia ?? '';
+        $this->jenis_kelamin = (string) ($a->jenis_kelamin ?? '');
+        $this->tinggi_badan = $a->tinggi_badan ?? '';
+        $this->berat_badan = $a->berat_badan ?? '';
+        $this->alamat = (string) ($a->alamat ?? '');
+        $this->kabupaten_kota = $a->kabupaten_kota ?: 'Kabupaten Bandung';
+        $this->pekerjaan = (string) ($a->pekerjaan ?? '');
+        $this->pekerjaan_lainnya = (string) ($a->pekerjaan_lainnya ?? '');
+
+        $this->melakukan_olahraga = $a->melakukan_olahraga ? 'ya' : 'tidak';
+
+        $this->frekuensi_berat = (string) ($a->frekuensi_berat ?? '');
+        $this->durasi_berat_jam = $a->durasi_berat_jam ?? '';
+        $this->durasi_berat_menit = $a->durasi_berat_menit ?? '';
+        $this->durasi_berat_tidak_tahu = (bool) $a->durasi_berat_tidak_tahu;
+        $this->frekuensi_sedang = (string) ($a->frekuensi_sedang ?? '');
+        $this->durasi_sedang_jam = $a->durasi_sedang_jam ?? '';
+        $this->durasi_sedang_menit = $a->durasi_sedang_menit ?? '';
+        $this->durasi_sedang_tidak_tahu = (bool) $a->durasi_sedang_tidak_tahu;
+        $this->frekuensi_jalan = (string) ($a->frekuensi_jalan ?? '');
+        $this->durasi_jalan_jam = $a->durasi_jalan_jam ?? '';
+        $this->durasi_jalan_menit = $a->durasi_jalan_menit ?? '';
+        $this->durasi_jalan_tidak_tahu = (bool) $a->durasi_jalan_tidak_tahu;
+        $this->cabang_olahraga = (string) ($a->cabang_olahraga ?? '');
+        $this->cabang_lainnya = (string) ($a->cabang_lainnya ?? '');
+        $this->tujuan_olahraga = (string) ($a->tujuan_olahraga ?? '');
+        $this->tujuan_lainnya = (string) ($a->tujuan_lainnya ?? '');
+        $this->jalur_olahraga = (string) ($a->jalur_olahraga ?? '');
+        $this->jalur_lainnya = (string) ($a->jalur_lainnya ?? '');
+        $this->pernah_malas = (string) ($a->pernah_malas ?? '');
+        $this->duduk_jam = $a->duduk_jam ?? '';
+        $this->duduk_menit = $a->duduk_menit ?? '';
+        $this->duduk_tidak_tahu = (bool) $a->duduk_tidak_tahu;
+        $this->fasilitas_olahraga = (string) ($a->fasilitas_olahraga ?? '');
+
+        $this->alasan_tidak_olahraga = (string) ($a->alasan_tidak_olahraga ?? '');
+        $this->alasan_lainnya = (string) ($a->alasan_lainnya ?? '');
+
+        $this->langkah = 1;
+        $this->selesai = false;
     }
 
     public function lanjut(): void
@@ -298,12 +383,65 @@ class Angket extends Component
             }
         }
 
-        AngketApmo::create($this->dataSimpan());
+        $data = $this->dataSimpan();
+        $fotoBaru = $this->unggahFotoBukti();
 
+        if ($fotoBaru === false) {
+            return;
+        }
+
+        if ($fotoBaru !== null) {
+            $data['foto_bukti'] = $fotoBaru;
+        }
+
+        if ($this->isianId !== null) {
+            $catatan = AngketApmo::where('pengguna_id', auth()->id())
+                ->findOrFail($this->isianId);
+            $fotoLama = $catatan->foto_bukti;
+
+            $catatan->update($data);
+
+            if ($fotoBaru !== null && $fotoLama) {
+                app(StorageService::class)->hapusFile($fotoLama);
+            }
+
+            $this->redirectRoute('mobile.laporan', navigate: true);
+
+            return;
+        }
+
+        AngketApmo::create($data);
+
+        $this->reset('foto_bukti');
         $this->namaTersimpan = trim(strip_tags($this->nama_lengkap));
         $this->waktuTersimpan = now('Asia/Jakarta')->locale('id')->translatedFormat('d M Y H:i');
         $this->selesai = true;
         $this->langkah = 1;
+    }
+
+    /**
+     * Simpan foto bukti ke MinIO. Null bila tidak ada foto baru,
+     * false bila unggahan gagal (pesan error sudah ditambahkan).
+     */
+    private function unggahFotoBukti(): string|false|null
+    {
+        if (! $this->foto_bukti) {
+            return null;
+        }
+
+        try {
+            return app(StorageService::class)
+                ->uploadGambar($this->foto_bukti, 'angket/' . now()->format('Y-m'));
+        } catch (\InvalidArgumentException $e) {
+            $this->addError('foto_bukti', $e->getMessage());
+
+            return false;
+        } catch (\Throwable $e) {
+            report($e);
+            $this->addError('foto_bukti', 'Foto gagal diunggah. Periksa koneksi lalu coba lagi.');
+
+            return false;
+        }
     }
 
     public function isiLagi(): void
@@ -348,6 +486,7 @@ class Angket extends Component
                 'alasan_tidak_olahraga' => 'required|in:' . implode(',', array_keys(self::OPSI_ALASAN)),
                 'alasan_lainnya' => 'nullable|required_if:alasan_tidak_olahraga,lainnya|max:100',
                 'fasilitas_olahraga' => 'required|in:' . implode(',', array_keys(self::OPSI_FASILITAS)),
+                'foto_bukti' => $this->aturanFotoBukti(),
             ];
         }
 
@@ -363,6 +502,7 @@ class Angket extends Component
             'jalur_lainnya' => 'nullable|required_if:jalur_olahraga,lainnya|max:100',
             'pernah_malas' => 'required|in:pernah,tidak_pernah',
             'fasilitas_olahraga' => 'required|in:' . implode(',', array_keys(self::OPSI_FASILITAS)),
+            'foto_bukti' => $this->aturanFotoBukti(),
         ];
 
         foreach (['berat', 'sedang', 'jalan'] as $jenis) {
@@ -376,6 +516,21 @@ class Angket extends Component
         }
 
         return $aturan;
+    }
+
+    /**
+     * Foto bukti wajib saat pengisian baru. Pada mode ubah, foto lama boleh
+     * dipertahankan sehingga unggahan baru bersifat opsional.
+     */
+    private function aturanFotoBukti(): array
+    {
+        $sudahAda = $this->isianId !== null
+            && AngketApmo::where('pengguna_id', auth()->id())
+                ->whereKey($this->isianId)
+                ->whereNotNull('foto_bukti')
+                ->exists();
+
+        return [$sudahAda ? 'nullable' : 'required', 'image', 'max:10240'];
     }
 
     private function periksaDurasiOlahraga(): void
@@ -456,11 +611,17 @@ class Angket extends Component
             ? AngketApmo::where('pengguna_id', auth()->id())->latest('dibuat_pada')->first()
             : null;
 
+        $isianDiubah = $this->isianId !== null && auth()->check()
+            ? AngketApmo::where('pengguna_id', auth()->id())->find($this->isianId)
+            : null;
+
         $daftarDesa = $this->kecamatan_id
             ? DesaKelurahan::where('kecamatan_id', $this->kecamatan_id)->orderBy('nama_desa_kelurahan')->get()
             : collect();
 
         return view('livewire.mobile.angket', [
+            'modeUbah' => $this->isianId !== null,
+            'isianDiubah' => $isianDiubah,
             'pengisianTerakhir' => $pengisianTerakhir,
             'daftarKecamatan' => Kecamatan::orderBy('nama_kecamatan')->get(),
             'daftarDesa' => $daftarDesa,

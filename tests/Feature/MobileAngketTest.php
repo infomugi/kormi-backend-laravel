@@ -9,12 +9,26 @@ use App\Models\Kormi\AngketApmo;
 use App\Models\Master\DesaKelurahan;
 use App\Models\Master\Kecamatan;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class MobileAngketTest extends TestCase
 {
     use DatabaseTransactions;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Storage::fake('minio');
+    }
+
+    private function fotoUji(): UploadedFile
+    {
+        return UploadedFile::fake()->image('selfie.jpg', 320, 320);
+    }
 
     private function penggunaUji(): Pengguna
     {
@@ -32,6 +46,38 @@ class MobileAngketTest extends TestCase
     private function desaUji(): DesaKelurahan
     {
         return DesaKelurahan::whereNotNull('kecamatan_id')->orderBy('kecamatan_id')->firstOrFail();
+    }
+
+    private function catatanUji(Pengguna $pengguna, DesaKelurahan $desa): AngketApmo
+    {
+        return AngketApmo::create([
+            'pengguna_id' => $pengguna->id,
+            'nama_lengkap' => 'Responden Uji Angket',
+            'usia' => 33,
+            'jenis_kelamin' => 'pria',
+            'tinggi_badan' => 170,
+            'berat_badan' => 66,
+            'alamat' => 'Jl. Lama No. 5',
+            'kecamatan' => $desa->kecamatan->nama_kecamatan,
+            'desa' => $desa->nama_desa_kelurahan,
+            'kabupaten_kota' => 'Kabupaten Bandung',
+            'pekerjaan' => 'pegawai_swasta',
+            'melakukan_olahraga' => true,
+            'frekuensi_berat' => '2',
+            'durasi_berat_jam' => 1,
+            'durasi_berat_menit' => 20,
+            'frekuensi_sedang' => '1',
+            'durasi_sedang_jam' => 0,
+            'durasi_sedang_menit' => 30,
+            'frekuensi_jalan' => '3',
+            'durasi_jalan_tidak_tahu' => true,
+            'cabang_olahraga' => 'sepakbola',
+            'tujuan_olahraga' => 'kesehatan',
+            'jalur_olahraga' => 'sendiri',
+            'pernah_malas' => 'tidak_pernah',
+            'fasilitas_olahraga' => 'memadai',
+            'foto_bukti' => 'angket/uji/foto-lama.jpg',
+        ]);
     }
 
     private function isiIdentitas($component)
@@ -70,7 +116,7 @@ class MobileAngketTest extends TestCase
     {
         $this->get('/mobile/angket')
             ->assertOk()
-            ->assertSee('Angket APMO')
+            ->assertSee('Survey APMO')
             ->assertSee('Identitas')
             ->assertSee('kd-steps', false)
             ->assertSee('Nama Lengkap')
@@ -82,7 +128,7 @@ class MobileAngketTest extends TestCase
     {
         $this->get('/mobile/beranda')
             ->assertOk()
-            ->assertSee('Angket APMO')
+            ->assertSee('Survey APMO')
             ->assertSee(route('mobile.angket'), false);
 
         $this->actingAs($this->penggunaUji())
@@ -136,6 +182,7 @@ class MobileAngketTest extends TestCase
             ->call('lanjut');
 
         $this->isiDetailOlahraga($komponen)
+            ->set('foto_bukti', $this->fotoUji())
             ->call('kirim')
             ->assertHasNoErrors()
             ->assertSet('selesai', true)
@@ -145,6 +192,9 @@ class MobileAngketTest extends TestCase
 
         $this->assertNotNull($angket);
         $this->assertSame($user->id, $angket->pengguna_id);
+        $this->assertNotNull($angket->foto_bukti);
+        $this->assertStringStartsWith('angket/', $angket->foto_bukti);
+        Storage::disk('minio')->assertExists($angket->foto_bukti);
         $this->assertTrue($angket->melakukan_olahraga);
         $this->assertSame('2', $angket->frekuensi_berat);
         $this->assertSame(1, $angket->durasi_berat_jam);
@@ -170,6 +220,7 @@ class MobileAngketTest extends TestCase
             ->assertSet('langkah', 3)
             ->set('alasan_tidak_olahraga', 'tidak_ada_waktu')
             ->set('fasilitas_olahraga', 'kurang')
+            ->set('foto_bukti', $this->fotoUji())
             ->call('kirim')
             ->assertHasNoErrors()
             ->assertSet('selesai', true);
@@ -182,6 +233,7 @@ class MobileAngketTest extends TestCase
         $this->assertSame('tidak_ada_waktu', $angket->alasan_tidak_olahraga);
         $this->assertNull($angket->frekuensi_berat);
         $this->assertSame('kurang', $angket->fasilitas_olahraga);
+        $this->assertNotNull($angket->foto_bukti);
     }
 
     public function test_identitas_wajib_lengkap_sebelum_lanjut(): void
@@ -267,6 +319,7 @@ class MobileAngketTest extends TestCase
         $this->isiDetailOlahraga($komponen)
             ->set('durasi_berat_jam', 0)
             ->set('durasi_berat_menit', 0)
+            ->set('foto_bukti', $this->fotoUji())
             ->call('kirim')
             ->assertHasErrors(['durasi_berat_jam']);
     }
@@ -420,6 +473,7 @@ class MobileAngketTest extends TestCase
                 ->call('lanjut');
 
             $this->isiDetailOlahraga($komponen)
+                ->set('foto_bukti', $this->fotoUji())
                 ->call('kirim')
                 ->assertSet('selesai', true)
                 ->assertSet('waktuTersimpan', '11 Agt 2026 03:00');
@@ -444,6 +498,7 @@ class MobileAngketTest extends TestCase
             ->set('tujuan_lainnya', 'Bersosialisasi')
             ->set('jalur_olahraga', 'lainnya')
             ->set('jalur_lainnya', 'Komunitas')
+            ->set('foto_bukti', $this->fotoUji())
             ->call('kirim')
             ->assertHasNoErrors()
             ->assertSet('selesai', true);
@@ -454,5 +509,201 @@ class MobileAngketTest extends TestCase
         $this->assertSame('Bersosialisasi', $angket->tujuan_lainnya);
         $this->assertSame('Komunitas', $angket->jalur_lainnya);
         $this->assertSame('Wiraswasta mandiri', $angket->pekerjaan_lainnya);
+    }
+
+    public function test_ubah_isian_memuat_data_lama_dan_memperbarui_baris_yang_sama(): void
+    {
+        $user = $this->penggunaUji();
+        $this->actingAs($user);
+
+        $desa = $this->desaUji();
+        $catatan = $this->catatanUji($user, $desa);
+        $jumlahAwal = AngketApmo::count();
+
+        Livewire::test(Angket::class, ['isian' => $catatan->id])
+            ->assertSet('isianId', $catatan->id)
+            ->assertSet('nama_lengkap', 'Responden Uji Angket')
+            ->assertSet('usia', 33)
+            ->assertSet('melakukan_olahraga', 'ya')
+            ->assertSet('kecamatan_id', $desa->kecamatan_id)
+            ->assertSet('desa_kelurahan_id', $desa->id)
+            ->assertSet('langkah', 1)
+            ->assertSet('selesai', false)
+            ->assertSee('Ubah Isian APMO')
+            ->set('alamat', 'Jl. Baru No. 8')
+            ->call('lanjut')
+            ->assertHasNoErrors()
+            ->assertSet('langkah', 2)
+            ->call('lanjut')
+            ->assertHasNoErrors()
+            ->assertSet('langkah', 3)
+            ->assertSee('Simpan Perubahan')
+            ->assertSee('Foto Bukti Survey')
+            ->assertSee(route('mobile.laporan'), false)
+            ->call('kirim')
+            ->assertHasNoErrors()
+            ->assertRedirect(route('mobile.laporan'));
+
+        $this->assertSame($jumlahAwal, AngketApmo::count());
+
+        $catatan->refresh();
+
+        $this->assertSame('Jl. Baru No. 8', $catatan->alamat);
+        $this->assertSame($user->id, $catatan->pengguna_id);
+        $this->assertSame('angket/uji/foto-lama.jpg', $catatan->foto_bukti);
+    }
+
+    public function test_ubah_isian_tidak_berolahraga_memuat_pilihan_alasan(): void
+    {
+        $user = $this->penggunaUji();
+        $this->actingAs($user);
+        $desa = $this->desaUji();
+
+        $catatan = AngketApmo::create([
+            'pengguna_id' => $user->id,
+            'nama_lengkap' => 'Responden Uji Angket',
+            'usia' => 40,
+            'jenis_kelamin' => 'wanita',
+            'alamat' => 'Jl. Lama No. 6',
+            'kecamatan' => $desa->kecamatan->nama_kecamatan,
+            'desa' => $desa->nama_desa_kelurahan,
+            'kabupaten_kota' => 'Kabupaten Bandung',
+            'pekerjaan' => 'wiraswasta',
+            'melakukan_olahraga' => false,
+            'alasan_tidak_olahraga' => 'tidak_ada_waktu',
+            'fasilitas_olahraga' => 'kurang',
+        ]);
+
+        Livewire::test(Angket::class, ['isian' => $catatan->id])
+            ->assertSet('melakukan_olahraga', 'tidak')
+            ->assertSet('alasan_tidak_olahraga', 'tidak_ada_waktu')
+            ->assertSet('fasilitas_olahraga', 'kurang')
+            ->assertSet('jenis_kelamin', 'wanita')
+            ->set('alasan_tidak_olahraga', 'lelah')
+            ->call('lanjut')
+            ->assertHasNoErrors()
+            ->call('lanjut')
+            ->assertHasNoErrors()
+            ->assertSet('langkah', 3)
+            ->set('foto_bukti', $this->fotoUji())
+            ->call('kirim')
+            ->assertHasNoErrors()
+            ->assertRedirect(route('mobile.laporan'));
+
+        $catatan->refresh();
+
+        $this->assertFalse($catatan->melakukan_olahraga);
+        $this->assertSame('lelah', $catatan->alasan_tidak_olahraga);
+        $this->assertNotNull($catatan->foto_bukti);
+    }
+
+    public function test_foto_bukti_wajib_diisi(): void
+    {
+        $komponen = $this->isiIdentitas(Livewire::test(Angket::class))
+            ->call('lanjut')
+            ->set('melakukan_olahraga', 'tidak')
+            ->call('lanjut')
+            ->assertSee('Foto Bukti Survey')
+            ->set('alasan_tidak_olahraga', 'tidak_ada_waktu')
+            ->set('fasilitas_olahraga', 'kurang')
+            ->call('kirim')
+            ->assertHasErrors(['foto_bukti'])
+            ->assertSet('selesai', false);
+
+        $this->assertSame('Ambil atau unggah foto selfie sebagai bukti survey.', $komponen->errors()->first('foto_bukti'));
+        $this->assertSame(0, AngketApmo::where('nama_lengkap', 'Responden Uji Angket')->count());
+    }
+
+    public function test_ubah_isian_tanpa_foto_lama_mewajibkan_unggahan_foto(): void
+    {
+        $user = $this->penggunaUji();
+        $this->actingAs($user);
+        $desa = $this->desaUji();
+
+        $catatan = AngketApmo::create([
+            'pengguna_id' => $user->id,
+            'nama_lengkap' => 'Responden Uji Angket',
+            'usia' => 40,
+            'jenis_kelamin' => 'wanita',
+            'alamat' => 'Jl. Lama No. 6',
+            'kecamatan' => $desa->kecamatan->nama_kecamatan,
+            'desa' => $desa->nama_desa_kelurahan,
+            'kabupaten_kota' => 'Kabupaten Bandung',
+            'pekerjaan' => 'wiraswasta',
+            'melakukan_olahraga' => false,
+            'alasan_tidak_olahraga' => 'tidak_ada_waktu',
+            'fasilitas_olahraga' => 'kurang',
+        ]);
+
+        Livewire::test(Angket::class, ['isian' => $catatan->id])
+            ->call('lanjut')
+            ->assertHasNoErrors()
+            ->call('lanjut')
+            ->assertHasNoErrors()
+            ->call('kirim')
+            ->assertHasErrors(['foto_bukti']);
+
+        $this->assertNull($catatan->fresh()->foto_bukti);
+    }
+
+    public function test_ubah_isian_mengganti_foto_bukti_menghapus_foto_lama(): void
+    {
+        $user = $this->penggunaUji();
+        $this->actingAs($user);
+
+        $catatan = $this->catatanUji($user, $this->desaUji());
+        Storage::disk('minio')->put('angket/uji/foto-lama.jpg', 'foto-lama');
+
+        Livewire::test(Angket::class, ['isian' => $catatan->id])
+            ->call('lanjut')
+            ->assertHasNoErrors()
+            ->call('lanjut')
+            ->assertHasNoErrors()
+            ->set('foto_bukti', $this->fotoUji())
+            ->call('kirim')
+            ->assertHasNoErrors()
+            ->assertRedirect(route('mobile.laporan'));
+
+        $catatan->refresh();
+
+        $this->assertNotSame('angket/uji/foto-lama.jpg', $catatan->foto_bukti);
+        Storage::disk('minio')->assertMissing('angket/uji/foto-lama.jpg');
+        Storage::disk('minio')->assertExists($catatan->foto_bukti);
+    }
+
+    public function test_halaman_ubah_isian_dapat_diakses_pemilik(): void
+    {
+        $user = $this->penggunaUji();
+        $catatan = $this->catatanUji($user, $this->desaUji());
+
+        $this->actingAs($user)
+            ->get(route('mobile.angket.ubah', $catatan))
+            ->assertOk()
+            ->assertSee('Ubah Isian APMO')
+            ->assertSee('Simpan Perubahan')
+            ->assertSee('Jl. Lama No. 5');
+
+        $this->assertSame(1, AngketApmo::where('pengguna_id', $user->id)->count());
+    }
+
+    public function test_ubah_isian_pengguna_lain_ditolak_404(): void
+    {
+        $pemilik = $this->penggunaUji();
+        $catatan = $this->catatanUji($pemilik, $this->desaUji());
+
+        $this->actingAs($this->penggunaUji())
+            ->get(route('mobile.angket.ubah', $catatan))
+            ->assertNotFound();
+
+        $this->assertNotNull(AngketApmo::find($catatan->id));
+    }
+
+    public function test_ubah_isian_guest_ditolak_404(): void
+    {
+        $pemilik = $this->penggunaUji();
+        $catatan = $this->catatanUji($pemilik, $this->desaUji());
+
+        Livewire::test(Angket::class, ['isian' => $catatan->id])
+            ->assertNotFound();
     }
 }

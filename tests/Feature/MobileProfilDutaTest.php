@@ -133,6 +133,8 @@ class MobileProfilDutaTest extends TestCase
             ->set('duta_kecamatan_id', $kecamatan->id)
             ->set('duta_desa_kelurahan_id', $desa->id)
             ->set('duta_pekerjaan', 'Pelatih Senam')
+            ->set('duta_nama_bank', 'Bank BJB')
+            ->set('duta_nomor_rekening', '1234567890')
             ->set('duta_gelar_prestasi', 'Juara 1 Senam Kreasi')
             ->call('simpanDataAkun')
             ->assertHasNoErrors();
@@ -146,6 +148,8 @@ class MobileProfilDutaTest extends TestCase
         $this->assertSame('Nama Baru Terhubung', $duta->nama_lengkap);
         $this->assertSame('Duta Pemuda & Kebugaran', $duta->kategori_duta);
         $this->assertSame('Pelatih Senam', $duta->pekerjaan_profesi);
+        $this->assertSame('Bank BJB', $duta->nama_bank);
+        $this->assertSame('1234567890', $duta->nomor_rekening);
         $this->assertSame('Juara 1 Senam Kreasi', $duta->gelar_prestasi);
         $this->assertSame(1, DutaOlahraga::where('pengguna_id', $user->id)->count());
     }
@@ -162,6 +166,8 @@ class MobileProfilDutaTest extends TestCase
             'jenis_kelamin' => 'L',
             'tahun_pemilihan' => 2026,
             'kategori_duta' => 'Duta Olahraga Masyarakat',
+            'nama_bank' => 'Bank BJB',
+            'nomor_rekening' => '9876543210',
             'status_aktif' => true,
             'status_unggulan' => false,
             'status_pendaftaran' => DutaOlahraga::STATUS_DISETUJUI,
@@ -173,6 +179,8 @@ class MobileProfilDutaTest extends TestCase
             ->assertOk()
             ->assertSee('Duta Terhubung Uji')
             ->assertSee('Disetujui')
+            ->assertSee('Bank BJB')
+            ->assertSee('9876543210')
             ->assertSee('Edit Profil Duta')
             ->assertDontSee('Hubungkan Profil Duta');
     }

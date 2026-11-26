@@ -858,9 +858,8 @@
                                 name="uploadFoto"
                                 inputId="uploadFotoGaleri"
                                 accept="image/jpeg,image/png,image/webp"
-                                :maxSizeMB="10"
                                 emptyTitle="Pilih Foto Dokumentasi"
-                                emptySubtitle="JPG, PNG, WEBP (Maksimal 10MB)"
+                                emptySubtitle="JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB"
                                 aspectRatio="h-64 sm:h-72"
                             />
                         </x-form.card>
@@ -993,9 +992,8 @@
                                 name="uploadSampul"
                                 inputId="uploadSampulAlbum"
                                 accept="image/jpeg,image/png,image/webp"
-                                :maxSizeMB="10"
                                 emptyTitle="Pilih Foto Sampul Album"
-                                emptySubtitle="JPG, PNG, WEBP (Maksimal 10MB)"
+                                emptySubtitle="JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB"
                                 aspectRatio="h-44 sm:h-52"
                             />
                         </x-form.card>
@@ -1010,12 +1008,43 @@
                             <div 
                                 x-data="{
                                     isDragging: false,
-                                    handleFiles(files) {
+                                    isCompressing: false,
+                                    kompresStatus: '',
+                                    async handleFiles(files) {
                                         if (!files || files.length === 0) return;
-                                        @this.uploadMultiple('uploadAlbumBulkFoto', files, () => {
+                                        const asli = Array.from(files);
+                                        let hasil = asli;
+
+                                        if (window.compressImageClientSide) {
+                                            this.isCompressing = true;
+                                            hasil = [];
+                                            for (let i = 0; i < asli.length; i++) {
+                                                this.kompresStatus = 'Mengompres ' + (i + 1) + '/' + asli.length + '…';
+                                                let berkas = asli[i];
+                                                try {
+                                                    if ((berkas.type || '').startsWith('image/')) {
+                                                        const terkompres = await window.compressImageClientSide(berkas, {
+                                                            maxSizeMB: 1,
+                                                            maxWidthOrHeight: 1600,
+                                                            initialQuality: 0.85
+                                                        });
+                                                        if (terkompres) berkas = terkompres;
+                                                    }
+                                                } catch (e) {
+                                                    // Gagal kompres: sertakan berkas asli.
+                                                }
+                                                hasil.push(berkas);
+                                            }
+                                            this.isCompressing = false;
+                                            this.kompresStatus = '';
+                                        }
+
+                                        @this.uploadMultiple('uploadAlbumBulkFoto', hasil, () => {
                                             this.isDragging = false;
                                         }, () => {
                                             this.isDragging = false;
+                                            this.isCompressing = false;
+                                            this.kompresStatus = '';
                                         });
                                     }
                                 }"
@@ -1047,6 +1076,8 @@
                                     @change="handleFiles($event.target.files)"
                                     class="hidden"
                                 >
+
+                                <p x-show="kompresStatus" x-text="kompresStatus" class="text-[11px] font-bold text-emerald-700"></p>
 
                                 @error('uploadAlbumBulkFoto')
                                     <span class="text-xs text-rose-600 font-bold block">{{ $message }}</span>
@@ -1179,19 +1210,50 @@
                     <div class="lg:col-span-7 space-y-6">
                         <x-form.card 
                             title="Pilih Berkas Foto (Multi-File)" 
-                            subtitle="Maksimal 10MB per foto. Format yang didukung: JPG, PNG, WEBP."
+                            subtitle="Otomatis dikompres ≤ 1 MB per foto. Format yang didukung: JPG, PNG, WEBP."
                             icon="upload-cloud"
                             size="default"
                         >
                             <div 
                                 x-data="{
                                     isDragging: false,
-                                    handleFiles(files) {
+                                    isCompressing: false,
+                                    kompresStatus: '',
+                                    async handleFiles(files) {
                                         if (!files || files.length === 0) return;
-                                        @this.uploadMultiple('uploadBulkFoto', files, () => {
+                                        const asli = Array.from(files);
+                                        let hasil = asli;
+
+                                        if (window.compressImageClientSide) {
+                                            this.isCompressing = true;
+                                            hasil = [];
+                                            for (let i = 0; i < asli.length; i++) {
+                                                this.kompresStatus = 'Mengompres ' + (i + 1) + '/' + asli.length + '…';
+                                                let berkas = asli[i];
+                                                try {
+                                                    if ((berkas.type || '').startsWith('image/')) {
+                                                        const terkompres = await window.compressImageClientSide(berkas, {
+                                                            maxSizeMB: 1,
+                                                            maxWidthOrHeight: 1600,
+                                                            initialQuality: 0.85
+                                                        });
+                                                        if (terkompres) berkas = terkompres;
+                                                    }
+                                                } catch (e) {
+                                                    // Gagal kompres: sertakan berkas asli.
+                                                }
+                                                hasil.push(berkas);
+                                            }
+                                            this.isCompressing = false;
+                                            this.kompresStatus = '';
+                                        }
+
+                                        @this.uploadMultiple('uploadBulkFoto', hasil, () => {
                                             this.isDragging = false;
                                         }, () => {
                                             this.isDragging = false;
+                                            this.isCompressing = false;
+                                            this.kompresStatus = '';
                                         });
                                     }
                                 }"
@@ -1226,6 +1288,8 @@
                                     @change="handleFiles($event.target.files)"
                                     class="hidden"
                                 >
+
+                                <p x-show="kompresStatus" x-text="kompresStatus" class="text-[11px] font-bold text-emerald-700"></p>
 
                                 @error('uploadBulkFoto')
                                     <span class="text-xs text-rose-600 font-bold block flex items-center gap-1">

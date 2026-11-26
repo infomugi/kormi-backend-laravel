@@ -38,10 +38,16 @@ class Layanan extends Component
             default => [],
         };
 
+        $isDuta = $user->isDutaOlahraga();
+        $itemAbsensi = ['nama' => 'Absensi Harian', 'desc' => 'Absen masuk & pulang dengan foto dan GPS', 'icon' => 'clipboard-check', 'route' => 'mobile.absensi'];
+
         $layananPartisipasi = [];
 
-        if ($user->isDutaOlahraga() || $user->isPegiatOlahraga()) {
-            $layananPartisipasi[] = ['nama' => 'Absensi Harian', 'desc' => 'Absen masuk & pulang dengan foto dan GPS', 'icon' => 'clipboard-check', 'route' => 'mobile.absensi'];
+        if ($isDuta) {
+            // Duta hanya melihat Absensi; Survey APMO dan Direktori tampil di seksi lain.
+            $layananPartisipasi[] = $itemAbsensi;
+        } elseif ($user->isPegiatOlahraga()) {
+            $layananPartisipasi[] = $itemAbsensi;
             $layananPartisipasi[] = ['nama' => 'Catat Aktivitas', 'desc' => 'Catat sesi olahraga untuk APMO', 'icon' => 'clipboard-pen', 'route' => 'partisipasi.catat'];
             $layananPartisipasi[] = ['nama' => 'Riwayat Aktivitas', 'desc' => 'Status verifikasi dan badge APMO', 'icon' => 'history', 'route' => 'partisipasi.riwayat'];
 
@@ -50,8 +56,10 @@ class Layanan extends Component
             }
         }
 
-        $informasiPublik = [
-            ['nama' => 'Direktori Duta', 'desc' => 'Cari duta olahraga desa', 'icon' => 'users', 'route' => 'mobile.direktori-duta'],
+        $direktoriDuta = ['nama' => 'Direktori Duta', 'desc' => 'Cari duta olahraga desa', 'icon' => 'users', 'route' => 'mobile.direktori-duta'];
+
+        $informasiPublik = $isDuta ? [$direktoriDuta] : [
+            $direktoriDuta,
             ['nama' => 'Berita KORMI', 'desc' => 'Warta dan artikel terbaru', 'icon' => 'newspaper', 'route' => 'mobile.berita'],
             ['nama' => 'Program APMO', 'desc' => 'Anugerah Peserta Olahraga Masyarakat', 'icon' => 'trophy', 'route' => 'apmo'],
             ['nama' => 'SDI', 'desc' => 'Sumber daya insani keolahragaan', 'icon' => 'graduation-cap', 'route' => 'sdi'],

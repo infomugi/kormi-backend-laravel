@@ -32,6 +32,29 @@ class DutaOlahragaDaftar extends Component
         'Duta Olahraga Tradisional',
     ];
 
+    public const DAFTAR_BANK = [
+        'Bank BJB',
+        'Bank BJB Syariah',
+        'BCA',
+        'BRI',
+        'BNI',
+        'Bank Mandiri',
+        'BSI',
+        'BTN',
+        'CIMB Niaga',
+        'Bank Permata',
+        'Bank Danamon',
+        'OCBC',
+        'Bank Panin',
+        'Bank Mega',
+        'Bank DKI',
+        'Bank Jateng',
+        'Bank Nagari',
+        'Bank Sumsel Babel',
+        'Bank Kalsel',
+        'Bank Sulselbar',
+    ];
+
     public const PENDIDIKAN_TERAKHIR = [
         'SD',
         'SMP',
@@ -65,6 +88,8 @@ class DutaOlahragaDaftar extends Component
     public string $gelar_prestasi = '';
     public string $deskripsi_prestasi = '';
     public string $akun_instagram = '';
+    public string $nama_bank = '';
+    public string $nomor_rekening = '';
     public $foto = null;
 
     // Step 4 - Akun & Konfirmasi
@@ -115,6 +140,8 @@ class DutaOlahragaDaftar extends Component
                     ?: ($duta->tanggal_lahir ? $duta->tanggal_lahir->format('Y-m-d') : null);
                 $this->pendidikan_terakhir = (string) ($duta->pendidikan_terakhir ?? '');
                 $this->pekerjaan_profesi = $this->pekerjaan_profesi ?: (string) ($duta->pekerjaan_profesi ?? '');
+                $this->nama_bank = (string) ($duta->nama_bank ?? '');
+                $this->nomor_rekening = (string) ($duta->nomor_rekening ?? '');
             }
         }
 
@@ -160,6 +187,8 @@ class DutaOlahragaDaftar extends Component
                 'gelar_prestasi'      => 'nullable|max:150',
                 'deskripsi_prestasi'  => 'nullable|max:1500',
                 'akun_instagram'      => 'nullable|max:100',
+                'nama_bank'           => ['nullable', Rule::in(self::DAFTAR_BANK)],
+                'nomor_rekening'      => 'nullable|digits_between:6,25',
                 'foto'                => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
             ],
             4 => $this->stepEmpatRules(),
@@ -254,6 +283,8 @@ class DutaOlahragaDaftar extends Component
         'gelar_prestasi.max'           => 'Gelar prestasi maksimal 150 karakter.',
         'deskripsi_prestasi.max'       => 'Deskripsi prestasi maksimal 1500 karakter.',
         'akun_instagram.max'           => 'Nama akun Instagram maksimal 100 karakter.',
+        'nama_bank.in'                 => 'Bank yang dipilih tidak valid.',
+        'nomor_rekening.digits_between' => 'Nomor rekening harus berupa angka 6-25 digit.',
         'foto.image'                   => 'Berkas foto harus berupa gambar.',
         'foto.mimes'                   => 'Format foto harus JPG, JPEG, PNG, atau WEBP.',
         'foto.max'                     => 'Ukuran foto maksimal 5 MB.',
@@ -431,6 +462,8 @@ class DutaOlahragaDaftar extends Component
                     'gelar_prestasi'      => $gelarPrestasi,
                     'deskripsi_prestasi'  => $deskripsiPrestasi,
                     'akun_instagram'      => $akunInstagram,
+                    'nama_bank'           => $this->nama_bank !== '' ? $this->nama_bank : null,
+                    'nomor_rekening'      => $this->nomor_rekening !== '' ? trim($this->nomor_rekening) : null,
                     'foto_url'            => $pathFoto,
                     'status_aktif'        => false,
                     'status_unggulan'     => false,
@@ -526,6 +559,7 @@ class DutaOlahragaDaftar extends Component
                 : collect(),
             'daftarKategori'   => self::KATEGORI_DUTA,
             'daftarPendidikan' => self::PENDIDIKAN_TERAKHIR,
+            'daftarBank'       => self::DAFTAR_BANK,
             'langkahWizard'    => [
                 1 => 'Identitas',
                 2 => 'Domisili',

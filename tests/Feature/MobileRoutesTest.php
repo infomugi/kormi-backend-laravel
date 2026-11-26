@@ -2,8 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Livewire\Mobile\Masuk;
+use App\Models\Content\Berita;
 use App\Models\Core\Pengguna;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class MobileRoutesTest extends TestCase
@@ -106,8 +109,8 @@ class MobileRoutesTest extends TestCase
     {
         $this->get('/mobile/login')
             ->assertOk()
-            ->assertSee('href="' . url('/mobile/lupa-password') . '"', false)
-            ->assertSee('href="' . url('/mobile/daftar') . '"', false);
+            ->assertSee('href="'.url('/mobile/lupa-password').'"', false)
+            ->assertSee('href="'.url('/mobile/daftar').'"', false);
     }
 
     public function test_halaman_admin_daftar_dan_lupa_password_mengalihkan_pengunjung_mobile(): void
@@ -134,7 +137,7 @@ class MobileRoutesTest extends TestCase
     {
         $this->assertNotNull(Pengguna::where('email', 'duta.olahraga@kormibdg.id')->first());
 
-        \Livewire\Livewire::test(\App\Livewire\Mobile\Masuk::class)
+        Livewire::test(Masuk::class)
             ->set('email', 'duta.olahraga@kormibdg.id')
             ->set('kata_sandi', 'password123')
             ->call('login')
@@ -144,7 +147,7 @@ class MobileRoutesTest extends TestCase
 
     public function test_login_desktop_duta_tetap_ke_dashboard_admin(): void
     {
-        \Livewire\Livewire::test(\App\Livewire\Backend\Auth\Masuk::class)
+        Livewire::test(\App\Livewire\Backend\Auth\Masuk::class)
             ->set('email', 'duta.olahraga@kormibdg.id')
             ->set('kata_sandi', 'password123')
             ->call('login')
@@ -162,15 +165,15 @@ class MobileRoutesTest extends TestCase
             ->assertOk()
             ->assertSee('kd-mobile', false)
             ->assertSee('Absensi hari ini')
-            ->assertSee('Survei APMO');
+            ->assertSee('Survey APMO');
 
         $admin = Pengguna::whereHas('peran', fn ($q) => $q->where('slug', 'super-admin'))->firstOrFail();
         $this->actingAs($admin)
             ->get('/mobile/dashboard')
             ->assertOk()
             ->assertDontSee('Absensi hari ini')
-            ->assertDontSee('Isi Survei Sekarang')
-            ->assertDontSee('Perbarui Jawaban Survei');
+            ->assertDontSee('Isi Survey Sekarang')
+            ->assertDontSee('Perbarui Jawaban Survey');
     }
 
     public function test_login_mobile_peran_admin_mengarahkan_ke_dashboard_mobile(): void
@@ -181,7 +184,7 @@ class MobileRoutesTest extends TestCase
             'admin.inorga@kormibdg.id',
             'editor.berita@kormibdg.id',
         ] as $email) {
-            \Livewire\Livewire::test(\App\Livewire\Mobile\Masuk::class)
+            Livewire::test(Masuk::class)
                 ->set('email', $email)
                 ->set('kata_sandi', 'password123')
                 ->call('login')
@@ -198,7 +201,7 @@ class MobileRoutesTest extends TestCase
             'admin.inorga@kormibdg.id',
             'editor.berita@kormibdg.id',
         ] as $email) {
-            \Livewire\Livewire::test(\App\Livewire\Backend\Auth\Masuk::class)
+            Livewire::test(\App\Livewire\Backend\Auth\Masuk::class)
                 ->set('email', $email)
                 ->set('kata_sandi', 'password123')
                 ->call('login')
@@ -210,7 +213,7 @@ class MobileRoutesTest extends TestCase
     public function test_dashboard_mobile_peran_admin_menampilkan_ringkasan_sesuai_peran(): void
     {
         $harapan = [
-            'admin@kormibdg.id' => ['Super Admin', 'admin.galeri'],
+            'admin@kormibdg.id' => ['Super Admin', 'mobile.layanan'],
             'admin.korcam@kormibdg.id' => ['Korcam', 'admin.duta'],
             'admin.inorga@kormibdg.id' => ['Inorga', 'admin.inorga'],
             'editor.berita@kormibdg.id' => ['Editor', 'admin.berita'],
@@ -224,7 +227,8 @@ class MobileRoutesTest extends TestCase
                 ->assertOk()
                 ->assertSee('kd-mobile', false)
                 ->assertSee($badgePeran)
-                ->assertSee('Ringkasan data')
+                ->assertDontSee('Ringkasan data')
+                ->assertDontSee('Kabar KORMI')
                 ->assertDontSee('Buka Dashboard CMS')
                 ->assertSee(route($routeName), false)
                 ->assertSee('kd-tabbar', false);
@@ -232,11 +236,21 @@ class MobileRoutesTest extends TestCase
 
         $super = Pengguna::where('email', 'admin@kormibdg.id')->firstOrFail();
 
-        $this->actingAs($super)
+        $respons = $this->actingAs($super)
             ->get('/mobile/dashboard')
-            ->assertOk()
-            ->assertSee('Monitoring APMO')
-            ->assertSee('Survei APMO')
+            ->assertOk();
+
+        $cepat = str($respons->getContent())->between('kd-home-quick', 'kd-home-metrics')->toString();
+        $this->assertStringContainsString('>Layanan<', $cepat);
+        $this->assertStringContainsString('>Direktori<', $cepat);
+        $this->assertStringContainsString('>Monitoring APMO<', $cepat);
+        $this->assertStringContainsString('>Kelola User<', $cepat);
+        $this->assertStringContainsString(route('mobile.kelola-user'), $cepat);
+        $this->assertStringNotContainsString('Kelola Situs', $cepat);
+        $this->assertStringNotContainsString('>Unduhan<', $cepat);
+        $this->assertStringNotContainsString('>Berita<', $cepat);
+
+        $respons->assertSee('Monitoring APMO')
             ->assertSee(route('mobile.apmo.wilayah'), false);
 
         foreach (['admin.korcam@kormibdg.id', 'admin.inorga@kormibdg.id', 'editor.berita@kormibdg.id'] as $email) {
@@ -249,7 +263,7 @@ class MobileRoutesTest extends TestCase
 
     public function test_login_mobile_pegiat_olahraga_mengarahkan_ke_dashboard_mobile(): void
     {
-        \Livewire\Livewire::test(\App\Livewire\Mobile\Masuk::class)
+        Livewire::test(Masuk::class)
             ->set('email', 'warga@kormibdg.id')
             ->set('kata_sandi', 'password123')
             ->call('login')
@@ -259,7 +273,7 @@ class MobileRoutesTest extends TestCase
 
     public function test_login_desktop_pegiat_olahraga_tetap_ke_dashboard_admin(): void
     {
-        \Livewire\Livewire::test(\App\Livewire\Backend\Auth\Masuk::class)
+        Livewire::test(\App\Livewire\Backend\Auth\Masuk::class)
             ->set('email', 'warga@kormibdg.id')
             ->set('kata_sandi', 'password123')
             ->call('login')
@@ -281,6 +295,8 @@ class MobileRoutesTest extends TestCase
             ->assertSee('Riwayat APMO')
             ->assertSee(route('partisipasi.catat'), false)
             ->assertSee(route('partisipasi.riwayat'), false)
+            ->assertSee('Survey APMO sekarang')
+            ->assertSee(route('mobile.angket'), false)
             ->assertSee('kd-tabbar', false);
     }
 
@@ -300,7 +316,7 @@ class MobileRoutesTest extends TestCase
         $this->assertStringContainsString('>Profil<', $tabbar);
         $this->assertStringNotContainsString('>APMO<', $tabbar);
         $this->assertStringNotContainsString('>Absensi<', $tabbar);
-        $this->assertStringNotContainsString('kd-tab--fab', $tabbar);
+        $this->assertStringNotContainsString('kd-tab--accent', $tabbar);
         $this->assertStringNotContainsString('>Direktori<', $tabbar);
         $this->assertStringNotContainsString('>Masuk<', $tabbar);
         $this->assertStringContainsString('kd-tab is-active', $tabbar);
@@ -310,7 +326,7 @@ class MobileRoutesTest extends TestCase
         $this->assertStringContainsString(route('mobile.profil'), $tabbar);
     }
 
-    public function test_menu_bawah_duta_berisi_absensi_dan_apmo(): void
+    public function test_menu_bawah_duta_beranda_absensi_survey_riwayat_profil(): void
     {
         $duta = Pengguna::where('email', 'duta.olahraga@kormibdg.id')->firstOrFail();
 
@@ -322,13 +338,17 @@ class MobileRoutesTest extends TestCase
         $tabbar = str($html)->between('<nav class="kd-tabbar', '</nav>')->toString();
 
         $this->assertStringContainsString('>Beranda<', $tabbar);
-        $this->assertStringContainsString('>APMO<', $tabbar);
         $this->assertStringContainsString('>Absensi<', $tabbar);
-        $this->assertStringContainsString('>Laporan<', $tabbar);
+        $this->assertStringContainsString('>Survey APMO<', $tabbar);
+        $this->assertStringContainsString('>Riwayat<', $tabbar);
         $this->assertStringContainsString('>Profil<', $tabbar);
-        $this->assertStringContainsString('kd-tab--fab', $tabbar);
-        $this->assertStringContainsString(route('mobile.angket'), $tabbar);
+        $this->assertStringNotContainsString('>Laporan<', $tabbar);
+        $this->assertStringNotContainsString('>Direktori<', $tabbar);
+        $this->assertStringContainsString('kd-tab--accent', $tabbar);
         $this->assertStringContainsString(route('mobile.absensi'), $tabbar);
+        $this->assertStringContainsString(route('mobile.angket'), $tabbar);
+        $this->assertStringContainsString(route('mobile.laporan'), $tabbar);
+        $this->assertStringContainsString(route('mobile.profil'), $tabbar);
     }
 
     public function test_menu_bawah_pengunjung_tetap_beranda_direktori_daftar_masuk(): void
@@ -365,6 +385,21 @@ class MobileRoutesTest extends TestCase
             ->assertSee('Informasi Publik')
             ->assertDontSee('Kelola Organisasi');
 
+        $duta = Pengguna::where('email', 'duta.olahraga@kormibdg.id')->firstOrFail();
+        $this->actingAs($duta)
+            ->get('/mobile/layanan')
+            ->assertOk()
+            ->assertSee('Absensi Harian')
+            ->assertSee('Survey APMO')
+            ->assertSee('Direktori Duta')
+            ->assertDontSee('Catat Aktivitas')
+            ->assertDontSee('Riwayat Aktivitas')
+            ->assertDontSee('Daftar Duta')
+            ->assertDontSee('Berita KORMI')
+            ->assertDontSee('Program APMO')
+            ->assertDontSee('Kontak')
+            ->assertDontSee('Kelola Organisasi');
+
         $korcam = Pengguna::where('email', 'admin.korcam@kormibdg.id')->firstOrFail();
         $this->actingAs($korcam)
             ->get('/mobile/layanan')
@@ -399,7 +434,7 @@ class MobileRoutesTest extends TestCase
 
     public function test_halaman_mobile_berita_tampil_dan_detail(): void
     {
-        $berita = \App\Models\Content\Berita::where('status_publikasi', 'published')
+        $berita = Berita::where('status_publikasi', 'published')
             ->orderByDesc('tanggal_publikasi')
             ->firstOrFail();
 
@@ -409,7 +444,7 @@ class MobileRoutesTest extends TestCase
             ->assertSee($berita->judul)
             ->assertSee('kd-tabbar', false);
 
-        $this->get('/mobile/berita/' . $berita->slug)
+        $this->get('/mobile/berita/'.$berita->slug)
             ->assertOk()
             ->assertSee($berita->judul)
             ->assertSee('Semua berita')

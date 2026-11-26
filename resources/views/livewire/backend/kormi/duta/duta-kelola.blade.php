@@ -425,6 +425,17 @@
                                                     <span>@<span>{{ $d->akun_instagram }}</span></span>
                                                 </a>
                                             @endif
+
+                                            @if($d->nama_bank || $d->nomor_rekening)
+                                                <span class="flex items-center gap-1.5 text-[11px] text-slate-600 font-bold">
+                                                    <i data-lucide="credit-card" class="w-3.5 h-3.5 text-slate-400"></i>
+                                                    <span>{{ $d->nama_bank ?: '-' }}</span>
+                                                    @if($d->nomor_rekening)
+                                                        <span class="text-slate-300">•</span>
+                                                        <span>{{ $d->nomor_rekening }}</span>
+                                                    @endif
+                                                </span>
+                                            @endif
                                         </div>
                                     </x-table.td>
 
@@ -601,6 +612,17 @@
                                         @endif
                                     </div>
                                     <p class="text-xs text-slate-500 font-medium line-clamp-1">{{ $d->desaKelurahan->nama_desa_kelurahan ? 'Desa ' . $d->desaKelurahan->nama_desa_kelurahan : 'Kader Kecamatan' }}</p>
+
+                                    @if($d->nama_bank || $d->nomor_rekening)
+                                        <p class="text-[11px] text-slate-600 font-bold flex items-center gap-1.5 line-clamp-1 mt-1">
+                                            <i data-lucide="credit-card" class="w-3 h-3 text-slate-400 shrink-0"></i>
+                                            <span>{{ $d->nama_bank ?: '-' }}</span>
+                                            @if($d->nomor_rekening)
+                                                <span class="text-slate-300">•</span>
+                                                <span class="truncate">{{ $d->nomor_rekening }}</span>
+                                            @endif
+                                        </p>
+                                    @endif
                                     
                                     @if($d->gelar_prestasi || $d->prestasi)
                                         <p class="text-[11px] text-slate-400 line-clamp-2 mt-2 pt-2 border-t border-slate-100 italic">{{ $d->gelar_prestasi ?: $d->prestasi }}</p>
@@ -911,9 +933,8 @@
                                 name="uploadFotoDuta"
                                 inputId="uploadFotoDutaInput"
                                 accept="image/jpeg,image/png,image/webp"
-                                :maxSizeMB="5"
                                 emptyTitle="Pilih Pas Foto Duta"
-                                emptySubtitle="Format JPG, PNG, WEBP (Maks. 5MB)"
+                                emptySubtitle="Format JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB"
                                 aspectRatio="h-72 sm:h-80"
                             />
                         </x-form.card>
@@ -955,6 +976,27 @@
                                         class="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-800 rounded-xl text-xs font-semibold focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                                     >
                                 </div>
+                            </x-form.field>
+
+                            <x-form.field label="Bank (Opsional)" name="nama_bank">
+                                <x-form.select name="nama_bank" wire:model="nama_bank">
+                                    <option value="">Pilih bank</option>
+                                    @foreach($daftarBank as $bank)
+                                        <option value="{{ $bank }}">{{ $bank }}</option>
+                                    @endforeach
+                                </x-form.select>
+                            </x-form.field>
+
+                            <x-form.field label="Nomor Rekening (Opsional)" name="nomor_rekening">
+                                <x-form.input
+                                    type="text"
+                                    name="nomor_rekening"
+                                    wire:model="nomor_rekening"
+                                    placeholder="Contoh: 1234567890"
+                                    icon="credit-card"
+                                    inputmode="numeric"
+                                    maxlength="25"
+                                />
                             </x-form.field>
                         </x-form.card>
 
@@ -1075,6 +1117,14 @@
                         <div>
                             <span class="text-[10px] text-slate-400 font-bold uppercase block">Instagram</span>
                             <span class="font-bold text-pink-600">{{ $pratinjauDuta->akun_instagram ? '@'.$pratinjauDuta->akun_instagram : '-' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Bank</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauDuta->nama_bank ?: '-' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block">Nomor Rekening</span>
+                            <span class="font-bold text-slate-800">{{ $pratinjauDuta->nomor_rekening ?: '-' }}</span>
                         </div>
                         <div>
                             <span class="text-[10px] text-slate-400 font-bold uppercase block">Status</span>

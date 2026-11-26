@@ -323,6 +323,38 @@ class DutaPendaftaranPublikTest extends TestCase
         $response->assertDontSee($data['nama_lengkap']);
     }
 
+    public function test_bank_dan_nomor_rekening_divalidasi_dan_tersimpan(): void
+    {
+        $data = $this->dataPendaftaranValid();
+
+        $komponen = Livewire::test(DutaOlahragaDaftar::class)
+            ->set($data)
+            ->set('currentStep', 3)
+            ->set('nama_bank', 'Bank Tidak Dikenal')
+            ->call('nextStep')
+            ->assertHasErrors('nama_bank');
+
+        $komponen
+            ->set('nama_bank', 'Bank BJB')
+            ->set('nomor_rekening', 'bukan-angka')
+            ->call('nextStep')
+            ->assertHasErrors('nomor_rekening');
+
+        $komponen
+            ->set('nomor_rekening', '1234567890')
+            ->call('nextStep')
+            ->assertHasNoErrors()
+            ->set('currentStep', 4)
+            ->call('submit')
+            ->assertHasNoErrors()
+            ->assertSet('berhasil', true);
+
+        $duta = DutaOlahraga::where('email', $data['email'])->first();
+        $this->assertNotNull($duta);
+        $this->assertSame('Bank BJB', $duta->nama_bank);
+        $this->assertSame('1234567890', $duta->nomor_rekening);
+    }
+
     // =====================================================================
     // 5. DUPLIKAT EMAIL
     // =====================================================================
@@ -461,6 +493,63 @@ class DutaPendaftaranPublikTest extends TestCase
         $this->assertSame($duta->id, $pengguna->duta_id);
         $this->assertNotNull($pengguna->disetujui_pada);
         $this->assertSame($this->admin->id, $pengguna->disetujui_oleh);
+    }
+
+    public function test_pratinjau_verifikasi_menampilkan_bank_dan_nomor_rekening(): void
+    {
+        $duta = $this->buatDuta([
+            'status_aktif'       => false,
+            'status_pendaftaran' => DutaOlahraga::STATUS_MENUNGGU,
+            'nama_bank'          => 'Bank BJB',
+            'nomor_rekening'     => '9876543210',
+        ]);
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(DutaKelola::class)
+            ->call('bukaPratinjau', $duta->id)
+            ->assertSet('tampilkanModalPratinjau', true)
+            ->assertSee('Bank BJB')
+            ->assertSee('9876543210');
+    }
+
+    public function test_admin_dapat_memperbarui_bank_dan_nomor_rekening_lewat_form_edit(): void
+    {
+        $duta = $this->buatDuta();
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(DutaKelola::class)
+            ->call('bukaFormEdit', $duta->id)
+            ->assertSet('nama_bank', '')
+            ->set('nama_bank', 'BCA')
+            ->set('nomor_rekening', '5550123456')
+            ->call('simpan')
+            ->assertHasNoErrors();
+
+        $duta->refresh();
+        $this->assertSame('BCA', $duta->nama_bank);
+        $this->assertSame('5550123456', $duta->nomor_rekening);
+    }
+
+    public function test_daftar_duta_menampilkan_bank_dan_nomor_rekening(): void
+    {
+        $nama = 'Duta Rekening Uji ' . Str::random(6);
+
+        $this->buatDuta([
+            'nama_lengkap'   => $nama,
+            'nama_bank'      => 'BRI',
+            'nomor_rekening' => '1122334455',
+        ]);
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(DutaKelola::class)
+            ->set('cari', $nama)
+            ->assertSee('1122334455')
+            ->set('tampilanMode', 'grid')
+            ->assertSee('BRI')
+            ->assertSee('1122334455');
     }
 
     // =====================================================================

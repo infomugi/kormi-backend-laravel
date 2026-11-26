@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Panduan Duta Olahraga — Pendaftaran, Masuk, dan Survei APMO</title>
+<style>
+    @page {
+        margin: 42pt 44pt 46pt 44pt;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: 'DejaVu Sans', sans-serif;
+        font-size: 9.3pt;
+        line-height: 1.55;
+        color: #23251f;
+    }
+
+    p {
+        margin: 0 0 8pt;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        vertical-align: top;
+    }
+
+    .page {
+        page-break-before: always;
+    }
+
+    .keep {
+        page-break-inside: avoid;
+    }
+
+    /* ---------------- Sampul ---------------- */
+    .cover {
+        background: #1c1e18;
+        color: #f4f6ee;
+        border-radius: 14px;
+        padding: 26pt 26pt 22pt;
+        margin-bottom: 16pt;
+    }
+
+    .cover-top td {
+        vertical-align: middle;
+    }
+
+    .logo-chip {
+        display: inline-block;
+        background: #ffffff;
+        border-radius: 9px;
+        padding: 6pt 7pt;
+    }
+
+    .logo-chip img {
+        height: 34pt;
+    }
+
+    .org-name {
+        font-size: 10.5pt;
+        font-weight: bold;
+        letter-spacing: 0.06em;
+    }
+
+    .org-sub {
+        font-size: 6.8pt;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: #b9bdb0;
+        margin-top: 2pt;
+    }
+
+    .cover-kicker {
+        margin-top: 20pt;
+        font-size: 7.6pt;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #c6fa28;
+        font-weight: bold;
+    }
+
+    .cover h1 {
+        margin: 6pt 0 8pt;
+        font-size: 21pt;
+        line-height: 1.18;
+        letter-spacing: -0.01em;
+        color: #ffffff;
+    }
+
+    .cover-lead {
+        margin: 0;
+        font-size: 9.4pt;
+        line-height: 1.6;
+        color: #d5d9ca;
+        width: 96%;
+    }
+
+    .cover-meta {
+        margin-top: 16pt;
+        border-top: 1px solid #3a3d33;
+        padding-top: 10pt;
+        font-size: 8pt;
+    }
+
+    .cover-meta td {
+        padding: 2.4pt 0;
+        color: #d5d9ca;
+    }
+
+    .cover-meta .label {
+        width: 30%;
+        color: #969b8b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 6.8pt;
+    }
+
+    .cover-meta .value {
+        width: 70%;
+        font-weight: bold;
+        color: #ffffff;
+    }
+
+    .url {
+        color: #2f5d00;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+
+    .cover .url {
+        color: #c6fa28;
+    }
+
+    /* ---------------- Tipografi umum ---------------- */
+    .kicker {
+        font-size: 7.4pt;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #5f7a12;
+        font-weight: bold;
+        margin-bottom: 3pt;
+    }
+
+    h2 {
+        font-size: 15pt;
+        line-height: 1.25;
+        margin: 0 0 3pt;
+        letter-spacing: -0.01em;
+        color: #1c1e18;
+    }
+
+    h3 {
+        font-size: 11pt;
+        margin: 0 0 4pt;
+        color: #1c1e18;
+    }
+
+    h4 {
+        font-size: 9.6pt;
+        margin: 0 0 3pt;
+        color: #1c1e18;
+    }
+
+    .lead {
+        font-size: 9.5pt;
+        color: #4d5147;
+        margin: 0 0 12pt;
+    }
+
+    .section-rule {
+        border-top: 2.5pt solid #1c1e18;
+        margin: 8pt 0 12pt;
+    }
+
+    .muted {
+        color: #6c7065;
+    }
+
+    .small {
+        font-size: 8.2pt;
+    }
+
+    .strong {
+        font-weight: bold;
+    }
+
+    /* ---------------- Kotak isi ---------------- */
+    .toc {
+        background: #f4f6ef;
+        border: 1px solid #e2e6d8;
+        border-radius: 10px;
+        padding: 13pt 15pt 9pt;
+        margin-bottom: 13pt;
+    }
+
+    .toc-title {
+        font-size: 7.6pt;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #5f7a12;
+        font-weight: bold;
+        margin-bottom: 6pt;
+    }
+
+    .toc td {
+        padding: 3pt 0;
+        font-size: 9pt;
+        border-bottom: 1px dotted #d6dbc9;
+    }
+
+    .toc tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .toc .num {
+        width: 15pt;
+        font-weight: bold;
+        color: #7c9a20;
+    }
+
+    .callout {
+        border-radius: 8px;
+        padding: 9pt 11pt;
+        margin: 10pt 0;
+        font-size: 8.8pt;
+    }
+
+    .callout .title {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 2pt;
+    }
+
+    .callout-note {
+        background: #f2f9da;
+        border-left: 3pt solid #9bd21c;
+    }
+
+    .callout-warn {
+        background: #fdf3e2;
+        border-left: 3pt solid #e2a02a;
+    }
+
+    .callout-info {
+        background: #eef3f8;
+        border-left: 3pt solid #5b87ad;
+    }
+
+    .callout-quiet {
+        background: #f5f5f2;
+        border-left: 3pt solid #b8bcb0;
+    }
+
+    /* ---------------- Langkah ---------------- */
+    .step {
+        border: 1px solid #e1e5d7;
+        border-radius: 10px;
+        padding: 12pt 13pt 8pt;
+        margin-bottom: 11pt;
+    }
+
+    .step-head {
+        margin-bottom: 7pt;
+    }
+
+    .step-num {
+        display: inline-block;
+        width: 20pt;
+        height: 20pt;
+        line-height: 20pt;
+        text-align: center;
+        border-radius: 10pt;
+        background: #1c1e18;
+        color: #c6fa28;
+        font-weight: bold;
+        font-size: 9.5pt;
+    }
+
+    .step-title {
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 6pt;
+        font-size: 11pt;
+        font-weight: bold;
+        color: #1c1e18;
+    }
+
+    .step-sub {
+        display: block;
+        margin: 2pt 0 0 26pt;
+        font-size: 8.2pt;
+        color: #6c7065;
+    }
+
+    /* ---------------- Tabel ---------------- */
+    .fields {
+        margin: 4pt 0 9pt;
+        font-size: 8.6pt;
+    }
+
+    .fields th {
+        text-align: left;
+        background: #f4f6ef;
+        color: #4a4e43;
+        font-size: 7.2pt;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 5pt 7pt;
+        border: 1px solid #e3e7d9;
+    }
+
+    .fields td {
+        padding: 5pt 7pt;
+        border: 1px solid #e3e7d9;
+        line-height: 1.45;
+    }
+
+    .fields tr:nth-child(even) td {
+        background: #fafbf7;
+    }
+
+    .req {
+        color: #b3261e;
+        font-weight: bold;
+    }
+
+    .tag {
+        display: inline-block;
+        font-size: 6.8pt;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        font-weight: bold;
+        padding: 1pt 4pt;
+        border-radius: 3pt;
+        background: #eef1e6;
+        color: #5d6155;
+    }
+
+    .tag-wajib {
+        background: #fbeeea;
+        color: #a33a2a;
+    }
+
+    .tag-opsional {
+        background: #eef1e6;
+        color: #666b5d;
+    }
+
+    /* ---------------- Elemen khusus ---------------- */
+    .pill-row td {
+        text-align: center;
+        font-size: 8pt;
+        padding: 0 2pt;
+    }
+
+    .pill {
+        background: #f4f6ef;
+        border: 1px solid #e2e6d8;
+        border-radius: 8px;
+        padding: 7pt 4pt;
+        font-weight: bold;
+        color: #2f332a;
+    }
+
+    .pill-num {
+        display: block;
+        color: #7c9a20;
+        font-size: 7.2pt;
+        letter-spacing: 0.08em;
+        margin-bottom: 2pt;
+    }
+
+    .arrow {
+        color: #b4b9aa;
+        font-size: 10pt;
+    }
+
+    .btn {
+        display: inline-block;
+        border: 1px solid #cfd4c6;
+        border-radius: 4px;
+        background: #ffffff;
+        padding: 0.5pt 4pt;
+        font-size: 8pt;
+        font-weight: bold;
+        color: #2b2e26;
+    }
+
+    .btn-dark {
+        background: #1c1e18;
+        border-color: #1c1e18;
+        color: #c6fa28;
+    }
+
+    .checklist td {
+        padding: 4.5pt 0;
+        border-bottom: 1px solid #eef0e8;
+        font-size: 8.9pt;
+    }
+
+    .checklist tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .check-box {
+        width: 18pt;
+        color: #7c9a20;
+        font-weight: bold;
+        font-size: 10pt;
+    }
+
+    .two-col {
+        margin-bottom: 10pt;
+    }
+
+    .two-col td {
+        width: 50%;
+        vertical-align: top;
+    }
+
+    .two-col td.left {
+        padding-right: 9pt;
+    }
+
+    .two-col td.right {
+        padding-left: 9pt;
+    }
+
+    .card {
+        border: 1px solid #e1e5d7;
+        border-radius: 9px;
+        padding: 10pt 12pt 6pt;
+        background: #ffffff;
+    }
+
+    .card-title {
+        font-size: 9.3pt;
+        font-weight: bold;
+        margin-bottom: 4pt;
+    }
+
+    .faq {
+        border-bottom: 1px solid #e6e9df;
+        padding: 7pt 0;
+    }
+
+    .faq:last-child {
+        border-bottom: 0;
+    }
+
+    .faq-q {
+        font-weight: bold;
+        font-size: 9.2pt;
+        margin-bottom: 2pt;
+    }
+
+    .faq-a {
+        font-size: 8.7pt;
+        color: #4d5147;
+        margin: 0;
+    }
+
+    .end-note {
+        margin-top: 14pt;
+        border-top: 1px solid #dfe3d6;
+        padding-top: 9pt;
+        font-size: 7.8pt;
+        color: #6c7065;
+    }
+
+    .badge-line {
+        margin: 0 0 10pt;
+    }
+
+    .badge-line .badge {
+        display: inline-block;
+        background: #1c1e18;
+        color: #c6fa28;
+        font-size: 7pt;
+        font-weight: bold;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 2pt 6pt;
+        border-radius: 3pt;
+        margin-right: 4pt;
+    }
+
+    ul, ol {
+        margin: 0 0 8pt;
+        padding-left: 14pt;
+    }
+
+    li {
+        margin-bottom: 3pt;
+    }
+
+    .no-margin {
+        margin-bottom: 0;
+    }
+</style>
+</head>
+<body>
+
+<!-- ================= SAMPUL ================= -->
+<div class="cover">
+    <table class="cover-top">
+        <tr>
+            <td style="width: 52pt;">
+                <span class="logo-chip">
+                    <img src="../public/assets/image/logo-kormi.png" alt="Logo KORMI">
+                </span>
+            </td>
+            <td>
+                <div class="org-name">KORMI KABUPATEN BANDUNG</div>
+                <div class="org-sub">Komite Olahraga Rekreasi Masyarakat Indonesia</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="cover-kicker">Panduan Pengguna &middot; Duta Olahraga</div>
+    <h1>Dari Mendaftar sampai<br>Laporan APMO dalam Satu Alur</h1>
+    <p class="cover-lead">
+        Panduan langkah demi langkah untuk calon dan anggota Duta Olahraga KORMI Kabupaten Bandung:
+        membuat akun, masuk ke aplikasi, mengisi Survei APMO, lalu mengunduh laporannya dalam bentuk PDF.
+    </p>
+
+    <table class="cover-meta">
+        <tr>
+            <td class="label">Ditujukan untuk</td>
+            <td class="value">Calon dan anggota Duta Olahraga</td>
+        </tr>
+        <tr>
+            <td class="label">Platform</td>
+            <td class="value">Aplikasi mobile KORMI Kabupaten Bandung</td>
+        </tr>
+        <tr>
+            <td class="label">Halaman pendaftaran</td>
+            <td class="value"><span class="url">https://kormi-backend-laravel.test/mobile/daftar-duta</span></td>
+        </tr>
+        <tr>
+            <td class="label">Halaman masuk</td>
+            <td class="value"><span class="url">https://kormi-backend-laravel.test/mobile/login</span></td>
+        </tr>
+        <tr>
+            <td class="label">Versi</td>
+            <td class="value">1.0 &middot; November 2026</td>
+        </tr>
+    </table>
+</div>
+
+<p class="lead" style="margin-bottom: 11pt;">
+    Alur yang Anda jalani singkat: daftar, tunggu persetujuan, masuk, isi survei, lalu simpan laporannya.
+    Panduan ini mengikuti tampilan aplikasi mobile, jadi label tombol dan nama menu yang disebut di sini
+    persis seperti yang Anda lihat di layar.
+</p>
+
+<table class="two-col">
+    <tr>
+        <td class="left">
+            <div class="toc">
+                <div class="toc-title">Isi panduan</div>
+                <table>
+                    <tr><td class="num">1</td><td>Sebelum mulai</td></tr>
+                    <tr><td class="num">2</td><td>Mendaftar sebagai Duta Olahraga</td></tr>
+                    <tr><td class="num">3</td><td>Masuk ke aplikasi</td></tr>
+                    <tr><td class="num">4</td><td>Mengisi Survei APMO</td></tr>
+                    <tr><td class="num">5</td><td>Mengunduh laporan APMO (PDF)</td></tr>
+                    <tr><td class="num">6</td><td>Kendala umum dan solusinya</td></tr>
+                    <tr><td class="num">7</td><td>Bantuan dan catatan data</td></tr>
+                </table>
+            </div>
+        </td>
+        <td class="right">
+            <div class="card">
+                <div class="card-title">Tiga hal yang perlu diingat</div>
+                <table class="checklist">
+                    <tr>
+                        <td class="check-box">&#10003;</td>
+                        <td>Akun hasil pendaftaran baru bisa dipakai masuk <span class="strong">setelah disetujui administrator</span>.</td>
+                    </tr>
+                    <tr>
+                        <td class="check-box">&#10003;</td>
+                        <td>Survei APMO selalu ditutup dengan <span class="strong">foto selfie</span> sebagai bukti pengisian.</td>
+                    </tr>
+                    <tr>
+                        <td class="check-box">&#10003;</td>
+                        <td>Hasil survei bisa diunduh sebagai <span class="strong">PDF</span> dari menu Riwayat.</td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div class="callout callout-quiet" style="margin-top: 2pt;">
+    <span class="title">Catatan alamat aplikasi</span>
+    Contoh alamat di panduan ini memakai domain uji <span class="strong">kormi-backend-laravel.test</span>.
+    Jika Anda menerima tautan resmi dengan domain lain, gunakan tautan resmi tersebut. Alur dan tombolnya sama.
+</div>
+
+<!-- ================= 1. SEBELUM MULAI ================= -->
+<div class="page">
+    <div class="kicker">Bagian 1</div>
+    <h2>Sebelum mulai</h2>
+    <p class="lead">
+        Siapkan bahan berikut supaya pendaftaran dan pengisian survei berjalan sekali jalan.
+        Total waktu yang dibutuhkan sekitar 10&ndash;15 menit, ditambah waktu verifikasi dari administrator.
+    </p>
+    <div class="section-rule"></div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">1</span>
+            <span class="step-title">Siapkan data dan berkas</span>
+            <span class="step-sub">Cukup siapkan yang ada; kolom bertanda opsional boleh dikosongkan.</span>
+        </div>
+
+        <table class="checklist">
+            <tr>
+                <td class="check-box">&#10003;</td>
+                <td><span class="strong">Data kependudukan (KTP/KK).</span> Untuk memastikan nama lengkap, tanggal lahir, dan alamat domisili sesuai dokumen.</td>
+            </tr>
+            <tr>
+                <td class="check-box">&#10003;</td>
+                <td><span class="strong">Nomor HP/WhatsApp aktif.</span> Dipakai administrator untuk menghubungi Anda bila ada data yang perlu dikonfirmasi.</td>
+            </tr>
+            <tr>
+                <td class="check-box">&#10003;</td>
+                <td><span class="strong">Alamat email aktif.</span> Email ini menjadi identitas akun Anda dan dipakai untuk masuk ke aplikasi.</td>
+            </tr>
+            <tr>
+                <td class="check-box">&#10003;</td>
+                <td><span class="strong">Kecamatan dan desa/kelurahan domisili.</span> Menentukan wilayah penugasan Duta Anda.</td>
+            </tr>
+            <tr>
+                <td class="check-box">&#10003;</td>
+                <td><span class="strong">Pas foto (opsional).</span> Format JPG, JPEG, PNG, atau WEBP. Sistem akan mengompresnya otomatis.</td>
+            </tr>
+            <tr>
+                <td class="check-box">&#10003;</td>
+                <td><span class="strong">Foto selfie (nanti saat survei).</span> Diambil langsung dari kamera depan atau dipilih dari galeri.</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">2</span>
+            <span class="step-title">Siapkan perangkat</span>
+            <span class="step-sub">Tidak perlu memasang aplikasi tambahan.</span>
+        </div>
+        <ul>
+            <li>Gunakan browser modern di ponsel, seperti Chrome, Safari, atau Edge versi terbaru.</li>
+            <li>Pastikan koneksi internet stabil, terutama saat mengunggah pas foto dan foto selfie.</li>
+            <li>Izinkan akses kamera ketika browser meminta, agar tombol <span class="btn">Ambil Foto Selfie</span> berfungsi.</li>
+        </ul>
+    </div>
+
+    <div class="step keep" style="margin-bottom: 0;">
+        <div class="step-head">
+            <span class="step-num">3</span>
+            <span class="step-title">Kenali istilah yang dipakai</span>
+            <span class="step-sub">Agar tidak bingung saat membaca menu dan pesan di aplikasi.</span>
+        </div>
+        <table class="fields">
+            <tr>
+                <th style="width: 24%;">Istilah</th>
+                <th>Arti singkat</th>
+            </tr>
+            <tr>
+                <td><span class="strong">Duta Olahraga</span></td>
+                <td>Penggerak olahraga masyarakat di tingkat desa/kelurahan yang membantu mendata partisipasi warga.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">APMO</span></td>
+                <td>Angket Partisipasi Masyarakat dalam Olahraga, yaitu survei kebiasaan dan fasilitas olahraga warga.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">Verifikasi</span></td>
+                <td>Pemeriksaan data pendaftaran oleh administrator sebelum akun Anda diaktifkan.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">Isian APMO</span></td>
+                <td>Satu set jawaban survei yang tersimpan, dapat diubah, dan dapat dicetak menjadi PDF.</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- ================= 2. MENDAFTAR ================= -->
+<div class="page">
+    <div class="kicker">Bagian 2</div>
+    <h2>Mendaftar sebagai Duta Olahraga</h2>
+    <p class="lead">
+        Pendaftaran terdiri dari empat langkah. Tombol <span class="btn">Lanjut</span> akan memeriksa kelengkapan
+        data di setiap langkah, jadi Anda tidak bisa melewati kolom wajib yang masih kosong.
+    </p>
+    <div class="section-rule"></div>
+
+    <table class="pill-row" style="margin-bottom: 12pt;">
+        <tr>
+            <td><div class="pill"><span class="pill-num">LANGKAH 1</span>Identitas</div></td>
+            <td style="width: 14pt;" class="arrow">&#8594;</td>
+            <td><div class="pill"><span class="pill-num">LANGKAH 2</span>Domisili</div></td>
+            <td style="width: 14pt;" class="arrow">&#8594;</td>
+            <td><div class="pill"><span class="pill-num">LANGKAH 3</span>Profil Duta</div></td>
+            <td style="width: 14pt;" class="arrow">&#8594;</td>
+            <td><div class="pill"><span class="pill-num">LANGKAH 4</span>Akun</div></td>
+        </tr>
+    </table>
+
+    <div class="callout callout-info">
+        <span class="title">Membuka halaman pendaftaran</span>
+        Buka <span class="url">https://kormi-backend-laravel.test/mobile/daftar-duta</span> di browser ponsel.
+        Anda juga bisa memilih menu <span class="strong">Daftar</span> pada bilah navigasi di bagian bawah halaman.
+    </div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">1</span>
+            <span class="step-title">Identitas calon Duta</span>
+            <span class="step-sub">Isi sesuai dokumen kependudukan.</span>
+        </div>
+        <table class="fields">
+            <tr>
+                <th style="width: 33%;">Kolom</th>
+                <th style="width: 15%;">Sifat</th>
+                <th>Keterangan</th>
+            </tr>
+            <tr>
+                <td>Nama Lengkap</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Minimal 3 karakter, maksimal 150 karakter. Contoh: <span class="muted">Rian Hidayat</span>.</td>
+            </tr>
+            <tr>
+                <td>Jenis Kelamin</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Pilih <span class="strong">Laki-laki</span> atau <span class="strong">Perempuan</span>.</td>
+            </tr>
+            <tr>
+                <td>Tanggal Lahir</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Tidak boleh melebihi tanggal hari ini.</td>
+            </tr>
+            <tr>
+                <td>Tempat Lahir</td>
+                <td><span class="tag tag-opsional">Opsional</span></td>
+                <td>Contoh: <span class="muted">Bandung</span>.</td>
+            </tr>
+            <tr>
+                <td>Pendidikan Terakhir</td>
+                <td><span class="tag tag-opsional">Opsional</span></td>
+                <td>Pilih jenjang: SD, SMP, SMA-SMK, D3, D4-S1, S2, atau S3.</td>
+            </tr>
+            <tr>
+                <td>Pekerjaan / Profesi</td>
+                <td><span class="tag tag-opsional">Opsional</span></td>
+                <td>Contoh: <span class="muted">Guru / Wiraswasta</span>.</td>
+            </tr>
+        </table>
+        <p class="small muted no-margin">Setelah semua terisi, tekan <span class="btn">Lanjut</span> di bagian bawah formulir.</p>
+    </div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">2</span>
+            <span class="step-title">Domisili dan kontak</span>
+            <span class="step-sub">Menentukan wilayah penugasan dan kanal komunikasi Anda.</span>
+        </div>
+        <p class="small" style="margin-bottom: 6pt;">
+            <span class="strong">Urutannya penting:</span> pilih kecamatan lebih dulu. Daftar desa/kelurahan
+            akan menyesuaikan otomatis dan baru bisa dipilih setelah kecamatan terisi.
+        </p>
+        <table class="fields">
+            <tr>
+                <th style="width: 33%;">Kolom</th>
+                <th style="width: 15%;">Sifat</th>
+                <th>Keterangan</th>
+            </tr>
+            <tr>
+                <td>Kecamatan Domisili</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Pilih dari daftar kecamatan Kabupaten Bandung.</td>
+            </tr>
+            <tr>
+                <td>Desa / Kelurahan</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Pilih setelah kecamatan. Hanya menampilkan desa di kecamatan tersebut.</td>
+            </tr>
+            <tr>
+                <td>Alamat Domisili Lengkap</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Minimal 10 karakter. Sertakan nama jalan, RT/RW, dusun, atau patokan alamat.</td>
+            </tr>
+            <tr>
+                <td>Nomor Telepon / WhatsApp</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>9&ndash;20 karakter; boleh angka, spasi, tanda + dan -. Contoh: <span class="muted">081234567890</span>.</td>
+            </tr>
+            <tr>
+                <td>Alamat Email</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Menjadi identitas akun Anda. Gunakan email aktif yang belum dipakai pendaftaran lain.</td>
+            </tr>
+        </table>
+        <div class="callout callout-note" style="margin-bottom: 0;">
+            <span class="title">Satu email untuk satu akun</span>
+            Jika email sudah terdaftar, sistem akan menolak. Gunakan email lain, atau masuk ke akun lama
+            bila Anda memang sudah pernah mendaftar.
+        </div>
+    </div>
+</div>
+
+<!-- ================= 2 lanjutan ================= -->
+<div class="page">
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">3</span>
+            <span class="step-title">Profil Duta</span>
+            <span class="step-sub">Kategori pembinaan, rekam jejak, dan pas foto.</span>
+        </div>
+        <table class="fields">
+            <tr>
+                <th style="width: 33%;">Kolom</th>
+                <th style="width: 15%;">Sifat</th>
+                <th>Keterangan</th>
+            </tr>
+            <tr>
+                <td>Kategori Duta</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>
+                    Pilih salah satu: Duta Olahraga Masyarakat, Duta Pemuda &amp; Kebugaran,
+                    Duta Lansia Bugar, Duta Pelajar Berprestasi, Duta Senam &amp; Kesehatan,
+                    atau Duta Olahraga Tradisional.
+                </td>
+            </tr>
+            <tr>
+                <td>Gelar / Prestasi Utama</td>
+                <td><span class="tag tag-opsional">Opsional</span></td>
+                <td>Contoh: <span class="muted">Juara 1 Senam Bugar 2025</span>.</td>
+            </tr>
+            <tr>
+                <td>Deskripsi Prestasi &amp; Pengalaman</td>
+                <td><span class="tag tag-opsional">Opsional</span></td>
+                <td>Maksimal 1500 karakter. Boleh berisi pengalaman, sertifikasi, atau peran sebagai penggerak di masyarakat.</td>
+            </tr>
+            <tr>
+                <td>Akun Instagram</td>
+                <td><span class="tag tag-opsional">Opsional</span></td>
+                <td>Tulis nama akun tanpa tanda @. Contoh: <span class="muted">nama_instagram</span>.</td>
+            </tr>
+            <tr>
+                <td>Pas Foto Duta</td>
+                <td><span class="tag tag-opsional">Opsional</span></td>
+                <td>JPG, JPEG, PNG, atau WEBP. Sistem mengompres ukuran foto otomatis.</td>
+            </tr>
+        </table>
+        <div class="callout callout-note" style="margin-bottom: 0;">
+            <span class="title">Ingin mengganti foto?</span>
+            Setelah foto terpilih, tombol akan berubah menjadi <span class="btn">Ganti Foto Duta</span>.
+            Pratinjau foto muncul di atas tombol sebelum Anda lanjut.
+        </div>
+    </div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">4</span>
+            <span class="step-title">Akun dan konfirmasi</span>
+            <span class="step-sub">Langkah terakhir sebelum data dikirim untuk verifikasi.</span>
+        </div>
+        <ol>
+            <li>Periksa <span class="strong">Ringkasan Pendaftaran Duta</span>: nama, jenis kelamin dan tanggal lahir, kecamatan dan desa, kontak, kategori, serta status pas foto.</li>
+            <li>Buat <span class="strong">kata sandi</span> minimal 8 karakter, lalu ulangi di kolom Konfirmasi Kata Sandi. Gunakan ikon mata untuk melihat isi sandi.</li>
+            <li>Centang dua pernyataan: persetujuan <span class="strong">syarat &amp; ketentuan</span> dan pernyataan bahwa seluruh data yang diisi <span class="strong">benar</span>.</li>
+            <li>Tekan <span class="btn btn-dark">Kirim Pendaftaran</span> dan tunggu hingga muncul tulisan &ldquo;Mengirim Data...&rdquo; selesai.</li>
+        </ol>
+        <div class="callout callout-info" style="margin-bottom: 0;">
+            <span class="title">Sudah masuk ke akun sebelumnya?</span>
+            Kolom kata sandi tidak akan muncul. Pendaftaran Anda akan ditautkan ke akun yang sedang
+            digunakan setelah administrator menyetujuinya.
+        </div>
+    </div>
+
+    <div class="step keep" style="margin-bottom: 0;">
+        <div class="step-head">
+            <span class="step-num">&#10003;</span>
+            <span class="step-title">Setelah pendaftaran terkirim</span>
+            <span class="step-sub">Halaman konfirmasi dan langkah berikutnya.</span>
+        </div>
+        <p>
+            Anda akan melihat halaman <span class="strong">Pendaftaran Berhasil Dikirim</span>. Status
+            pendaftaran saat ini adalah <span class="strong">menunggu verifikasi administrator</span>.
+            Profil Anda baru tampil di direktori publik setelah disetujui.
+        </p>
+        <p class="no-margin">
+            Jika mendaftar sebagai tamu, akun dibuat otomatis dengan email dan kata sandi yang Anda isi,
+            tetapi <span class="strong">belum bisa dipakai masuk</span> sampai administrator menyetujui.
+            Simpan email dan kata sandi Anda. Dari halaman konfirmasi, tersedia tombol
+            <span class="btn">Lihat Direktori Duta</span> dan <span class="btn">Masuk ke Akun</span>.
+        </p>
+    </div>
+</div>
+
+<!-- ================= 3. MASUK ================= -->
+<div class="page">
+    <div class="kicker">Bagian 3</div>
+    <h2>Masuk ke aplikasi</h2>
+    <p class="lead">
+        Setelah pendaftaran Anda disetujui administrator, gunakan email dan kata sandi yang dibuat saat
+        mendaftar untuk masuk. Prosesnya hanya butuh beberapa detik.
+    </p>
+    <div class="section-rule"></div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">1</span>
+            <span class="step-title">Buka halaman masuk</span>
+            <span class="step-sub">Dari tautan langsung atau menu Masuk.</span>
+        </div>
+        <p class="no-margin">
+            Buka <span class="url">https://kormi-backend-laravel.test/mobile/login</span>, atau pilih menu
+            <span class="strong">Masuk</span> pada bilah navigasi bawah saat Anda belum masuk.
+        </p>
+    </div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">2</span>
+            <span class="step-title">Isi email dan kata sandi</span>
+            <span class="step-sub">Gunakan data akun yang terdaftar.</span>
+        </div>
+        <ul>
+            <li><span class="strong">Alamat Email:</span> email yang Anda daftarkan.</li>
+            <li><span class="strong">Kata Sandi:</span> kata sandi yang dibuat pada langkah 4 pendaftaran.</li>
+            <li>Opsional: centang <span class="strong">Ingat sesi saya di perangkat ini</span> agar tidak perlu masuk ulang di ponsel yang sama.</li>
+            <li>Tekan <span class="btn btn-dark">Masuk</span>, lalu tunggu proses selesai.</li>
+        </ul>
+        <p class="no-margin">
+            Duta Olahraga akan diarahkan langsung ke <span class="strong">Beranda</span> aplikasi mobile.
+        </p>
+    </div>
+
+    <div class="callout callout-warn keep">
+        <span class="title">Muncul pesan &ldquo;Akun Anda belum disetujui...&rdquo;?</span>
+        Artinya pendaftaran Anda masih menunggu verifikasi administrator atau akun sedang dinonaktifkan.
+        Tunggu proses persetujuan selesai, lalu coba masuk lagi. Bila sudah cukup lama, hubungi pengurus
+        KORMI Kabupaten Bandung.
+    </div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">3</span>
+            <span class="step-title">Lupa kata sandi</span>
+            <span class="step-sub">Tautan tersedia di halaman masuk.</span>
+        </div>
+        <p class="no-margin">
+            Tekan tautan <span class="strong">Lupa sandi?</span> di kanan label Kata Sandi, lalu ikuti
+            petunjuk yang muncul. Jika email pemulihan tidak kunjung masuk, periksa folder spam/promosi,
+            kemudian hubungi administrator untuk dibantu.
+        </p>
+    </div>
+
+    <div class="step keep" style="margin-bottom: 0;">
+        <div class="step-head">
+            <span class="step-num">4</span>
+            <span class="step-title">Kenali navigasi bawah untuk Duta</span>
+            <span class="step-sub">Lima menu utama yang akan sering Anda pakai.</span>
+        </div>
+        <table class="fields">
+            <tr>
+                <th style="width: 24%;">Menu</th>
+                <th>Fungsi</th>
+            </tr>
+            <tr>
+                <td><span class="strong">Beranda</span></td>
+                <td>Ringkasan absensi hari ini dan pintasan ke Survei APMO.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">Absensi</span></td>
+                <td>Mencatat kehadiran/aktivitas harian Anda.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">Survey APMO</span></td>
+                <td>Memulai pengisian survei baru.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">Riwayat</span></td>
+                <td>Daftar isian APMO: melihat, mengubah, mengunduh PDF, dan melihat statistik.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">Profil</span></td>
+                <td>Data akun dan informasi wilayah Anda.</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- ================= 4. SURVEI APMO ================= -->
+<div class="page">
+    <div class="kicker">Bagian 4</div>
+    <h2>Mengisi Survei APMO</h2>
+    <p class="lead">
+        Survei ini memetakan kebiasaan olahraga dan kualitas fasilitas di wilayah Anda. Tidak ada jawaban
+        benar atau salah. Isi apa adanya sesuai kondisi Anda dalam satu minggu terakhir.
+    </p>
+    <div class="section-rule"></div>
+
+    <div class="callout callout-info keep">
+        <span class="title">Membuka survei</span>
+        Dari <span class="strong">Beranda</span>, tekan kartu Survey APMO lalu pilih
+        <span class="btn">Isi Survey Sekarang</span>. Anda juga bisa langsung memilih menu
+        <span class="strong">Survey APMO</span> di navigasi bawah.
+    </div>
+
+    <table class="pill-row" style="margin-bottom: 12pt;">
+        <tr>
+            <td><div class="pill"><span class="pill-num">LANGKAH 1</span>Identitas</div></td>
+            <td style="width: 14pt;" class="arrow">&#8594;</td>
+            <td><div class="pill"><span class="pill-num">LANGKAH 2</span>Olahraga</div></td>
+            <td style="width: 14pt;" class="arrow">&#8594;</td>
+            <td><div class="pill"><span class="pill-num">LANGKAH 3</span>Detail</div></td>
+        </tr>
+    </table>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">1</span>
+            <span class="step-title">Identitas responden</span>
+            <span class="step-sub">Sebagian kolom sudah terisi otomatis dari akun Anda.</span>
+        </div>
+        <table class="fields">
+            <tr>
+                <th style="width: 30%;">Kolom</th>
+                <th style="width: 14%;">Sifat</th>
+                <th>Keterangan</th>
+            </tr>
+            <tr>
+                <td>Nama Lengkap</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Terisi otomatis dari akun; bisa disesuaikan bila perlu. 3&ndash;100 karakter.</td>
+            </tr>
+            <tr>
+                <td>Usia (tahun)</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Antara 10 dan 100 tahun.</td>
+            </tr>
+            <tr>
+                <td>Jenis Kelamin</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Pilih <span class="strong">Pria</span> atau <span class="strong">Wanita</span>.</td>
+            </tr>
+            <tr>
+                <td>Tinggi &amp; Berat Badan</td>
+                <td><span class="tag tag-opsional">Opsional</span></td>
+                <td>Tinggi 80&ndash;250 cm, berat 20&ndash;300 kg. Dipakai untuk menghitung IMT pada laporan.</td>
+            </tr>
+            <tr>
+                <td>Alamat Lengkap</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Minimal 5 karakter. Tulis nama jalan, RT/RW, dan desa/kelurahan.</td>
+            </tr>
+            <tr>
+                <td>Kecamatan</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Pilih lebih dulu; daftar desa/kelurahan menyesuaikan setelahnya.</td>
+            </tr>
+            <tr>
+                <td>Desa / Kelurahan</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Baru bisa dipilih setelah kecamatan terisi.</td>
+            </tr>
+            <tr>
+                <td>Kabupaten / Kota</td>
+                <td><span class="tag">Terkunci</span></td>
+                <td>Otomatis <span class="strong">Kabupaten Bandung</span> dan tidak dapat diubah.</td>
+            </tr>
+            <tr>
+                <td>Pekerjaan Sekarang</td>
+                <td><span class="tag tag-wajib">Wajib</span></td>
+                <td>Pelajar/Mahasiswa, PNS/TNI/POLRI/BUMN, Pegawai Swasta, Wiraswasta/Wirausaha, Petani/Nelayan, atau Lainnya.</td>
+            </tr>
+        </table>
+        <div class="callout callout-quiet" style="margin-bottom: 0;">
+            <span class="title">Memilih &ldquo;Lainnya&rdquo;</span>
+            Kolom tambahan <span class="strong">Sebutkan Pekerjaan</span> akan muncul dan wajib diisi.
+            Setelah selesai, tekan <span class="btn">Lanjut ke Pertanyaan Olahraga</span>.
+        </div>
+    </div>
+
+    <div class="step keep" style="margin-bottom: 0;">
+        <div class="step-head">
+            <span class="step-num">2</span>
+            <span class="step-title">Pertanyaan olahraga</span>
+            <span class="step-sub">Satu pertanyaan yang menentukan arah langkah berikutnya.</span>
+        </div>
+        <p class="no-margin">
+            Pertanyaan nomor 7: <span class="strong">&ldquo;Apakah dalam satu minggu terakhir ini, Anda melakukan
+            kegiatan olahraga?&rdquo;</span> Pilih <span class="strong">Ya</span> atau <span class="strong">Tidak</span>,
+            lalu tekan <span class="btn">Lanjut</span>. Pilihan Anda menentukan apakah Anda mengisi bagian detail
+            olahraga atau bagian alasan tidak berolahraga.
+        </p>
+    </div>
+</div>
+
+<!-- ================= 4 lanjutan ================= -->
+<div class="page">
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">3</span>
+            <span class="step-title">Detail survei</span>
+            <span class="step-sub">Isi sesuai jawaban Anda pada pertanyaan nomor 7.</span>
+        </div>
+
+        <h4 style="margin-bottom: 4pt;">Jika Anda menjawab &ldquo;Ya&rdquo; (nomor 8&ndash;19)</h4>
+        <table class="fields">
+            <tr>
+                <th style="width: 8%;">No.</th>
+                <th style="width: 42%;">Pertanyaan</th>
+                <th>Cara menjawab</th>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>Frekuensi olahraga berat (membuat napas terengah-engah)</td>
+                <td>1 kali, 2 kali, 3 kali, atau lebih dari 3 kali per minggu.</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>Durasi olahraga berat</td>
+                <td>Isi jam (0&ndash;23) dan menit (0&ndash;59). Bila tidak yakin, centang <span class="strong">Tidak tahu/Tidak pasti</span>.</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>Frekuensi olahraga sedang</td>
+                <td>1 kali, 2 kali, 3 kali, atau lebih dari 3 kali per minggu.</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>Durasi olahraga sedang</td>
+                <td>Sama seperti nomor 9; boleh centang tidak tahu.</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td>Frekuensi jalan kaki</td>
+                <td>1 kali, 2 kali, 3 kali, atau lebih dari 3 kali per minggu.</td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td>Durasi jalan kaki</td>
+                <td>Sama seperti nomor 9; boleh centang tidak tahu.</td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td>Cabang olahraga yang sering dilakukan</td>
+                <td>Sepakbola, Bola Voli, Bulutangkis, Atletik, Senam Aerobik, Bersepeda, Basket, Renang, Beladiri, Jalan, atau Lainnya.</td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td>Tujuan utama berolahraga</td>
+                <td>Menjaga Kesehatan, Menurunkan Berat Badan, Menambah Pergaulan, Berprestasi, atau Lainnya.</td>
+            </tr>
+            <tr>
+                <td>16</td>
+                <td>Jalur melakukan olahraga</td>
+                <td>Pilih salah satu opsi yang tersedia, termasuk <span class="strong">Sendiri</span> atau <span class="strong">Lainnya</span>.</td>
+            </tr>
+            <tr>
+                <td>17</td>
+                <td>Pernah merasa malas berolahraga?</td>
+                <td>Pilih <span class="strong">Pernah</span> atau <span class="strong">Tidak Pernah</span>.</td>
+            </tr>
+            <tr>
+                <td>18</td>
+                <td>Lama duduk per hari <span class="muted">(muncul jika nomor 17 = Pernah)</span></td>
+                <td>Isi jam dan menit, atau centang tidak tahu.</td>
+            </tr>
+            <tr>
+                <td>19</td>
+                <td>Penilaian fasilitas olahraga di daerah Anda</td>
+                <td>Memadai, Kurang, atau Sangat Kurang.</td>
+            </tr>
+        </table>
+
+        <h4 style="margin: 8pt 0 4pt;">Jika Anda menjawab &ldquo;Tidak&rdquo; (nomor 20&ndash;21)</h4>
+        <table class="fields">
+            <tr>
+                <th style="width: 8%;">No.</th>
+                <th style="width: 42%;">Pertanyaan</th>
+                <th>Cara menjawab</th>
+            </tr>
+            <tr>
+                <td>20</td>
+                <td>Alasan tidak melakukan olahraga</td>
+                <td>Tidak Berminat, Tidak Ada Waktu, Tidak Ada Sarana/Prasarana, Lelah, Sudah cukup melalui pekerjaan, atau Lainnya.</td>
+            </tr>
+            <tr>
+                <td>21</td>
+                <td>Penilaian fasilitas olahraga di daerah Anda</td>
+                <td>Memadai, Kurang, atau Sangat Kurang.</td>
+            </tr>
+        </table>
+
+        <div class="callout callout-warn" style="margin-bottom: 0;">
+            <span class="title">Durasi tidak boleh nol</span>
+            Bila tidak mencentang &ldquo;Tidak tahu&rdquo;, isi durasi lebih dari 0 menit. Contoh: 0 jam 30 menit.
+            Aturan yang sama berlaku untuk lama duduk pada nomor 18.
+        </div>
+    </div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">4</span>
+            <span class="step-title">Foto bukti survei</span>
+            <span class="step-sub">Wajib pada pengisian baru.</span>
+        </div>
+        <ul>
+            <li>Tekan <span class="btn">Ambil Foto Selfie</span> untuk membuka kamera depan, atau <span class="btn">pilih foto dari galeri</span>.</li>
+            <li>Format yang diterima: JPG, JPEG, PNG, dan WEBP. Sistem mengompres foto secara otomatis; batas unggah di server 10 MB.</li>
+            <li>Pastikan wajah terlihat jelas dan foto benar-benar milik Anda, karena foto ini menjadi bukti bahwa survei diisi langsung oleh responden.</li>
+            <li>Bila ingin mengganti, tekan <span class="btn">Ganti Foto Selfie</span>. Saat mengubah isian lama, foto sebelumnya tetap tersimpan sehingga unggahan baru bersifat opsional.</li>
+        </ul>
+    </div>
+
+    <div class="step keep" style="margin-bottom: 0;">
+        <div class="step-head">
+            <span class="step-num">5</span>
+            <span class="step-title">Kirim dan selesaikan</span>
+            <span class="step-sub">Satu ketukan untuk menyimpan jawaban.</span>
+        </div>
+        <p>
+            Tekan <span class="btn btn-dark">Kirim Survey</span>, lalu tunggu proses pengiriman selesai.
+            Halaman <span class="strong">Survey Terkirim</span> akan menampilkan nama responden, waktu pengisian,
+            status foto bukti, dan status penyimpanan.
+        </p>
+        <p class="no-margin">
+            Dari halaman itu Anda bisa memilih <span class="btn">Kembali ke Beranda</span>,
+            <span class="btn">Buka Layanan</span>, atau <span class="btn">Isi Survey Lagi</span>.
+            Bila Anda sedang mengubah isian lama, tombol yang tersedia adalah
+            <span class="btn">Simpan Perubahan</span> dan hasilnya kembali ke halaman Laporan.
+        </p>
+    </div>
+
+    <div class="callout callout-note keep" style="margin-bottom: 0;">
+        <span class="title">Sudah pernah mengisi?</span>
+        Aplikasi akan menampilkan pemberitahuan bahwa Anda sudah pernah mengisi survei. Pengisian baru tetap
+        disimpan sebagai data terbaru, dan isian lama tetap tersedia di Riwayat sampai Anda menghapusnya.
+    </div>
+</div>
+
+<!-- ================= 5. PDF ================= -->
+<div class="page">
+    <div class="kicker">Bagian 5</div>
+    <h2>Mengunduh laporan APMO dalam PDF</h2>
+    <p class="lead">
+        Setiap isian yang tersimpan dapat diunduh sebagai dokumen PDF resmi. Cocok untuk arsip pribadi,
+        lampiran laporan kegiatan, atau bukti pengisian survei.
+    </p>
+    <div class="section-rule"></div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">1</span>
+            <span class="step-title">Buka menu Riwayat</span>
+            <span class="step-sub">Halaman berjudul Laporan APMO.</span>
+        </div>
+        <p class="no-margin">
+            Dari navigasi bawah, pilih <span class="strong">Riwayat</span>. Pastikan tab
+            <span class="strong">Riwayat APMO</span> aktif dan pilihan lingkup berada di
+            <span class="strong">Saya</span>. Tombol PDF hanya muncul untuk isian milik akun Anda.
+        </p>
+    </div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">2</span>
+            <span class="step-title">Pilih isian dan tekan PDF</span>
+            <span class="step-sub">Tersedia di setiap baris riwayat.</span>
+        </div>
+        <p>
+            Di bawah setiap isian terdapat tiga tombol: <span class="btn">Ubah</span>,
+            <span class="btn">PDF</span>, dan <span class="btn">Hapus</span>. Tekan
+            <span class="btn">PDF</span> untuk mengunduh laporan isian tersebut.
+        </p>
+        <p class="no-margin">
+            Berkas akan terunduh otomatis dengan nama
+            <span class="strong">Laporan-Survey-APMO-[nama]-[tanggal].pdf</span>. Buka melalui folder
+            Unduhan/Downloads di ponsel Anda.
+        </p>
+    </div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">3</span>
+            <span class="step-title">Isi dokumen PDF</span>
+            <span class="step-sub">Lima bagian utama plus kop dan nomor dokumen.</span>
+        </div>
+        <table class="fields">
+            <tr>
+                <th style="width: 10%;">Bagian</th>
+                <th style="width: 30%;">Judul</th>
+                <th>Isi</th>
+            </tr>
+            <tr>
+                <td><span class="strong">A</span></td>
+                <td>Identitas Responden</td>
+                <td>Nama, usia, jenis kelamin, tinggi/berat, pekerjaan, alamat, desa, kecamatan, dan tanggal isian.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">B</span></td>
+                <td>Ringkasan Status</td>
+                <td>Indeks Massa Tubuh (IMT) beserta kategori, status olahraga, estimasi menit per minggu, dan lama duduk.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">C</span></td>
+                <td>Kebiasaan Olahraga</td>
+                <td>Frekuensi, durasi per sesi, dan estimasi waktu per minggu untuk olahraga berat, sedang, dan jalan kaki.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">D</span></td>
+                <td>Preferensi &amp; Fasilitas</td>
+                <td>Cabang favorit, tujuan, jalur olahraga, penilaian fasilitas, dan lama duduk.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">E</span></td>
+                <td>Foto Bukti Kegiatan</td>
+                <td>Foto selfie yang Anda unggah saat mengisi survei, bila ada.</td>
+            </tr>
+        </table>
+        <p class="small muted no-margin">
+            Di bagian atas dokumen tercantum kop KORMI Kabupaten Bandung, nomor dokumen
+            (format <span class="strong">APMO-XXXXXXXX</span>), tanggal isian, dan waktu cetak.
+            Dokumen dihasilkan otomatis oleh sistem dan sah tanpa tanda tangan basah.
+        </p>
+    </div>
+
+    <table class="two-col keep">
+        <tr>
+            <td class="left">
+                <div class="card" style="height: 100%;">
+                    <div class="card-title">Tombol Ubah</div>
+                    <p class="small no-margin">
+                        Memperbaiki jawaban pada isian lama. Data lama akan ditimpa setelah Anda menekan
+                        <span class="btn">Simpan Perubahan</span>. Unduh ulang PDF setelah mengubah data
+                        agar isinya sesuai.
+                    </p>
+                </div>
+            </td>
+            <td class="right">
+                <div class="card" style="height: 100%;">
+                    <div class="card-title">Tombol Hapus</div>
+                    <p class="small no-margin">
+                        Menghapus isian secara permanen setelah Anda mengonfirmasi. PDF yang sudah terunduh
+                        sebelumnya tidak terpengaruh. Sebaiknya unduh dulu sebelum menghapus.
+                    </p>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="callout callout-warn keep" style="margin-bottom: 0;">
+        <span class="title">PDF tidak kunjung terunduh?</span>
+        Pastikan Anda membuka tab <span class="strong">Riwayat APMO</span> dengan lingkup
+        <span class="strong">Saya</span>, lalu izinkan unduhan/pop-up pada browser. Bila masih gagal,
+        coba browser lain atau periksa ruang penyimpanan ponsel.
+    </div>
+</div>
+
+<!-- ================= 5b. STATISTIK ================= -->
+<div class="page">
+    <div class="kicker">Bagian 5 &middot; Lanjutan</div>
+    <h2>Melihat statistik dan rekap wilayah</h2>
+    <p class="lead">
+        Selain riwayat, halaman Laporan APMO menyediakan ringkasan otomatis dari isian yang tersimpan.
+        Berguna untuk memantau perkembangan dan kondisi wilayah Anda.
+    </p>
+    <div class="section-rule"></div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">1</span>
+            <span class="step-title">Pilih tab Statistik APMO</span>
+            <span class="step-sub">Di halaman yang sama dengan Riwayat.</span>
+        </div>
+        <p class="no-margin">
+            Tekan tab <span class="strong">Statistik APMO</span>, lalu pilih lingkup data:
+            <span class="strong">Saya</span>, <span class="strong">Desa</span>, atau
+            <span class="strong">Kecamatan</span>.
+        </p>
+    </div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">2</span>
+            <span class="step-title">Baca ringkasannya</span>
+            <span class="step-sub">Angka dihitung dari isian yang tersimpan.</span>
+        </div>
+        <table class="fields">
+            <tr>
+                <th style="width: 24%;">Lingkup</th>
+                <th>Yang ditampilkan</th>
+            </tr>
+            <tr>
+                <td><span class="strong">Saya</span></td>
+                <td>Jumlah kali isi, IMT dan kategorinya, lama duduk, profil terakhir, kebiasaan olahraga per minggu, cabang favorit, tujuan, dan jalur.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">Desa</span></td>
+                <td>Rekap warga di desa/kelurahan Anda: jumlah isian, persentase aktif olahraga, rata-rata usia, jenis kelamin, cabang terpopuler, frekuensi, dan penilaian fasilitas.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">Kecamatan</span></td>
+                <td>Rekap yang sama untuk lingkup kecamatan.</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="callout callout-warn keep" style="margin-bottom: 0;">
+        <span class="title">Rekap desa/kecamatan kosong?</span>
+        Kemungkinan wilayah Anda belum diatur pada profil. Lengkapi melalui menu
+        <span class="strong">Profil</span>, atau minta bantuan administrator untuk memperbarui data wilayah.
+        Sementara itu, isian pribadi tetap dapat dilihat pada lingkup <span class="strong">Saya</span>.
+    </div>
+
+    <div class="step keep" style="margin-top: 12pt; margin-bottom: 0;">
+        <div class="step-head">
+            <span class="step-num">&#10003;</span>
+            <span class="step-title">Alur singkat dari awal sampai akhir</span>
+            <span class="step-sub">Ringkasan satu halaman.</span>
+        </div>
+        <table class="pill-row">
+            <tr>
+                <td><div class="pill"><span class="pill-num">1</span>Daftar<br><span class="small muted">4 langkah</span></div></td>
+                <td style="width: 12pt;" class="arrow">&#8594;</td>
+                <td><div class="pill"><span class="pill-num">2</span>Tunggu<br><span class="small muted">persetujuan admin</span></div></td>
+                <td style="width: 12pt;" class="arrow">&#8594;</td>
+                <td><div class="pill"><span class="pill-num">3</span>Masuk<br><span class="small muted">email &amp; sandi</span></div></td>
+                <td style="width: 12pt;" class="arrow">&#8594;</td>
+                <td><div class="pill"><span class="pill-num">4</span>Isi survei<br><span class="small muted">3 langkah</span></div></td>
+                <td style="width: 12pt;" class="arrow">&#8594;</td>
+                <td><div class="pill"><span class="pill-num">5</span>Unduh<br><span class="small muted">PDF</span></div></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- ================= 6. FAQ ================= -->
+<div class="page">
+    <div class="kicker">Bagian 6</div>
+    <h2>Kendala umum dan solusinya</h2>
+    <p class="lead">
+        Sebagian besar kendala bisa diselesaikan sendiri dalam beberapa langkah. Berikut yang paling sering terjadi.
+    </p>
+    <div class="section-rule"></div>
+
+    <div class="faq keep">
+        <div class="faq-q">1. Sudah mendaftar, tetapi belum bisa masuk. Mengapa?</div>
+        <p class="faq-a">Akun baru aktif setelah administrator menyetujui pendaftaran. Tunggu proses verifikasi selesai, lalu coba masuk kembali. Bila sudah lama, hubungi pengurus KORMI Kabupaten Bandung.</p>
+    </div>
+
+    <div class="faq keep">
+        <div class="faq-q">2. Muncul pesan bahwa email sudah terdaftar.</div>
+        <p class="faq-a">Satu email hanya untuk satu akun. Masuk dengan email tersebut, atau daftar memakai email lain. Jika Anda merasa belum pernah mendaftar, hubungi administrator.</p>
+    </div>
+
+    <div class="faq keep">
+        <div class="faq-q">3. Saya sudah punya pendaftaran tetapi ingin mendaftar lagi.</div>
+        <p class="faq-a">Satu akun hanya boleh memiliki satu pendaftaran aktif. Untuk memperbarui data, hubungi administrator KORMI. Pendaftaran ulang hanya bisa dilakukan jika pendaftaran sebelumnya ditolak.</p>
+    </div>
+
+    <div class="faq keep">
+        <div class="faq-q">4. Lupa kata sandi.</div>
+        <p class="faq-a">Di halaman masuk, tekan <span class="strong">Lupa sandi?</span> lalu ikuti petunjuknya. Cek folder spam/promosi bila email belum masuk. Jika tetap tidak berhasil, minta bantuan administrator.</p>
+    </div>
+
+    <div class="faq keep">
+        <div class="faq-q">5. Tombol Lanjut tidak berpindah langkah.</div>
+        <p class="faq-a">Biasanya ada kolom wajib yang belum lengkap. Pesan berwarna merah muncul di bawah kolom terkait. Lengkapi, lalu tekan Lanjut lagi.</p>
+    </div>
+
+    <div class="faq keep">
+        <div class="faq-q">6. Foto gagal diunggah.</div>
+        <p class="faq-a">Pastikan format JPG, JPEG, PNG, atau WEBP dan ukuran berkas wajar. Periksa koneksi internet, lalu coba unggah ulang. Untuk foto selfie, izinkan akses kamera pada browser.</p>
+    </div>
+
+    <div class="faq keep">
+        <div class="faq-q">7. Ada jawaban survei yang salah. Bisa diperbaiki?</div>
+        <p class="faq-a">Bisa. Buka menu <span class="strong">Riwayat</span>, tekan <span class="strong">Ubah</span> pada isian tersebut, perbaiki jawaban, lalu tekan <span class="strong">Simpan Perubahan</span>. Unduh ulang PDF setelahnya.</p>
+    </div>
+
+    <div class="faq keep">
+        <div class="faq-q">8. Data pendaftaran (nama atau wilayah) perlu diubah.</div>
+        <p class="faq-a">Data pendaftaran tidak dapat diubah sendiri dari aplikasi. Hubungi administrator KORMI Kabupaten Bandung dengan menyertakan email akun dan data yang ingin diperbaiki.</p>
+    </div>
+
+    <div class="faq keep">
+        <div class="faq-q">9. Tombol PDF tidak muncul di riwayat.</div>
+        <p class="faq-a">Pastikan Anda berada di tab <span class="strong">Riwayat APMO</span> dengan lingkup <span class="strong">Saya</span>. Tombol PDF memang hanya tersedia untuk isian milik akun Anda, bukan isian warga lain.</p>
+    </div>
+
+    <div class="faq keep">
+        <div class="faq-q">10. Muncul pesan terlalu banyak percobaan.</div>
+        <p class="faq-a">Sistem membatasi jumlah percobaan pendaftaran untuk keamanan. Tunggu sesuai waktu yang tertera pada pesan (dalam hitungan menit), lalu coba lagi.</p>
+    </div>
+</div>
+
+<!-- ================= 7. BANTUAN ================= -->
+<div class="page">
+    <div class="kicker">Bagian 7</div>
+    <h2>Bantuan dan catatan data</h2>
+    <p class="lead">
+        Bila panduan ini belum menjawab kendala Anda, tim KORMI Kabupaten Bandung siap membantu.
+        Sertakan informasi yang lengkap agar penanganan bisa lebih cepat.
+    </p>
+    <div class="section-rule"></div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">1</span>
+            <span class="step-title">Cara menghubungi bantuan</span>
+            <span class="step-sub">Gunakan kanal resmi KORMI Kabupaten Bandung.</span>
+        </div>
+        <p class="no-margin">
+            Hubungi pengurus KORMI Kabupaten Bandung melalui kanal resmi yang tercantum pada menu
+            <span class="strong">Kontak</span> di situs KORMI Kabupaten Bandung, atau melalui pengurus
+            kecamatan/desa yang membina Anda.
+        </p>
+    </div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">2</span>
+            <span class="step-title">Informasi yang perlu disiapkan</span>
+            <span class="step-sub">Supaya admin bisa menelusuri kendala dengan cepat.</span>
+        </div>
+        <ul>
+            <li>Nama lengkap dan alamat email yang dipakai mendaftar.</li>
+            <li>Nomor HP/WhatsApp aktif.</li>
+            <li>Tangkapan layar (screenshot) pesan kesalahan, bila ada.</li>
+            <li>Perkiraan waktu kejadian dan jenis perangkat/browser yang digunakan.</li>
+        </ul>
+    </div>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">3</span>
+            <span class="step-title">Catatan penggunaan data</span>
+            <span class="step-sub">Data Anda dipakai untuk keperluan program, bukan diperjualbelikan.</span>
+        </div>
+        <ul>
+            <li>Data pendaftaran dipakai untuk memverifikasi identitas dan wilayah penugasan Duta.</li>
+            <li>Jawaban Survei APMO dipakai untuk pemetaan kebiasaan dan fasilitas olahraga masyarakat.</li>
+            <li>Foto selfie hanya berfungsi sebagai bukti bahwa survei diisi langsung oleh responden.</li>
+            <li>Jangan bagikan kata sandi kepada siapa pun. Administrator tidak akan meminta kata sandi Anda.</li>
+        </ul>
+    </div>
+
+    <div class="callout callout-note keep">
+        <span class="title">Tips menjaga akun</span>
+        Gunakan kata sandi yang unik dan mudah Anda ingat, aktifkan &ldquo;Ingat sesi saya&rdquo; hanya pada
+        perangkat pribadi, dan selalu keluar (logout) bila memakai perangkat bersama.
+    </div>
+
+    <div class="keep" style="margin-top: 16pt; border: 1px solid #e1e5d7; border-radius: 10px; padding: 14pt 16pt;">
+        <h3 style="margin-bottom: 4pt;">Selesai &mdash; selamat menjalankan peran sebagai Duta Olahraga</h3>
+        <p class="small" style="margin-bottom: 0;">
+            Dengan mengisi Survei APMO secara rutin, Anda membantu KORMI Kabupaten Bandung menyusun data
+            yang lebih akurat untuk pembinaan olahraga masyarakat. Terima kasih atas kontribusi Anda.
+        </p>
+    </div>
+
+    <div class="end-note">
+        Panduan Duta Olahraga &mdash; Pendaftaran, Masuk, dan Survei APMO &middot; Versi 1.0, November 2026.<br>
+        Diterbitkan untuk pengguna aplikasi mobile KORMI Kabupaten Bandung. Tampilan dan label tombol dapat
+        berubah sewaktu-waktu mengikuti pembaruan aplikasi.
+    </div>
+</div>
+
+</body>
+</html>
