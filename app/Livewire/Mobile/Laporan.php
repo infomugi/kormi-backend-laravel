@@ -5,6 +5,7 @@ namespace App\Livewire\Mobile;
 use App\Models\Core\Pengguna;
 use App\Models\Kormi\AngketApmo;
 use App\Models\Kormi\DutaOlahraga;
+use App\Services\StorageService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
@@ -52,6 +53,7 @@ class Laporan extends Component
         }
 
         $this->tab = $tab;
+        $this->hapusId = null;
         $this->resetPage();
     }
 
@@ -68,7 +70,9 @@ class Laporan extends Component
 
     public function konfirmasiHapus(string $id): void
     {
-        $this->hapusId = $id;
+        if (AngketApmo::where('pengguna_id', auth()->id())->whereKey($id)->exists()) {
+            $this->hapusId = $id;
+        }
     }
 
     public function batalHapus(): void
@@ -86,8 +90,11 @@ class Laporan extends Component
             return;
         }
 
-        app(\App\Services\StorageService::class)->hapusFile($isian->foto_bukti);
-        $isian->delete();
+        $foto = $isian->foto_bukti;
+
+        if ($isian->delete()) {
+            app(StorageService::class)->hapusFile($foto);
+        }
 
         $this->hapusId = null;
         $this->resetPage();

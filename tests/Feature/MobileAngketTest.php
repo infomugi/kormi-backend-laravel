@@ -706,4 +706,46 @@ class MobileAngketTest extends TestCase
         Livewire::test(Angket::class, ['isian' => $catatan->id])
             ->assertNotFound();
     }
+
+    public function test_kirim_tanpa_melewati_langkah_tidak_menyimpan_data(): void
+    {
+        $user = $this->penggunaUji();
+        $this->actingAs($user);
+
+        $jumlahAwal = AngketApmo::count();
+
+        Livewire::test(Angket::class)
+            ->set('nama_lengkap', '')
+            ->set('melakukan_olahraga', 'tidak')
+            ->set('alasan_tidak_olahraga', 'tidak_ada_waktu')
+            ->set('fasilitas_olahraga', 'kurang')
+            ->call('kirim')
+            ->assertHasErrors(['nama_lengkap', 'usia', 'kecamatan_id', 'desa_kelurahan_id', 'pekerjaan', 'foto_bukti'])
+            ->assertSet('langkah', 1)
+            ->assertSet('selesai', false);
+
+        $this->assertSame($jumlahAwal, AngketApmo::count());
+        $this->assertSame(0, AngketApmo::where('pengguna_id', $user->id)->count());
+    }
+
+    public function test_kirim_mode_ubah_tidak_menimpa_identitas_tidak_valid(): void
+    {
+        $user = $this->penggunaUji();
+        $this->actingAs($user);
+
+        $catatan = $this->catatanUji($user, $this->desaUji());
+
+        Livewire::test(Angket::class, ['isian' => $catatan->id])
+            ->set('nama_lengkap', '')
+            ->set('usia', 999)
+            ->call('kirim')
+            ->assertHasErrors(['nama_lengkap', 'usia'])
+            ->assertSet('langkah', 1)
+            ->assertSet('selesai', false);
+
+        $catatan->refresh();
+
+        $this->assertSame('Responden Uji Angket', $catatan->nama_lengkap);
+        $this->assertSame(33, $catatan->usia);
+    }
 }

@@ -7,6 +7,7 @@ use App\Models\Master\DesaKelurahan;
 use App\Models\Master\Kecamatan;
 use App\Services\StorageService;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
@@ -373,7 +374,18 @@ class Angket extends Component
     {
         $this->resetValidation();
 
-        $this->validate($this->aturanDetail());
+        try {
+            $this->validate(array_merge(
+                $this->aturanIdentitas(),
+                $this->aturanOlahraga(),
+                $this->aturanDetail(),
+            ));
+        } catch (ValidationException $e) {
+            $this->setErrorBag($e->validator->errors());
+            $this->langkah = $this->langkahKesalahan($this->getErrorBag()->keys());
+
+            return;
+        }
 
         if ($this->melakukan_olahraga === 'ya') {
             $this->periksaDurasiOlahraga();
@@ -551,6 +563,26 @@ class Angket extends Component
             && ((int) $this->duduk_jam * 60 + (int) $this->duduk_menit) <= 0) {
             $this->addError('duduk_jam', 'Isi lama duduk lebih dari 0 menit.');
         }
+    }
+
+    /**
+     * Langkah formulir yang memuat kesalahan pertama agar pesannya terlihat.
+     */
+    private function langkahKesalahan(array $kunci): int
+    {
+        $pertama = $kunci[0] ?? null;
+
+        $identitas = [
+            'nama_lengkap', 'usia', 'jenis_kelamin', 'tinggi_badan', 'berat_badan',
+            'alamat', 'kecamatan_id', 'desa_kelurahan_id', 'kabupaten_kota',
+            'pekerjaan', 'pekerjaan_lainnya',
+        ];
+
+        if (in_array($pertama, $identitas, true)) {
+            return 1;
+        }
+
+        return $pertama === 'melakukan_olahraga' ? 2 : 3;
     }
 
     private function dataSimpan(): array

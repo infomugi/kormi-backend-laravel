@@ -223,4 +223,41 @@ class MobileLaporanTest extends TestCase
             ->call('pilihTab', 'statistik')
             ->assertDontSee('Hapus permanen');
     }
+
+    public function test_pindah_tab_dan_lingkup_membatalkan_konfirmasi_hapus(): void
+    {
+        $warga = $this->penggunaUji();
+        $desa = $this->desaUji();
+        $baris = $this->isian($warga, $desa);
+
+        Livewire::actingAs($warga)
+            ->test(Laporan::class)
+            ->call('konfirmasiHapus', $baris->id)
+            ->assertSet('hapusId', $baris->id)
+            ->assertSee('Hapus permanen')
+            ->call('pilihTab', 'statistik')
+            ->assertSet('hapusId', null)
+            ->assertDontSee('Hapus permanen')
+            ->call('pilihTab', 'riwayat')
+            ->call('konfirmasiHapus', $baris->id)
+            ->assertSet('hapusId', $baris->id)
+            ->call('pilihLingkup', 'desa')
+            ->assertSet('hapusId', null)
+            ->assertDontSee('Hapus permanen');
+    }
+
+    public function test_konfirmasi_hapus_isian_pengguna_lain_tidak_aktif(): void
+    {
+        $pemilik = $this->penggunaUji();
+        $desa = $this->desaUji();
+        $baris = $this->isian($pemilik, $desa);
+
+        Livewire::actingAs($this->penggunaUji())
+            ->test(Laporan::class)
+            ->call('konfirmasiHapus', $baris->id)
+            ->assertSet('hapusId', null)
+            ->assertDontSee('Hapus permanen');
+
+        $this->assertNotNull(AngketApmo::find($baris->id));
+    }
 }

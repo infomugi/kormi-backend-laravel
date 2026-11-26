@@ -50,6 +50,13 @@
                         <span wire:loading.remove wire:target="lanjut">Lanjut ke Pertanyaan Olahraga</span>
                         <span wire:loading wire:target="lanjut">Memeriksa...</span>
                     </button>
+
+                    @if($modeUbah)
+                        <a href="{{ route('mobile.laporan') }}" wire:navigate class="kd-btn-ghost" style="width: 100%; margin-top: 10px;">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                            <span>Batal, kembali ke laporan</span>
+                        </a>
+                    @endif
                 </form>
             @elseif($langkah === 2)
                 <form wire:submit="lanjut" novalidate>
@@ -62,6 +69,13 @@
                             <span wire:loading wire:target="lanjut">Memeriksa...</span>
                         </button>
                     </div>
+
+                    @if($modeUbah)
+                        <a href="{{ route('mobile.laporan') }}" wire:navigate class="kd-btn-ghost" style="width: 100%; margin-top: 10px;">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                            <span>Batal, kembali ke laporan</span>
+                        </a>
+                    @endif
                 </form>
             @else
                 <form wire:submit="kirim" novalidate>
