@@ -29,6 +29,21 @@
 </head>
 <body class="min-h-screen bg-slate-100 antialiased overflow-x-hidden">
     <div class="mx-auto w-full max-w-[480px] min-h-screen bg-white shadow-xl">
+        @if(session()->has('impersonator_id'))
+            <div class="kd-impersonate" role="status">
+                <span class="kd-impersonate-info">
+                    <i data-lucide="shield-alert"></i>
+                    <span class="kd-impersonate-text">
+                        Mode impersonasi — masuk sebagai <strong>{{ auth()->user()?->nama_lengkap }}</strong>
+                        <span class="kd-impersonate-role">({{ auth()->user()?->peran?->nama_peran ?? 'Pengguna' }})</span>
+                    </span>
+                </span>
+                <a href="{{ route('admin.impersonate.leave', ['asal' => 'mobile']) }}" class="kd-impersonate-exit">
+                    Kembali ke Super Admin
+                </a>
+            </div>
+        @endif
+
         {{ $slot }}
     </div>
 

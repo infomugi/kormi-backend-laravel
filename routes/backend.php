@@ -127,6 +127,8 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::get('/leave-impersonation', function () {
+        $asalMobile = request()->query('asal') === 'mobile';
+
         if (session()->has('impersonator_id')) {
             $originalAdminId = session('impersonator_id');
             $originalAdmin = \App\Models\Core\Pengguna::find($originalAdminId);
@@ -137,7 +139,7 @@ Route::prefix('admin')->group(function () {
                 Auth::login($originalAdmin);
                 session()->regenerate();
                 session()->flash('pesan', 'Berhasil kembali ke sesi Super Administrator (' . $originalAdmin->nama_lengkap . ').');
-                return redirect()->route('admin.pengguna');
+                return redirect()->route($asalMobile ? 'mobile.kelola-user' : 'admin.pengguna');
             }
         }
         return redirect()->route('login');

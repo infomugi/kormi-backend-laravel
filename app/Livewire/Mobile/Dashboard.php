@@ -170,6 +170,7 @@ class Dashboard extends Component
 
         if ($isSuper) {
             $aksi[] = ['label' => 'Monitoring APMO', 'icon' => 'radar', 'route' => 'mobile.apmo.wilayah', 'tint' => 'amber'];
+            $aksi[] = ['label' => 'Kelola User', 'icon' => 'user-cog', 'route' => 'mobile.kelola-user', 'tint' => 'rose'];
         }
 
         $aksi[] = $isPengelola

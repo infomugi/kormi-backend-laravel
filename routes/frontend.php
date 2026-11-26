@@ -52,6 +52,7 @@ Route::prefix('mobile')->group(function () {
     Route::get('/laporan', \App\Livewire\Mobile\Laporan::class)->name('mobile.laporan')->middleware('auth');
     Route::get('/dashboard', \App\Livewire\Mobile\Dashboard::class)->name('mobile.dashboard')->middleware('auth');
     Route::get('/persetujuan', \App\Livewire\Mobile\Persetujuan::class)->name('mobile.persetujuan')->middleware('auth');
+    Route::get('/kelola-user', \App\Livewire\Mobile\KelolaUser::class)->name('mobile.kelola-user')->middleware(['auth', 'peran:super-admin']);
     Route::get('/apmo/wilayah', \App\Livewire\Mobile\ApmoWilayah::class)->name('mobile.apmo.wilayah')->middleware('auth');
 });
 
