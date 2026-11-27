@@ -405,6 +405,18 @@ class DutaPendaftaranPublikTest extends TestCase
             ->assertSee('<img', false);
     }
 
+    public function test_kegagalan_transport_unggah_foto_menampilkan_pesan_indonesia(): void
+    {
+        $komponen = Livewire::test(DutaOlahragaDaftar::class)
+            ->call('_uploadErrored', 'foto', null, false)
+            ->assertHasErrors(['foto']);
+
+        $this->assertSame(
+            'Foto gagal diunggah ke server. Periksa koneksi lalu coba lagi; bila tetap gagal, gunakan foto yang lebih kecil atau hubungi admin sistem.',
+            $komponen->errors()->first('foto')
+        );
+    }
+
     public function test_foto_valid_tersimpan_dan_pendaftaran_berhasil(): void
     {
         $data = $this->dataPendaftaranValid();

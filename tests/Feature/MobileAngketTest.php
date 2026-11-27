@@ -721,6 +721,21 @@ class MobileAngketTest extends TestCase
         $this->assertSame(0, AngketApmo::where('nama_lengkap', 'Responden Uji Angket')->count());
     }
 
+    public function test_kegagalan_transport_unggah_foto_menampilkan_pesan_indonesia(): void
+    {
+        $user = $this->penggunaUji();
+        $this->actingAs($user);
+
+        $komponen = Livewire::test(Angket::class)
+            ->call('_uploadErrored', 'foto_bukti', null, false)
+            ->assertHasErrors(['foto_bukti']);
+
+        $this->assertSame(
+            'Foto gagal diunggah ke server. Periksa koneksi lalu coba lagi; bila tetap gagal, gunakan foto yang lebih kecil atau hubungi admin sistem.',
+            $komponen->errors()->first('foto_bukti')
+        );
+    }
+
     public function test_ubah_isian_tanpa_foto_tetap_boleh_disimpan(): void
     {
         $user = $this->penggunaUji();

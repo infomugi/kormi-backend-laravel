@@ -393,6 +393,32 @@ class Angket extends Component
         ]);
     }
 
+    /**
+     * Terjemahkan kegagalan unggah di level transport (server menolak/memutus
+     * request sebelum validasi) menjadi pesan Indonesia. Pesan bawaan Livewire
+     * ("The foto_bukti failed to upload.") tidak memberi tahu pengguna apa pun.
+     */
+    public function _uploadErrored($name, $errorsInJson, $isMultiple)
+    {
+        $this->dispatch('upload:errored', name: $name)->self();
+
+        if (! is_null($errorsInJson)) {
+            $errorsInJson = $isMultiple
+                ? str_ireplace('files', $name, $errorsInJson)
+                : str_ireplace('files.0', $name, $errorsInJson);
+
+            $errors = json_decode($errorsInJson, true)['errors'] ?? null;
+
+            if ($errors) {
+                throw ValidationException::withMessages($errors);
+            }
+        }
+
+        throw ValidationException::withMessages([
+            $name => 'Foto gagal diunggah ke server. Periksa koneksi lalu coba lagi; bila tetap gagal, gunakan foto yang lebih kecil atau hubungi admin sistem.',
+        ]);
+    }
+
     public function kirim(): void
     {
         $this->resetValidation();
