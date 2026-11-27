@@ -15,13 +15,13 @@
     body {
         margin: 0;
         font-family: 'DejaVu Sans', sans-serif;
-        font-size: 9.3pt;
-        line-height: 1.55;
+        font-size: 9pt;
+        line-height: 1.5;
         color: #23251f;
     }
 
     p {
-        margin: 0 0 8pt;
+        margin: 0 0 7pt;
     }
 
     table {
@@ -46,8 +46,8 @@
         background: #1c1e18;
         color: #f4f6ee;
         border-radius: 14px;
-        padding: 26pt 26pt 22pt;
-        margin-bottom: 16pt;
+        padding: 23pt 24pt 19pt;
+        margin-bottom: 13pt;
     }
 
     .cover-top td {
@@ -89,26 +89,26 @@
     }
 
     .cover h1 {
-        margin: 6pt 0 8pt;
-        font-size: 21pt;
-        line-height: 1.18;
+        margin: 5pt 0 7pt;
+        font-size: 19.5pt;
+        line-height: 1.16;
         letter-spacing: -0.01em;
         color: #ffffff;
     }
 
     .cover-lead {
         margin: 0;
-        font-size: 9.4pt;
-        line-height: 1.6;
+        font-size: 9pt;
+        line-height: 1.55;
         color: #d5d9ca;
         width: 96%;
     }
 
     .cover-meta {
-        margin-top: 16pt;
+        margin-top: 12pt;
         border-top: 1px solid #3a3d33;
-        padding-top: 10pt;
-        font-size: 8pt;
+        padding-top: 8pt;
+        font-size: 7.8pt;
     }
 
     .cover-meta td {
@@ -151,7 +151,7 @@
     }
 
     h2 {
-        font-size: 15pt;
+        font-size: 14.5pt;
         line-height: 1.25;
         margin: 0 0 3pt;
         letter-spacing: -0.01em;
@@ -171,14 +171,14 @@
     }
 
     .lead {
-        font-size: 9.5pt;
+        font-size: 9.1pt;
         color: #4d5147;
-        margin: 0 0 12pt;
+        margin: 0 0 10pt;
     }
 
     .section-rule {
         border-top: 2.5pt solid #1c1e18;
-        margin: 8pt 0 12pt;
+        margin: 7pt 0 10pt;
     }
 
     .muted {
@@ -229,9 +229,10 @@
 
     .callout {
         border-radius: 8px;
-        padding: 9pt 11pt;
-        margin: 10pt 0;
-        font-size: 8.8pt;
+        padding: 8pt 10pt;
+        margin: 8pt 0;
+        font-size: 8.6pt;
+        page-break-inside: avoid;
     }
 
     .callout .title {
@@ -264,8 +265,8 @@
     .step {
         border: 1px solid #e1e5d7;
         border-radius: 10px;
-        padding: 12pt 13pt 8pt;
-        margin-bottom: 11pt;
+        padding: 10pt 11pt 6pt;
+        margin-bottom: 9pt;
     }
 
     .step-head {
@@ -279,8 +280,8 @@
         line-height: 20pt;
         text-align: center;
         border-radius: 10pt;
-        background: #1c1e18;
-        color: #c6fa28;
+        background: #c6fa28;
+        color: #1c1e18;
         font-weight: bold;
         font-size: 9.5pt;
     }
@@ -303,25 +304,25 @@
 
     /* ---------------- Tabel ---------------- */
     .fields {
-        margin: 4pt 0 9pt;
-        font-size: 8.6pt;
+        margin: 4pt 0 8pt;
+        font-size: 8.3pt;
     }
 
     .fields th {
         text-align: left;
         background: #f4f6ef;
         color: #4a4e43;
-        font-size: 7.2pt;
+        font-size: 7pt;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        padding: 5pt 7pt;
+        padding: 4pt 6pt;
         border: 1px solid #e3e7d9;
     }
 
     .fields td {
-        padding: 5pt 7pt;
+        padding: 4pt 6pt;
         border: 1px solid #e3e7d9;
-        line-height: 1.45;
+        line-height: 1.42;
     }
 
     .fields tr:nth-child(even) td {
@@ -407,6 +408,52 @@
         font-size: 8.9pt;
     }
 
+    /* ---------------- Tangkapan layar ---------------- */
+    .shots-head {
+        margin: 12pt 0 2pt;
+        font-size: 9.5pt;
+        font-weight: bold;
+        color: #1c1e18;
+    }
+
+    .shots-head span {
+        font-weight: normal;
+        color: #6c7065;
+        font-size: 8pt;
+    }
+
+    table.shots {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 9pt 0;
+        margin: 6pt 0 0 -9pt;
+        page-break-inside: avoid;
+    }
+
+    table.shots td {
+        width: 50%;
+        vertical-align: top;
+        padding: 0;
+    }
+
+    table.shots img {
+        width: 100%;
+        border: 1px solid #dfe4d5;
+        border-radius: 6pt;
+    }
+
+    .shot-cap {
+        margin-top: 3pt;
+        font-size: 7.2pt;
+        line-height: 1.4;
+        color: #5d6155;
+        text-align: left;
+    }
+
+    .shot-cap b {
+        color: #1c1e18;
+    }
+
     .checklist tr:last-child td {
         border-bottom: 0;
     }
@@ -438,7 +485,7 @@
     .card {
         border: 1px solid #e1e5d7;
         border-radius: 9px;
-        padding: 10pt 12pt 6pt;
+        padding: 9pt 11pt 5pt;
         background: #ffffff;
     }
 
@@ -450,7 +497,7 @@
 
     .faq {
         border-bottom: 1px solid #e6e9df;
-        padding: 7pt 0;
+        padding: 6pt 0;
     }
 
     .faq:last-child {
@@ -544,11 +591,11 @@
         </tr>
         <tr>
             <td class="label">Halaman pendaftaran</td>
-            <td class="value"><span class="url">https://kormi-backend-laravel.test/mobile/daftar-duta</span></td>
+            <td class="value"><span class="url">https://kormibdg.id/mobile/daftar-duta</span></td>
         </tr>
         <tr>
             <td class="label">Halaman masuk</td>
-            <td class="value"><span class="url">https://kormi-backend-laravel.test/mobile/login</span></td>
+            <td class="value"><span class="url">https://kormibdg.id/mobile/login</span></td>
         </tr>
         <tr>
             <td class="label">Versi</td>
@@ -573,7 +620,7 @@
                     <tr><td class="num">2</td><td>Mendaftar sebagai Duta Olahraga</td></tr>
                     <tr><td class="num">3</td><td>Masuk ke aplikasi</td></tr>
                     <tr><td class="num">4</td><td>Mengisi Survei APMO</td></tr>
-                    <tr><td class="num">5</td><td>Mengunduh laporan APMO (PDF)</td></tr>
+                    <tr><td class="num">5</td><td>Mengubah, mencetak, dan menghapus isian</td></tr>
                     <tr><td class="num">6</td><td>Kendala umum dan solusinya</td></tr>
                     <tr><td class="num">7</td><td>Bantuan dan catatan data</td></tr>
                 </table>
@@ -601,12 +648,6 @@
     </tr>
 </table>
 
-<div class="callout callout-quiet" style="margin-top: 2pt;">
-    <span class="title">Catatan alamat aplikasi</span>
-    Contoh alamat di panduan ini memakai domain uji <span class="strong">kormi-backend-laravel.test</span>.
-    Jika Anda menerima tautan resmi dengan domain lain, gunakan tautan resmi tersebut. Alur dan tombolnya sama.
-</div>
-
 <!-- ================= 1. SEBELUM MULAI ================= -->
 <div class="page">
     <div class="kicker">Bagian 1</div>
@@ -615,6 +656,13 @@
         Siapkan bahan berikut supaya pendaftaran dan pengisian survei berjalan sekali jalan.
         Total waktu yang dibutuhkan sekitar 10&ndash;15 menit, ditambah waktu verifikasi dari administrator.
     </p>
+
+    <div class="callout callout-quiet no-margin" style="margin-bottom: 10pt;">
+        <span class="title">Catatan alamat aplikasi</span>
+        Seluruh tautan di panduan ini memakai alamat resmi <span class="strong">kormibdg.id</span>.
+        Bila administrator memberikan tautan lain, ikuti tautan resmi tersebut. Alur dan tombolnya sama.
+    </div>
+
     <div class="section-rule"></div>
 
     <div class="step keep">
@@ -652,22 +700,9 @@
         </table>
     </div>
 
-    <div class="step keep">
-        <div class="step-head">
-            <span class="step-num">2</span>
-            <span class="step-title">Siapkan perangkat</span>
-            <span class="step-sub">Tidak perlu memasang aplikasi tambahan.</span>
-        </div>
-        <ul>
-            <li>Gunakan browser modern di ponsel, seperti Chrome, Safari, atau Edge versi terbaru.</li>
-            <li>Pastikan koneksi internet stabil, terutama saat mengunggah pas foto dan foto selfie.</li>
-            <li>Izinkan akses kamera ketika browser meminta, agar tombol <span class="btn">Ambil Foto Selfie</span> berfungsi.</li>
-        </ul>
-    </div>
-
     <div class="step keep" style="margin-bottom: 0;">
         <div class="step-head">
-            <span class="step-num">3</span>
+            <span class="step-num">2</span>
             <span class="step-title">Kenali istilah yang dipakai</span>
             <span class="step-sub">Agar tidak bingung saat membaca menu dan pesan di aplikasi.</span>
         </div>
@@ -720,8 +755,18 @@
 
     <div class="callout callout-info">
         <span class="title">Membuka halaman pendaftaran</span>
-        Buka <span class="url">https://kormi-backend-laravel.test/mobile/daftar-duta</span> di browser ponsel.
+        Buka <span class="url">https://kormibdg.id/mobile/daftar-duta</span> di browser ponsel.
         Anda juga bisa memilih menu <span class="strong">Daftar</span> pada bilah navigasi di bagian bawah halaman.
+    </div>
+
+    <div class="card keep" style="margin-bottom: 10pt;">
+        <div class="card-title">Siapkan perangkat</div>
+        <p class="small muted" style="margin-bottom: 4pt;">Tidak perlu memasang aplikasi tambahan.</p>
+        <ul style="margin-bottom: 0;">
+            <li>Gunakan browser modern di ponsel, seperti Chrome, Safari, atau Edge versi terbaru.</li>
+            <li>Pastikan koneksi internet stabil, terutama saat mengunggah pas foto dan foto selfie.</li>
+            <li>Izinkan akses kamera ketika browser meminta, agar tombol <span class="btn">Ambil Foto Selfie</span> berfungsi.</li>
+        </ul>
     </div>
 
     <div class="step keep">
@@ -821,8 +866,8 @@
 </div>
 
 <!-- ================= 2 lanjutan ================= -->
-<div class="page">
-    <div class="step keep">
+<div>
+    <div class="step">
         <div class="step-head">
             <span class="step-num">3</span>
             <span class="step-title">Profil Duta</span>
@@ -871,7 +916,7 @@
         </div>
     </div>
 
-    <div class="step keep">
+    <div class="step">
         <div class="step-head">
             <span class="step-num">4</span>
             <span class="step-title">Akun dan konfirmasi</span>
@@ -890,7 +935,7 @@
         </div>
     </div>
 
-    <div class="step keep" style="margin-bottom: 0;">
+    <div class="step" style="margin-bottom: 0;">
         <div class="step-head">
             <span class="step-num">&#10003;</span>
             <span class="step-title">Setelah pendaftaran terkirim</span>
@@ -908,6 +953,57 @@
             <span class="btn">Lihat Direktori Duta</span> dan <span class="btn">Masuk ke Akun</span>.
         </p>
     </div>
+
+    <div class="card keep" style="margin-bottom: 10pt;">
+        <div class="card-title">Arti status pendaftaran</div>
+        <table class="fields" style="margin: 6pt 0 0;">
+            <tr>
+                <th style="width: 22%;">Status</th>
+                <th>Artinya</th>
+            </tr>
+            <tr>
+                <td><span class="strong">Menunggu</span></td>
+                <td>Data sudah diterima dan sedang diperiksa administrator; akun belum bisa dipakai masuk.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">Disetujui</span></td>
+                <td>Akun aktif. Anda bisa masuk dan mulai mengisi Survei APMO.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">Ditolak</span></td>
+                <td>Data belum disetujui. Hubungi administrator KORMI Kabupaten Bandung untuk tindak lanjut.</td>
+            </tr>
+        </table>
+    </div>
+
+    <table class="shots" style="margin-top: 12pt; margin-bottom: 10pt;">
+        <tr>
+            <td colspan="2" class="shots-head" style="margin: 0 0 4pt;">Tampilan alur pendaftaran <span>&middot; contoh isian; data Anda akan berbeda.</span></td>
+        </tr>
+        <tr>
+            <td>
+                <img src="panduan-img/01-daftar-identitas.png" alt="Langkah 1 pendaftaran Duta: formulir identitas">
+                <div class="shot-cap"><b>Langkah 1 &mdash; Identitas.</b> Empat langkah pendaftaran ditandai di bagian atas formulir.</div>
+            </td>
+            <td>
+                <img src="panduan-img/02-daftar-domisili.png" alt="Langkah 2 pendaftaran Duta: domisili dan kontak">
+                <div class="shot-cap"><b>Langkah 2 &mdash; Domisili.</b> Pilih kecamatan lebih dulu; daftar desa menyesuaikan otomatis.</div>
+            </td>
+        </tr>
+    </table>
+
+    <table class="shots" style="margin-bottom: 10pt;">
+        <tr>
+            <td>
+                <img src="panduan-img/03-daftar-profil.png" alt="Langkah 3 pendaftaran Duta: profil dan kategori">
+                <div class="shot-cap"><b>Langkah 3 &mdash; Profil Duta.</b> Kategori wajib; prestasi, Instagram, dan pas foto opsional.</div>
+            </td>
+            <td>
+                <img src="panduan-img/04-daftar-akun.png" alt="Langkah 4 pendaftaran Duta: ringkasan dan kata sandi">
+                <div class="shot-cap"><b>Langkah 4 &mdash; Ringkasan &amp; akun.</b> Periksa data, buat kata sandi, lalu setujui dua pernyataan.</div>
+            </td>
+        </tr>
+    </table>
 </div>
 
 <!-- ================= 3. MASUK ================= -->
@@ -927,7 +1023,7 @@
             <span class="step-sub">Dari tautan langsung atau menu Masuk.</span>
         </div>
         <p class="no-margin">
-            Buka <span class="url">https://kormi-backend-laravel.test/mobile/login</span>, atau pilih menu
+            Buka <span class="url">https://kormibdg.id/mobile/login</span>, atau pilih menu
             <span class="strong">Masuk</span> pada bilah navigasi bawah saat Anda belum masuk.
         </p>
     </div>
@@ -1002,6 +1098,22 @@
             </tr>
         </table>
     </div>
+
+    <table class="shots" style="margin-top: 8pt; margin-bottom: 2pt;">
+        <tr>
+            <td colspan="2" class="shots-head" style="margin: 0 0 4pt;">Tampilan halaman masuk dan beranda</td>
+        </tr>
+        <tr>
+            <td>
+                <img src="panduan-img/05-masuk.png" alt="Halaman masuk aplikasi mobile KORMI" style="width: 92%;">
+                <div class="shot-cap"><b>Halaman Masuk.</b> Isi email dan kata sandi, lalu tekan <b>Masuk</b>. Tautan <b>Lupa sandi?</b> ada di kanan label kata sandi.</div>
+            </td>
+            <td>
+                <img src="panduan-img/06-beranda.png" alt="Beranda Duta Olahraga setelah berhasil masuk" style="width: 92%;">
+                <div class="shot-cap"><b>Beranda Duta.</b> Kartu Survey APMO dan pintasan Riwayat langsung terlihat setelah masuk.</div>
+            </td>
+        </tr>
+    </table>
 </div>
 
 <!-- ================= 4. SURVEI APMO ================= -->
@@ -1017,21 +1129,12 @@
     <div class="callout callout-info keep">
         <span class="title">Membuka survei</span>
         Dari <span class="strong">Beranda</span>, tekan kartu Survey APMO lalu pilih
-        <span class="btn">Isi Survey Sekarang</span>. Anda juga bisa langsung memilih menu
-        <span class="strong">Survey APMO</span> di navigasi bawah.
+        <span class="btn">Isi Survey Sekarang</span>, atau langsung pilih menu
+        <span class="strong">Survey APMO</span> di navigasi bawah. Alurnya tiga langkah:
+        Identitas, Olahraga, lalu Detail.
     </div>
 
-    <table class="pill-row" style="margin-bottom: 12pt;">
-        <tr>
-            <td><div class="pill"><span class="pill-num">LANGKAH 1</span>Identitas</div></td>
-            <td style="width: 14pt;" class="arrow">&#8594;</td>
-            <td><div class="pill"><span class="pill-num">LANGKAH 2</span>Olahraga</div></td>
-            <td style="width: 14pt;" class="arrow">&#8594;</td>
-            <td><div class="pill"><span class="pill-num">LANGKAH 3</span>Detail</div></td>
-        </tr>
-    </table>
-
-    <div class="step keep">
+    <div class="step">
         <div class="step-head">
             <span class="step-num">1</span>
             <span class="step-title">Identitas responden</span>
@@ -1061,7 +1164,7 @@
             <tr>
                 <td>Tinggi &amp; Berat Badan</td>
                 <td><span class="tag tag-opsional">Opsional</span></td>
-                <td>Tinggi 80&ndash;250 cm, berat 20&ndash;300 kg. Dipakai untuk menghitung IMT pada laporan.</td>
+                <td>Tinggi 80&ndash;250 cm, berat 20&ndash;300 kg. Bila diisi, sistem menghitung IMT pada laporan PDF.</td>
             </tr>
             <tr>
                 <td>Alamat Lengkap</td>
@@ -1086,45 +1189,84 @@
             <tr>
                 <td>Pekerjaan Sekarang</td>
                 <td><span class="tag tag-wajib">Wajib</span></td>
-                <td>Pelajar/Mahasiswa, PNS/TNI/POLRI/BUMN, Pegawai Swasta, Wiraswasta/Wirausaha, Petani/Nelayan, atau Lainnya.</td>
+                <td>Pelajar/Mahasiswa, PNS/TNI/POLRI/BUMN, Pegawai Swasta, Wiraswasta/Wirausaha, Petani/Nelayan, atau Lainnya. Jika memilih <span class="strong">Lainnya</span>, kolom Sebutkan Pekerjaan wajib diisi.</td>
             </tr>
         </table>
-        <div class="callout callout-quiet" style="margin-bottom: 0;">
-            <span class="title">Memilih &ldquo;Lainnya&rdquo;</span>
-            Kolom tambahan <span class="strong">Sebutkan Pekerjaan</span> akan muncul dan wajib diisi.
-            Setelah selesai, tekan <span class="btn">Lanjut ke Pertanyaan Olahraga</span>.
-        </div>
+        <p class="small muted no-margin">Setelah semua kolom wajib terisi, tekan <span class="btn">Lanjut ke Pertanyaan Olahraga</span>.</p>
     </div>
 
-    <div class="step keep" style="margin-bottom: 0;">
-        <div class="step-head">
-            <span class="step-num">2</span>
-            <span class="step-title">Pertanyaan olahraga</span>
-            <span class="step-sub">Satu pertanyaan yang menentukan arah langkah berikutnya.</span>
-        </div>
-        <p class="no-margin">
-            Pertanyaan nomor 7: <span class="strong">&ldquo;Apakah dalam satu minggu terakhir ini, Anda melakukan
-            kegiatan olahraga?&rdquo;</span> Pilih <span class="strong">Ya</span> atau <span class="strong">Tidak</span>,
-            lalu tekan <span class="btn">Lanjut</span>. Pilihan Anda menentukan apakah Anda mengisi bagian detail
-            olahraga atau bagian alasan tidak berolahraga.
-        </p>
-    </div>
-</div>
+    <table class="shots" style="margin-top: 10pt; margin-bottom: 10pt;">
+        <tr>
+            <td colspan="2" class="shots-head" style="margin: 0 0 4pt;">Tampilan langkah 1 <span>&middot; bagian atas dan bagian bawah formulir.</span></td>
+        </tr>
+        <tr>
+            <td>
+                <img src="panduan-img/07-angket-identitas.png" alt="Langkah 1 survei APMO: nama, usia, jenis kelamin, tinggi dan berat">
+                <div class="shot-cap"><b>Bagian atas.</b> Nama terisi otomatis. Isi usia, jenis kelamin, dan&mdash;bila ingin&mdash;tinggi serta berat badan.</div>
+            </td>
+            <td>
+                <img src="panduan-img/07b-angket-wilayah.png" alt="Langkah 1 survei APMO: alamat, kecamatan, desa, dan pekerjaan">
+                <div class="shot-cap"><b>Bagian bawah.</b> Alamat, kecamatan, desa, dan pekerjaan. Tombol <b>Lanjut ke Pertanyaan Olahraga</b> ada di paling bawah.</div>
+            </td>
+        </tr>
+    </table>
 
-<!-- ================= 4 lanjutan ================= -->
-<div class="page">
     <div class="step keep">
         <div class="step-head">
-            <span class="step-num">3</span>
-            <span class="step-title">Detail survei</span>
-            <span class="step-sub">Isi sesuai jawaban Anda pada pertanyaan nomor 7.</span>
+            <span class="step-num">2</span>
+            <span class="step-title">Pertanyaan olahraga (nomor 7)</span>
+            <span class="step-sub">Satu pertanyaan yang menentukan arah langkah berikutnya.</span>
         </div>
+        <p>
+            Pertanyaan nomor 7: <span class="strong">&ldquo;Apakah dalam satu minggu terakhir ini, Anda melakukan
+            kegiatan olahraga?&rdquo;</span> Pilih <span class="strong">Ya</span> atau <span class="strong">Tidak</span>,
+            lalu tekan <span class="btn">Lanjut</span>.
+        </p>
+        <table class="two-col" style="margin-bottom: 6pt;">
+            <tr>
+                <td class="left">
+                    <div class="card">
+                        <div class="card-title">Jika memilih Ya</div>
+                        <p class="small no-margin">Anda mengisi nomor 8&ndash;19: frekuensi dan durasi, cabang dan tujuan, lalu kebiasaan serta penilaian fasilitas.</p>
+                    </div>
+                </td>
+                <td class="right">
+                    <div class="card">
+                        <div class="card-title">Jika memilih Tidak</div>
+                        <p class="small no-margin">Anda mengisi nomor 20&ndash;21: alasan tidak berolahraga dan penilaian fasilitas di daerah Anda.</p>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <p class="small muted no-margin">Salah pilih? Tekan <span class="btn">Kembali</span> untuk mengganti jawaban nomor 7.</p>
+    </div>
 
-        <h4 style="margin-bottom: 4pt;">Jika Anda menjawab &ldquo;Ya&rdquo; (nomor 8&ndash;19)</h4>
+    <table style="width: 205pt; margin: 8pt auto 4pt; border-collapse: collapse; page-break-inside: avoid;">
+        <tr>
+            <td class="shots-head" style="margin: 0 0 4pt;">Tampilan langkah 2</td>
+        </tr>
+        <tr>
+            <td>
+                <img src="panduan-img/08-angket-olahraga.png" alt="Langkah 2 survei APMO: pertanyaan nomor 7" style="width: 205pt; border: 1px solid #dfe4d5; border-radius: 6pt;">
+                <div class="shot-cap"><b>Nomor 7.</b> Pilih salah satu jawaban, lalu tekan <b>Lanjut</b>. Tombol tidak aktif sampai ada pilihan.</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="step">
+        <div class="step-head">
+            <span class="step-num">3A</span>
+            <span class="step-title">Detail &ldquo;Ya&rdquo;: jenis dan durasi</span>
+            <span class="step-sub">Nomor 8&ndash;13. Pola isiannya sama untuk tiga jenis aktivitas.</span>
+        </div>
+        <p style="margin-bottom: 6pt;">
+            Untuk setiap aktivitas&mdash;olahraga berat, olahraga sedang, dan jalan kaki&mdash;Anda memilih
+            frekuensi per minggu, lalu mengisi durasi setiap kali berolahraga.
+        </p>
         <table class="fields">
             <tr>
                 <th style="width: 8%;">No.</th>
-                <th style="width: 42%;">Pertanyaan</th>
+                <th style="width: 40%;">Pertanyaan</th>
                 <th>Cara menjawab</th>
             </tr>
             <tr>
@@ -1157,10 +1299,29 @@
                 <td>Durasi jalan kaki</td>
                 <td>Sama seperti nomor 9; boleh centang tidak tahu.</td>
             </tr>
+        </table>
+        <div class="callout callout-warn" style="margin-bottom: 0;">
+            <span class="title">Durasi tidak boleh nol</span>
+            Bila tidak mencentang &ldquo;Tidak tahu&rdquo;, isi durasi lebih dari 0 menit. Contoh: 0 jam 30 menit.
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-head">
+            <span class="step-num">3B</span>
+            <span class="step-title">Detail &ldquo;Ya&rdquo;: cabang, tujuan, kebiasaan</span>
+            <span class="step-sub">Nomor 14&ndash;19.</span>
+        </div>
+        <table class="fields">
+            <tr>
+                <th style="width: 8%;">No.</th>
+                <th style="width: 40%;">Pertanyaan</th>
+                <th>Cara menjawab</th>
+            </tr>
             <tr>
                 <td>14</td>
                 <td>Cabang olahraga yang sering dilakukan</td>
-                <td>Sepakbola, Bola Voli, Bulutangkis, Atletik, Senam Aerobik, Bersepeda, Basket, Renang, Beladiri, Jalan, atau Lainnya.</td>
+                <td>Pilih satu: Sepakbola, Bola Voli, Bulutangkis, Atletik, Senam Aerobik, Bersepeda, Basket, Renang, Beladiri, Jalan, atau Lainnya.</td>
             </tr>
             <tr>
                 <td>15</td>
@@ -1170,7 +1331,7 @@
             <tr>
                 <td>16</td>
                 <td>Jalur melakukan olahraga</td>
-                <td>Pilih salah satu opsi yang tersedia, termasuk <span class="strong">Sendiri</span> atau <span class="strong">Lainnya</span>.</td>
+                <td>Pilih satu opsi yang tersedia, termasuk <span class="strong">Sendiri</span> atau <span class="strong">Lainnya</span>.</td>
             </tr>
             <tr>
                 <td>17</td>
@@ -1180,7 +1341,7 @@
             <tr>
                 <td>18</td>
                 <td>Lama duduk per hari <span class="muted">(muncul jika nomor 17 = Pernah)</span></td>
-                <td>Isi jam dan menit, atau centang tidak tahu.</td>
+                <td>Isi jam dan menit, atau centang tidak tahu. Durasi tidak boleh nol bila tidak centang.</td>
             </tr>
             <tr>
                 <td>19</td>
@@ -1188,18 +1349,65 @@
                 <td>Memadai, Kurang, atau Sangat Kurang.</td>
             </tr>
         </table>
+        <p class="small no-margin">
+            Pada nomor 14&ndash;16, pilihan <span class="strong">Lainnya</span> membuka kolom isian tambahan
+            yang wajib diisi. Nomor 18 hanya muncul bila nomor 17 dijawab <span class="strong">Pernah</span>.
+        </p>
+    </div>
 
-        <h4 style="margin: 8pt 0 4pt;">Jika Anda menjawab &ldquo;Tidak&rdquo; (nomor 20&ndash;21)</h4>
+    <table class="shots" style="margin-top: 10pt; margin-bottom: 10pt;">
+        <tr>
+            <td colspan="2" class="shots-head" style="margin: 0 0 4pt;">Tampilan 3A <span>&middot; frekuensi dan durasi (nomor 8&ndash;13).</span></td>
+        </tr>
+        <tr>
+            <td>
+                <img src="panduan-img/09-angket-detail.png" alt="Detail survei APMO: nomor 8 frekuensi olahraga berat">
+                <div class="shot-cap"><b>Nomor 8.</b> Pilih frekuensi olahraga berat dalam satu minggu terakhir.</div>
+            </td>
+            <td>
+                <img src="panduan-img/09b-angket-durasi.png" alt="Detail survei APMO: durasi jam dan menit serta opsi tidak tahu">
+                <div class="shot-cap"><b>Nomor 9.</b> Isi jam dan menit, atau centang <b>Tidak tahu/Tidak pasti</b>. Pola yang sama berlaku untuk nomor 10&ndash;13.</div>
+            </td>
+        </tr>
+    </table>
+
+    <table class="shots" style="margin-top: 10pt; margin-bottom: 10pt;">
+        <tr>
+            <td colspan="2" class="shots-head" style="margin: 0 0 4pt;">Tampilan 3B <span>&middot; cabang, tujuan, dan kebiasaan.</span></td>
+        </tr>
+        <tr>
+            <td>
+                <img src="panduan-img/09c-angket-cabang.png" alt="Detail survei APMO: cabang olahraga dan tujuan">
+                <div class="shot-cap"><b>Nomor 14&ndash;16.</b> Pilih satu cabang, tujuan, dan jalur olahraga. Pilihan <b>Lainnya</b> memunculkan kolom teks.</div>
+            </td>
+            <td>
+                <img src="panduan-img/09d-angket-kebiasaan.png" alt="Detail survei APMO: kebiasaan dan penilaian fasilitas">
+                <div class="shot-cap"><b>Nomor 17&ndash;19.</b> Kebugaran, lama duduk (bila pernah malas), dan penilaian fasilitas di daerah Anda.</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="step keep">
+        <div class="step-head">
+            <span class="step-num">3C</span>
+            <span class="step-title">Detail &ldquo;Tidak&rdquo;: alasan dan fasilitas</span>
+            <span class="step-sub">Nomor 20&ndash;21. Halaman ini berlabel &ldquo;Bagian 4&rdquo; di aplikasi.</span>
+        </div>
+        <p style="margin-bottom: 6pt;">
+            Bila Anda memilih <span class="strong">Tidak</span> pada nomor 7, halaman Detail berisi dua
+            pertanyaan saja. Pilihan <span class="strong">Lainnya</span> membuka kolom alasan tambahan
+            yang wajib diisi.
+        </p>
         <table class="fields">
             <tr>
                 <th style="width: 8%;">No.</th>
-                <th style="width: 42%;">Pertanyaan</th>
+                <th style="width: 40%;">Pertanyaan</th>
                 <th>Cara menjawab</th>
             </tr>
             <tr>
                 <td>20</td>
                 <td>Alasan tidak melakukan olahraga</td>
-                <td>Tidak Berminat, Tidak Ada Waktu, Tidak Ada Sarana/Prasarana, Lelah, Sudah cukup melalui pekerjaan, atau Lainnya.</td>
+                <td>Tidak Berminat, Tidak Ada Waktu, Tidak Ada Sarana/Prasarana, Lelah, Sudah cukup melalui pekerjaan yang saya lakukan, atau Lainnya.</td>
             </tr>
             <tr>
                 <td>21</td>
@@ -1207,13 +1415,23 @@
                 <td>Memadai, Kurang, atau Sangat Kurang.</td>
             </tr>
         </table>
-
-        <div class="callout callout-warn" style="margin-bottom: 0;">
-            <span class="title">Durasi tidak boleh nol</span>
-            Bila tidak mencentang &ldquo;Tidak tahu&rdquo;, isi durasi lebih dari 0 menit. Contoh: 0 jam 30 menit.
-            Aturan yang sama berlaku untuk lama duduk pada nomor 18.
-        </div>
+        <p class="small no-margin">
+            <span class="strong">Tetap perlu foto bukti:</span> cabang &ldquo;Tidak&rdquo; juga wajib
+            melampirkan foto selfie sebelum mengirim survei.
+        </p>
     </div>
+
+    <table style="width: 185pt; margin: 8pt auto 4pt; border-collapse: collapse; page-break-inside: avoid;">
+        <tr>
+            <td class="shots-head" style="margin: 0 0 4pt;">Tampilan 3C <span>&middot; cabang &ldquo;Tidak&rdquo;.</span></td>
+        </tr>
+        <tr>
+            <td>
+                <img src="panduan-img/08b-angket-tidak.png" alt="Detail survei APMO cabang Tidak: alasan dan fasilitas" style="width: 185pt; border: 1px solid #dfe4d5; border-radius: 6pt;">
+                <div class="shot-cap"><b>Nomor 20&ndash;21.</b> Halaman Detail untuk cabang &ldquo;Tidak&rdquo;. Pilih satu alasan, lalu nilai fasilitas olahraga.</div>
+            </td>
+        </tr>
+    </table>
 
     <div class="step keep">
         <div class="step-head">
@@ -1223,6 +1441,7 @@
         </div>
         <ul>
             <li>Tekan <span class="btn">Ambil Foto Selfie</span> untuk membuka kamera depan, atau <span class="btn">pilih foto dari galeri</span>.</li>
+            <li>Izinkan akses kamera saat browser meminta. Jika izin ditolak, Anda tetap bisa memilih foto dari galeri.</li>
             <li>Format yang diterima: JPG, JPEG, PNG, dan WEBP. Sistem mengompres foto secara otomatis; batas unggah di server 10 MB.</li>
             <li>Pastikan wajah terlihat jelas dan foto benar-benar milik Anda, karena foto ini menjadi bukti bahwa survei diisi langsung oleh responden.</li>
             <li>Bila ingin mengganti, tekan <span class="btn">Ganti Foto Selfie</span>. Saat mengubah isian lama, foto sebelumnya tetap tersimpan sehingga unggahan baru bersifat opsional.</li>
@@ -1248,20 +1467,46 @@
         </p>
     </div>
 
+    <div class="callout callout-info keep">
+        <span class="title">Periksa sebelum mengirim</span>
+        <ul style="margin-bottom: 0;">
+            <li>Semua pertanyaan wajib pada langkah Detail sudah terjawab.</li>
+            <li>Foto selfie sudah muncul di kotak Foto Bukti Survey.</li>
+            <li>Koneksi internet stabil agar pengiriman tidak terputus.</li>
+        </ul>
+    </div>
+
     <div class="callout callout-note keep" style="margin-bottom: 0;">
         <span class="title">Sudah pernah mengisi?</span>
         Aplikasi akan menampilkan pemberitahuan bahwa Anda sudah pernah mengisi survei. Pengisian baru tetap
         disimpan sebagai data terbaru, dan isian lama tetap tersedia di Riwayat sampai Anda menghapusnya.
     </div>
+
+    <table class="shots" style="margin-top: 10pt; margin-bottom: 10pt;">
+        <tr>
+            <td colspan="2" class="shots-head" style="margin: 0 0 4pt;">Tampilan langkah 4 dan 5</td>
+        </tr>
+        <tr>
+            <td>
+                <img src="panduan-img/10-angket-foto.png" alt="Bagian foto bukti survei APMO">
+                <div class="shot-cap"><b>Langkah 4.</b> Ambil selfie dari kamera depan atau pilih dari galeri. Tombol <b>Kirim Survey</b> berada tepat di bawahnya.</div>
+            </td>
+            <td>
+                <img src="panduan-img/10b-angket-kirim.png" alt="Tombol Kirim Survey pada survei APMO">
+                <div class="shot-cap"><b>Langkah 5.</b> Setelah foto terpasang, tekan <b>Kirim Survey</b> dan tunggu sampai muncul halaman Survey Terkirim.</div>
+            </td>
+        </tr>
+    </table>
+
 </div>
 
-<!-- ================= 5. PDF ================= -->
+<!-- ================= 5. KELOLA ISIAN ================= -->
 <div class="page">
     <div class="kicker">Bagian 5</div>
-    <h2>Mengunduh laporan APMO dalam PDF</h2>
+    <h2>Mengubah, mencetak, dan menghapus isian APMO</h2>
     <p class="lead">
-        Setiap isian yang tersimpan dapat diunduh sebagai dokumen PDF resmi. Cocok untuk arsip pribadi,
-        lampiran laporan kegiatan, atau bukti pengisian survei.
+        Setelah survei terkirim, isian tetap bisa Anda kelola dari halaman Laporan APMO: perbaiki
+        jawaban, unduh PDF untuk dicetak, atau hapus isian yang tidak diperlukan.
     </p>
     <div class="section-rule"></div>
 
@@ -1274,34 +1519,87 @@
         <p class="no-margin">
             Dari navigasi bawah, pilih <span class="strong">Riwayat</span>. Pastikan tab
             <span class="strong">Riwayat APMO</span> aktif dan pilihan lingkup berada di
-            <span class="strong">Saya</span>. Tombol PDF hanya muncul untuk isian milik akun Anda.
+            <span class="strong">Saya</span>. Setiap isian menampilkan ringkasan isian dan tiga tombol
+            aksi: <span class="btn">Ubah</span>, <span class="btn">PDF</span>, serta
+            <span class="btn">Hapus</span>. Ketiganya hanya muncul pada isian milik akun Anda.
         </p>
     </div>
 
-    <div class="step keep">
+    <table style="width: 180pt; margin: 6pt auto 8pt; border-collapse: collapse; page-break-inside: avoid;">
+        <tr>
+            <td>
+                <img src="panduan-img/13-laporan-aksi.png" alt="Kartu isian APMO dengan tombol Ubah, PDF, dan Hapus" style="width: 180pt; border: 1px solid #dfe4d5; border-radius: 6pt;">
+                <div class="shot-cap"><b>Kartu isian di Riwayat APMO.</b> Tiga tombol aksi berada di bawah ringkasan isian: <b>Ubah</b>, <b>PDF</b>, dan <b>Hapus</b>.</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="callout callout-note keep" style="margin-bottom: 0;">
+        <span class="title">Belum ada isian?</span>
+        Halaman menampilkan kotak <span class="strong">Belum ada isian APMO</span> disertai tombol
+        <span class="btn">Isi Survei APMO</span>. Tombol Ubah, PDF, dan Hapus baru muncul setelah
+        survei pertama terkirim.
+    </div>
+</div>
+
+<div class="step keep" style="margin-top: 14pt;">
         <div class="step-head">
             <span class="step-num">2</span>
-            <span class="step-title">Pilih isian dan tekan PDF</span>
-            <span class="step-sub">Tersedia di setiap baris riwayat.</span>
+            <span class="step-title">Ubah isian yang sudah tersimpan</span>
+            <span class="step-sub">Perbaiki jawaban tanpa membuat isian baru.</span>
         </div>
         <p>
-            Di bawah setiap isian terdapat tiga tombol: <span class="btn">Ubah</span>,
-            <span class="btn">PDF</span>, dan <span class="btn">Hapus</span>. Tekan
-            <span class="btn">PDF</span> untuk mengunduh laporan isian tersebut.
+            Tekan <span class="btn">Ubah</span> pada kartu isian. Formulir terbuka kembali dalam mode
+            <span class="strong">Ubah Isian APMO</span> dengan lencana <span class="strong">UBAH</span>.
+            Seluruh jawaban lama sudah terisi otomatis, dan ketiga langkah
+            (<span class="strong">Identitas</span>, <span class="strong">Olahraga</span>,
+            <span class="strong">Detail</span>) tetap bisa diperbaiki.
+        </p>
+        <p>
+            Banner peringatan menegaskan bahwa data lama akan ditimpa setelah Anda menekan
+            <span class="btn btn-dark">Simpan Perubahan</span>. Foto bukti selfie sebelumnya tetap
+            terpasang, sehingga unggahan baru bersifat opsional — tombolnya berubah menjadi
+            <span class="btn">Ganti Foto Selfie</span>.
         </p>
         <p class="no-margin">
-            Berkas akan terunduh otomatis dengan nama
-            <span class="strong">Laporan-Survey-APMO-[nama]-[tanggal].pdf</span>. Buka melalui folder
-            Unduhan/Downloads di ponsel Anda.
+            Setelah disimpan, Anda kembali ke halaman Laporan dan isian tampil dengan data terbaru.
+            Untuk membatalkan tanpa mengubah apa pun, tekan
+            <span class="btn">Batal, kembali ke laporan</span>. Unduh ulang PDF setelah mengubah data
+            agar dokumen sesuai.
         </p>
     </div>
 
-    <div class="step keep">
+    <table class="shots" style="margin-top: 8pt; margin-bottom: 4pt; page-break-inside: avoid;">
+        <tr>
+            <td colspan="2" class="shots-head" style="margin: 0 0 4pt;">Tampilan mode ubah</td>
+        </tr>
+        <tr>
+            <td>
+                <img src="panduan-img/15-angket-ubah.png" alt="Form ubah isian APMO langkah Identitas dengan jawaban lama terisi" style="width: 190pt;">
+                <div class="shot-cap"><b>Langkah Identitas.</b> Jawaban lama sudah terisi; banner mengingatkan data akan ditimpa.</div>
+            </td>
+            <td>
+                <img src="panduan-img/17-angket-simpan.png" alt="Tombol Simpan Perubahan dan Batal kembali ke laporan" style="width: 190pt;">
+                <div class="shot-cap"><b>Ujung formulir.</b> Foto lama tetap terpasang. Tekan <b>Simpan Perubahan</b>.</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="step keep" style="margin-top: 14pt;">
         <div class="step-head">
             <span class="step-num">3</span>
-            <span class="step-title">Isi dokumen PDF</span>
-            <span class="step-sub">Lima bagian utama plus kop dan nomor dokumen.</span>
+            <span class="step-title">Cetak laporan lewat PDF</span>
+            <span class="step-sub">Berkas PDF terunduh langsung, tanpa dialog cetak.</span>
         </div>
+        <p>
+            Tekan <span class="btn">PDF</span> pada kartu isian. Berkas langsung terunduh dengan nama
+            <span class="strong">Laporan-Survey-APMO-[nama]-[tanggal].pdf</span>. Untuk mencetak,
+            buka berkas dari folder Unduhan/Downloads, lalu pilih menu <span class="strong">Bagikan</span>
+            atau <span class="strong">Cetak</span> pada penampil PDF ponsel Anda.
+        </p>
+        <p class="no-margin">
+            Dokumen PDF berisi lima bagian utama plus kop dan nomor dokumen:
+        </p>
         <table class="fields">
             <tr>
                 <th style="width: 10%;">Bagian</th>
@@ -1341,40 +1639,71 @@
         </p>
     </div>
 
-    <table class="two-col keep">
-        <tr>
-            <td class="left">
-                <div class="card" style="height: 100%;">
-                    <div class="card-title">Tombol Ubah</div>
-                    <p class="small no-margin">
-                        Memperbaiki jawaban pada isian lama. Data lama akan ditimpa setelah Anda menekan
-                        <span class="btn">Simpan Perubahan</span>. Unduh ulang PDF setelah mengubah data
-                        agar isinya sesuai.
-                    </p>
-                </div>
-            </td>
-            <td class="right">
-                <div class="card" style="height: 100%;">
-                    <div class="card-title">Tombol Hapus</div>
-                    <p class="small no-margin">
-                        Menghapus isian secara permanen setelah Anda mengonfirmasi. PDF yang sudah terunduh
-                        sebelumnya tidak terpengaruh. Sebaiknya unduh dulu sebelum menghapus.
-                    </p>
-                </div>
-            </td>
-        </tr>
-    </table>
-
     <div class="callout callout-warn keep" style="margin-bottom: 0;">
         <span class="title">PDF tidak kunjung terunduh?</span>
         Pastikan Anda membuka tab <span class="strong">Riwayat APMO</span> dengan lingkup
         <span class="strong">Saya</span>, lalu izinkan unduhan/pop-up pada browser. Bila masih gagal,
         coba browser lain atau periksa ruang penyimpanan ponsel.
     </div>
-</div>
+
+    <div class="step keep" style="margin-top: 14pt;">
+        <div class="step-head">
+            <span class="step-num">4</span>
+            <span class="step-title">Hapus isian</span>
+            <span class="step-sub">Permanen, termasuk foto buktinya.</span>
+        </div>
+        <p>
+            Tekan <span class="btn">Hapus</span> pada kartu isian. Baris tombol langsung berganti
+            menjadi <span class="btn">Batal</span> dan <span class="btn">Hapus permanen</span> sebagai
+            konfirmasi. Tekan <span class="strong">Batal</span> bila berubah pikiran; tombol biasa akan
+            muncul lagi tanpa ada data yang hilang.
+        </p>
+        <p class="no-margin">
+            Menekan <span class="strong">Hapus permanen</span> menghapus isian beserta foto bukti
+            selfie-nya dari sistem. Tindakan ini tidak bisa dibatalkan, dan isian tersebut tidak dapat
+            diunduh lagi sebagai PDF. PDF yang sudah terunduh sebelumnya tetap aman.
+        </p>
+    </div>
+
+    <table style="width: 190pt; margin: 6pt auto 8pt; border-collapse: collapse; page-break-inside: avoid;">
+        <tr>
+            <td>
+                <img src="panduan-img/14-laporan-hapus.png" alt="Konfirmasi hapus isian: tombol Batal dan Hapus permanen" style="width: 190pt; border: 1px solid #dfe4d5; border-radius: 6pt;">
+                <div class="shot-cap"><b>Konfirmasi hapus.</b> Setelah Hapus ditekan, pilih <b>Batal</b> atau <b>Hapus permanen</b>.</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="callout callout-warn keep" style="margin-bottom: 0;">
+        <span class="title">Unduh PDF sebelum menghapus</span>
+        Isian yang sudah dihapus tidak bisa dipulihkan. Jika laporan masih dibutuhkan untuk arsip,
+        tekan <span class="btn">PDF</span> terlebih dahulu, baru hapus isian.
+    </div>
+
+    <div class="card keep" style="margin-top: 12pt; margin-bottom: 0;">
+        <div class="card-title">Ringkasan tiga tombol aksi</div>
+        <table class="fields" style="margin: 6pt 0 0;">
+            <tr>
+                <th style="width: 22%;">Tombol</th>
+                <th>Fungsi</th>
+            </tr>
+            <tr>
+                <td><span class="strong">Ubah</span></td>
+                <td>Membuka formulir terisi untuk memperbaiki jawaban. Data lama ditimpa setelah <span class="strong">Simpan Perubahan</span>.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">PDF</span></td>
+                <td>Mengunduh laporan resmi langsung ke folder Unduhan untuk diarsipkan atau dicetak.</td>
+            </tr>
+            <tr>
+                <td><span class="strong">Hapus</span></td>
+                <td>Menghapus isian dan foto buktinya secara permanen setelah konfirmasi <span class="strong">Hapus permanen</span>.</td>
+            </tr>
+        </table>
+    </div>
 
 <!-- ================= 5b. STATISTIK ================= -->
-<div class="page">
+<div style="page-break-before: always; padding-top: 4pt;">
     <div class="kicker">Bagian 5 &middot; Lanjutan</div>
     <h2>Melihat statistik dan rekap wilayah</h2>
     <p class="lead">
@@ -1383,44 +1712,54 @@
     </p>
     <div class="section-rule"></div>
 
-    <div class="step keep">
-        <div class="step-head">
-            <span class="step-num">1</span>
-            <span class="step-title">Pilih tab Statistik APMO</span>
-            <span class="step-sub">Di halaman yang sama dengan Riwayat.</span>
-        </div>
-        <p class="no-margin">
-            Tekan tab <span class="strong">Statistik APMO</span>, lalu pilih lingkup data:
-            <span class="strong">Saya</span>, <span class="strong">Desa</span>, atau
-            <span class="strong">Kecamatan</span>.
-        </p>
-    </div>
+    <table class="two-col">
+        <tr>
+            <td class="left" style="width: 55%;">
+                <div class="step keep" style="margin-bottom: 8pt;">
+                    <div class="step-head">
+                        <span class="step-num">1</span>
+                        <span class="step-title">Pilih tab Statistik APMO</span>
+                        <span class="step-sub">Di halaman yang sama dengan Riwayat.</span>
+                    </div>
+                    <p class="no-margin">
+                        Tekan tab <span class="strong">Statistik APMO</span>, lalu pilih lingkup data:
+                        <span class="strong">Saya</span>, <span class="strong">Desa</span>, atau
+                        <span class="strong">Kecamatan</span>.
+                    </p>
+                </div>
 
-    <div class="step keep">
-        <div class="step-head">
-            <span class="step-num">2</span>
-            <span class="step-title">Baca ringkasannya</span>
-            <span class="step-sub">Angka dihitung dari isian yang tersimpan.</span>
-        </div>
-        <table class="fields">
-            <tr>
-                <th style="width: 24%;">Lingkup</th>
-                <th>Yang ditampilkan</th>
-            </tr>
-            <tr>
-                <td><span class="strong">Saya</span></td>
-                <td>Jumlah kali isi, IMT dan kategorinya, lama duduk, profil terakhir, kebiasaan olahraga per minggu, cabang favorit, tujuan, dan jalur.</td>
-            </tr>
-            <tr>
-                <td><span class="strong">Desa</span></td>
-                <td>Rekap warga di desa/kelurahan Anda: jumlah isian, persentase aktif olahraga, rata-rata usia, jenis kelamin, cabang terpopuler, frekuensi, dan penilaian fasilitas.</td>
-            </tr>
-            <tr>
-                <td><span class="strong">Kecamatan</span></td>
-                <td>Rekap yang sama untuk lingkup kecamatan.</td>
-            </tr>
-        </table>
-    </div>
+                <div class="step keep">
+                    <div class="step-head">
+                        <span class="step-num">2</span>
+                        <span class="step-title">Baca ringkasannya</span>
+                        <span class="step-sub">Angka dihitung dari isian yang tersimpan.</span>
+                    </div>
+                    <table class="fields">
+                        <tr>
+                            <th style="width: 30%;">Lingkup</th>
+                            <th>Yang ditampilkan</th>
+                        </tr>
+                        <tr>
+                            <td><span class="strong">Saya</span></td>
+                            <td>Jumlah kali isi, IMT dan kategorinya, lama duduk, profil terakhir, kebiasaan olahraga per minggu, cabang favorit, tujuan, dan jalur.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="strong">Desa</span></td>
+                            <td>Rekap warga di desa/kelurahan Anda: jumlah isian, persentase aktif olahraga, rata-rata usia, jenis kelamin, cabang terpopuler, frekuensi, dan penilaian fasilitas.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="strong">Kecamatan</span></td>
+                            <td>Rekap yang sama untuk lingkup kecamatan.</td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+            <td class="right" style="width: 45%;">
+                <img src="panduan-img/12-laporan-statistik.png" alt="Tab Statistik APMO pada halaman Laporan" style="width: 84%; border: 1px solid #dfe4d5; border-radius: 6pt;">
+                <div class="shot-cap"><b>Tab Statistik APMO.</b> Pilih lingkup <b>Saya</b>, <b>Desa</b>, atau <b>Kecamatan</b>. Contoh di atas adalah tampilan saat belum ada isian.</div>
+            </td>
+        </tr>
+    </table>
 
     <div class="callout callout-warn keep" style="margin-bottom: 0;">
         <span class="title">Rekap desa/kecamatan kosong?</span>
@@ -1429,26 +1768,6 @@
         Sementara itu, isian pribadi tetap dapat dilihat pada lingkup <span class="strong">Saya</span>.
     </div>
 
-    <div class="step keep" style="margin-top: 12pt; margin-bottom: 0;">
-        <div class="step-head">
-            <span class="step-num">&#10003;</span>
-            <span class="step-title">Alur singkat dari awal sampai akhir</span>
-            <span class="step-sub">Ringkasan satu halaman.</span>
-        </div>
-        <table class="pill-row">
-            <tr>
-                <td><div class="pill"><span class="pill-num">1</span>Daftar<br><span class="small muted">4 langkah</span></div></td>
-                <td style="width: 12pt;" class="arrow">&#8594;</td>
-                <td><div class="pill"><span class="pill-num">2</span>Tunggu<br><span class="small muted">persetujuan admin</span></div></td>
-                <td style="width: 12pt;" class="arrow">&#8594;</td>
-                <td><div class="pill"><span class="pill-num">3</span>Masuk<br><span class="small muted">email &amp; sandi</span></div></td>
-                <td style="width: 12pt;" class="arrow">&#8594;</td>
-                <td><div class="pill"><span class="pill-num">4</span>Isi survei<br><span class="small muted">3 langkah</span></div></td>
-                <td style="width: 12pt;" class="arrow">&#8594;</td>
-                <td><div class="pill"><span class="pill-num">5</span>Unduh<br><span class="small muted">PDF</span></div></td>
-            </tr>
-        </table>
-    </div>
 </div>
 
 <!-- ================= 6. FAQ ================= -->
@@ -1562,24 +1881,23 @@
         </ul>
     </div>
 
-    <div class="callout callout-note keep">
+    <div class="callout callout-note keep" style="margin-bottom: 10pt;">
         <span class="title">Tips menjaga akun</span>
         Gunakan kata sandi yang unik dan mudah Anda ingat, aktifkan &ldquo;Ingat sesi saya&rdquo; hanya pada
         perangkat pribadi, dan selalu keluar (logout) bila memakai perangkat bersama.
     </div>
 
-    <div class="keep" style="margin-top: 16pt; border: 1px solid #e1e5d7; border-radius: 10px; padding: 14pt 16pt;">
+    <div class="keep" style="border: 1px solid #e1e5d7; border-radius: 10px; padding: 12pt 14pt;">
         <h3 style="margin-bottom: 4pt;">Selesai &mdash; selamat menjalankan peran sebagai Duta Olahraga</h3>
-        <p class="small" style="margin-bottom: 0;">
+        <p class="small" style="margin-bottom: 5pt;">
             Dengan mengisi Survei APMO secara rutin, Anda membantu KORMI Kabupaten Bandung menyusun data
             yang lebih akurat untuk pembinaan olahraga masyarakat. Terima kasih atas kontribusi Anda.
         </p>
-    </div>
-
-    <div class="end-note">
-        Panduan Duta Olahraga &mdash; Pendaftaran, Masuk, dan Survei APMO &middot; Versi 1.0, November 2026.<br>
-        Diterbitkan untuk pengguna aplikasi mobile KORMI Kabupaten Bandung. Tampilan dan label tombol dapat
-        berubah sewaktu-waktu mengikuti pembaruan aplikasi.
+        <p class="small muted no-margin">
+            Panduan Duta Olahraga &mdash; Pendaftaran, Masuk, dan Survei APMO &middot; Versi 1.0, November 2026.
+            Diterbitkan untuk pengguna aplikasi mobile KORMI Kabupaten Bandung; tampilan dan label tombol
+            dapat berubah mengikuti pembaruan aplikasi.
+        </p>
     </div>
 </div>
 

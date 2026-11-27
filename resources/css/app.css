@@ -1642,13 +1642,77 @@ a [data-lucide] {
     -webkit-box-orient: vertical;
 }
 
+/* Mini statistik Survey APMO per kecamatan */
+.kd-apmo-mini {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.kd-apmo-mini-item {
+    padding: 8px 10px;
+    border-radius: 14px;
+    background: #ffffff;
+    border: 1px solid #eceee9;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.kd-apmo-mini-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px;
+    min-width: 0;
+}
+
+.kd-apmo-mini-name {
+    font-size: 10.5px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--kd-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kd-apmo-mini-num {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #4d8a00;
+}
+
+.kd-apmo-mini-bar {
+    height: 3px;
+    border-radius: 999px;
+    background: #eef0ec;
+    overflow: hidden;
+}
+
+.kd-apmo-mini-bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--kd-lime);
+}
+
+.kd-apmo-mini-item.is-empty .kd-apmo-mini-num {
+    color: #b6b9b2;
+}
+
+.kd-apmo-mini-item.is-empty .kd-apmo-mini-bar > span {
+    background: transparent;
+}
+
 .kd-galeri {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
-}
-
-.kd-galeri img {
+}.kd-galeri img {
     width: 100%;
     height: 84px;
     object-fit: cover;
@@ -5402,6 +5466,32 @@ a [data-lucide] {
     border-color: #dcefa6;
     color: #3f4a16;
     text-decoration: none;
+}
+
+.kd-laporan .kd-report-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin: -2px 0 12px;
+}
+
+.kd-laporan .kd-report-pdf {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    border: 1px solid #dcefa6;
+    border-radius: 12px;
+    background: var(--kd-lime-soft);
+    color: #3f4a16;
+    font-family: inherit;
+    font-size: 10.5px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.kd-laporan .kd-report-pdf svg {
+    width: 13px;
+    height: 13px;
 }
 
 .kd-verify-btn.is-danger {

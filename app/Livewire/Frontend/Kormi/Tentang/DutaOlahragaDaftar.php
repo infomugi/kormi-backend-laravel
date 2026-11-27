@@ -308,6 +308,50 @@ class DutaOlahragaDaftar extends Component
         $this->akun_instagram = ltrim(trim($value), '@');
     }
 
+    /**
+     * Validasi berkas foto segera setelah diunggah ke penyimpanan sementara,
+     * sehingga kesalahan format/ukuran tampil dalam bahasa Indonesia dan tidak
+     * baru ketahuan saat submit. Berkas yang tidak valid langsung dibuang.
+     */
+    public function updatedFoto(): void
+    {
+        $this->resetErrorBag('foto');
+
+        if (! $this->foto) {
+            return;
+        }
+
+        // Foto HEIC dari iPhone yang tidak sempat dikonversi browser diberi
+        // pesan khusus agar pengguna tahu langkah berikutnya.
+        $namaFoto = strtolower((string) $this->foto->getClientOriginalName());
+        $tipeFoto = strtolower((string) $this->foto->getMimeType());
+
+        if (
+            str_ends_with($namaFoto, '.heic') || str_ends_with($namaFoto, '.heif')
+            || in_array($tipeFoto, ['image/heic', 'image/heif', 'image/heic-sequence', 'image/heif-sequence'], true)
+        ) {
+            $this->addError('foto', 'Foto berformat HEIC belum bisa diproses di perangkat ini. Pilih ulang foto dari galeri (biasanya otomatis dikonversi) atau gunakan foto JPG/PNG.');
+            $this->foto = null;
+
+            return;
+        }
+
+        $validator = validator(
+            ['foto' => $this->foto],
+            ['foto' => 'image|mimes:jpg,jpeg,png,webp|max:5120'],
+            [
+                'foto.image' => 'Berkas foto harus berupa gambar.',
+                'foto.mimes' => 'Format foto harus JPG, JPEG, PNG, atau WEBP.',
+                'foto.max'   => 'Ukuran foto maksimal 5 MB.',
+            ],
+        );
+
+        if ($validator->fails()) {
+            $this->addError('foto', $validator->errors()->first('foto'));
+            $this->foto = null;
+        }
+    }
+
     public function nextStep(): void
     {
         $this->validate($this->rulesForStep($this->currentStep));
@@ -417,6 +461,13 @@ class DutaOlahragaDaftar extends Component
                 $pathFoto = $storage->uploadGambar($this->foto, 'duta/pendaftaran');
             } catch (\InvalidArgumentException $e) {
                 $this->addError('foto', $e->getMessage());
+
+                return;
+            } catch (\Throwable $e) {
+                // Penyimpanan (MinIO) sedang bermasalah: jangan tampilkan error
+                // 500 yang menghapus seluruh isian. Beri pesan yang bisa ditindak.
+                report($e);
+                $this->addError('foto', 'Foto gagal diunggah ke penyimpanan. Coba lagi beberapa saat, atau hapus pas foto untuk melanjutkan tanpa foto.');
 
                 return;
             }

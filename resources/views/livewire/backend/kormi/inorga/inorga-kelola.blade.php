@@ -843,7 +843,7 @@
                         <!-- Logo Upload -->
                         <x-form.card 
                             title="Logo Resmi Inorga" 
-                            subtitle="Format PNG transparan disarankan (Maks 5MB)"
+                            subtitle="Format PNG transparan disarankan — PNG/WEBP dikompres ≤ 1 MB, SVG apa adanya"
                             icon="image"
                             size="default"
                         >
@@ -853,7 +853,7 @@
                                 name="uploadLogo"
                                 inputId="uploadLogoInorga"
                                 title="Klik atau seret logo ke sini"
-                                subtitle="PNG, JPG, WEBP, SVG (Maks. 5MB)"
+                                subtitle="PNG, JPG, WEBP, SVG — PNG/WEBP dikompres ≤ 1 MB, SVG apa adanya"
                                 aspectRatio="h-44 sm:h-52"
                             />
                         </x-form.card>

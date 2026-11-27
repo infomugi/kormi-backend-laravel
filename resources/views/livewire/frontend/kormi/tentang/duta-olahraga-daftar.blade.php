@@ -351,10 +351,16 @@
                             <x-form.field label="Pas Foto Duta" name="foto" badge="Opsional" hint="Format JPG, JPEG, PNG, atau WEBP. Otomatis dikompres ≤ 1 MB.">
                                 <div class="space-y-3">
                                     @if($foto)
-                                        @php $ekstensiFoto = strtolower($foto->getClientOriginalExtension()); @endphp
-                                        @if(in_array($ekstensiFoto, ['jpg', 'jpeg', 'png', 'webp']))
+                                        @php
+                                            try {
+                                                $pratinjauFoto = $foto->isPreviewable() ? $foto->temporaryUrl() : null;
+                                            } catch (\Throwable $e) {
+                                                $pratinjauFoto = null;
+                                            }
+                                        @endphp
+                                        @if($pratinjauFoto)
                                             <div class="relative w-full max-w-[220px] rounded-2xl overflow-hidden border border-emerald-200 bg-slate-50">
-                                                <img src="{{ $foto->temporaryUrl() }}" alt="Pratinjau foto duta" class="w-full h-56 object-cover">
+                                                <img src="{{ $pratinjauFoto }}" alt="Pratinjau foto duta" class="w-full h-56 object-cover">
                                             </div>
                                         @else
                                             <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] font-bold text-slate-600 flex items-center gap-2">
@@ -362,6 +368,9 @@
                                                 <span>{{ $foto->getClientOriginalName() }}</span>
                                             </div>
                                         @endif
+                                        <button type="button" wire:click="$set('foto', null)" class="text-[11px] font-bold text-rose-600 hover:text-rose-800 hover:underline">
+                                            Hapus foto
+                                        </button>
                                     @endif
 
                                     <label class="flex flex-col items-center justify-center gap-2 w-full px-4 py-6 rounded-2xl border-2 border-dashed border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50 transition-colors cursor-pointer text-center">

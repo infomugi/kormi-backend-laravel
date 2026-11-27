@@ -150,8 +150,24 @@
                 </div>
 
                 @if($foto)
+                    @php
+                        // Cegah 500 (FileNotPreviewableException) untuk berkas yang
+                        // tidak bisa dipratinjaukan, mis. HEIC/HEIF dari iPhone.
+                        try {
+                            $urlPratinjau = $foto->isPreviewable() ? $foto->temporaryUrl() : null;
+                        } catch (\Throwable $e) {
+                            $urlPratinjau = null;
+                        }
+                    @endphp
                     <div class="kd-abs-shot">
-                        <img src="{{ $foto->temporaryUrl() }}" alt="Pratinjau foto kehadiran">
+                        @if($urlPratinjau)
+                            <img src="{{ $urlPratinjau }}" alt="Pratinjau foto kehadiran">
+                        @else
+                            <span class="kd-file-chip" style="align-self: center; margin: 18px auto 8px;">
+                                <i data-lucide="file"></i>
+                                <span>{{ $foto->getClientOriginalName() }}</span>
+                            </span>
+                        @endif
                         <span class="kd-abs-shot-badge"><i data-lucide="check"></i> Siap dikirim</span>
                         <button type="button" class="kd-abs-shot-retake" @click="bukaKamera()">
                             <i data-lucide="refresh-cw"></i>

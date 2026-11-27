@@ -17,6 +17,20 @@
                 <span class="kd-badge">Beranda</span>
             </div>
 
+            @guest
+                <div class="kd-success-actions">
+                    <a href="{{ route('mobile.daftar-duta') }}" wire:navigate class="kd-btn-primary">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                        <span>Daftar Duta Olahraga</span>
+                    </a>
+                    <a href="{{ route('mobile.login') }}" wire:navigate class="kd-btn-ghost">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <span>Masuk</span>
+                    </a>
+                </div>
+            @endguest
+
+            @auth
             <div class="kd-control" style="margin-bottom: 14px;">
                 <a href="{{ route('mobile.direktori-duta') }}" wire:navigate class="kd-searchlink">Cari duta olahraga…</a>
                 <span class="kd-icon"><i data-lucide="search"></i></span>
@@ -79,10 +93,30 @@
             </div>
 
             <div class="kd-subhead">
+                <h4>Survey APMO per Kecamatan</h4>
+                <span class="kd-chip">{{ number_format($apmoKecamatan['total']) }} isian</span>
+            </div>
+
+            <div class="kd-apmo-mini">
+                @foreach($apmoKecamatan['baris'] as $kec)
+                    <div class="kd-apmo-mini-item {{ $kec['total'] === 0 ? 'is-empty' : '' }}">
+                        <span class="kd-apmo-mini-top">
+                            <span class="kd-apmo-mini-name">{{ $kec['nama'] }}</span>
+                            <span class="kd-apmo-mini-num">{{ number_format($kec['total']) }}</span>
+                        </span>
+                        <span class="kd-apmo-mini-bar">
+                            <span style="width: {{ round($kec['total'] / $apmoKecamatan['maks'] * 100) }}%"></span>
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+
+            <p class="kd-footnote">{{ $apmoKecamatan['terisi'] }}/{{ $apmoKecamatan['jumlahKecamatan'] }} kecamatan terisi · bar dibandingkan dengan isian terbanyak</p>
+
+            <div class="kd-subhead">
                 <h4>Berita Terkini</h4>
                 <a href="{{ route('berita') }}" wire:navigate>Semua warta</a>
             </div>
-
             @forelse($beritaList as $news)
                 <a href="{{ route('berita.detail', $news->slug) }}" wire:navigate class="kd-item">
                     <span class="kd-item-thumb">
@@ -163,7 +197,10 @@
             </a>
 
             <p class="kd-footnote">KORMI Kabupaten Bandung · {{ $stats['totalKecamatan'] }} kecamatan · {{ $stats['totalDuta'] }} duta olahraga</p>
+            @endauth
         </div>
 
-        <x-mobile.tabbar aktif="beranda" />
+        @auth
+            <x-mobile.tabbar aktif="beranda" />
+        @endauth
     </div>

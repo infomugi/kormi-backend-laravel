@@ -484,7 +484,7 @@
                                             :upload="$foto_kegiatan" 
                                             name="foto_kegiatan" 
                                             emptyTitle="Pilih Foto Kamera / Galeri" 
-                                            emptySubtitle="Format JPG, PNG, WEBP maks 10MB" 
+                                            emptySubtitle="Format JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB"
                                             aspectRatio="h-32 sm:h-36"
                                         />
                                     </x-form.field>

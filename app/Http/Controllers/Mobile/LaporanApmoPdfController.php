@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Mobile;
 use App\Http\Controllers\Controller;
 use App\Livewire\Mobile\Angket;
 use App\Models\Kormi\AngketApmo;
+use App\Services\StorageService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class LaporanApmoPdfController extends Controller
@@ -101,17 +101,7 @@ class LaporanApmoPdfController extends Controller
 
     private function fotoDataUri(?string $path): ?string
     {
-        if (empty($path)) {
-            return null;
-        }
-
-        try {
-            $biner = Str::startsWith($path, ['http://', 'https://'])
-                ? @file_get_contents($path)
-                : Storage::disk('minio')->get($path);
-        } catch (\Throwable) {
-            return null;
-        }
+        $biner = app(StorageService::class)->getIsiFile($path);
 
         if (! $biner) {
             return null;

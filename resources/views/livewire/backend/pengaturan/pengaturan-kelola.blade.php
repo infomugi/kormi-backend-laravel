@@ -269,8 +269,7 @@
                                 name="uploadLogo"
                                 input-id="uploadLogoUtama"
                                 empty-title="Unggah Logo Utama KORMI"
-                                empty-subtitle="Format PNG, SVG, WEBP (Maksimal 5MB)"
-                                :max-size-m-b="5"
+                                empty-subtitle="Format PNG, SVG, WEBP — PNG/WEBP dikompres ≤ 1 MB, SVG apa adanya"
                                 aspect-ratio="h-44 sm:h-52"
                             />
                         </x-form.card>
@@ -287,8 +286,7 @@
                                 name="uploadFavicon"
                                 input-id="uploadFaviconBrowser"
                                 empty-title="Unggah Favicon"
-                                empty-subtitle="Format PNG, ICO (Maksimal 2MB)"
-                                :max-size-m-b="2"
+                                empty-subtitle="Format PNG, ICO — PNG dikompres ≤ 1 MB, ICO apa adanya"
                                 aspect-ratio="h-44 sm:h-52"
                             />
                         </x-form.card>

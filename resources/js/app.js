@@ -96,14 +96,18 @@ function pasangKompresiUnggahGambar() {
         event.stopPropagation();
 
         const asli = Array.from(input.files);
+        const adaHeic = asli.some((berkas) =>
+            /^image\/hei[cf]/i.test(berkas.type || '') || /\.(heic|heif)$/i.test(berkas.name || '')
+        );
+        const labelKompres = adaHeic ? 'Mengonversi/mengompres foto' : 'Mengompres foto';
         aktif += 1;
-        tampilkanChip(asli.length > 1 ? 'Mengompres foto 1/' + asli.length + '…' : 'Mengompres foto…');
+        tampilkanChip(asli.length > 1 ? labelKompres + ' 1/' + asli.length + '…' : labelKompres + '…');
 
         try {
             const hasil = [];
             for (let i = 0; i < asli.length; i++) {
                 if (asli.length > 1) {
-                    tampilkanChip('Mengompres foto ' + (i + 1) + '/' + asli.length + '…');
+                    tampilkanChip(labelKompres + ' ' + (i + 1) + '/' + asli.length + '…');
                 }
                 let berkas = asli[i];
                 if ((berkas.type || '').startsWith('image/')) {

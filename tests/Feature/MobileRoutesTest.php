@@ -44,11 +44,19 @@ class MobileRoutesTest extends TestCase
 
     public function test_halaman_mobile_beranda_tampil(): void
     {
-        $this->get('/mobile/beranda')
+        $html = $this->get('/mobile/beranda')
             ->assertOk()
             ->assertSee('kd-mobile', false)
             ->assertSee('Selamat Datang')
-            ->assertSee('kd-tabbar', false);
+            ->assertSee('Daftar Duta Olahraga')
+            ->assertSee(route('mobile.daftar-duta'), false)
+            ->assertSee(route('mobile.login'), false)
+            ->getContent();
+
+        $this->assertStringNotContainsString('<nav class="kd-tabbar', $html);
+        $this->assertStringNotContainsString('Layanan KORMI', $html);
+        $this->assertStringNotContainsString('Survey APMO', $html);
+        $this->assertStringNotContainsString('Cari duta olahraga', $html);
     }
 
     public function test_halaman_mobile_direktori_duta_tampil(): void
@@ -353,7 +361,7 @@ class MobileRoutesTest extends TestCase
 
     public function test_menu_bawah_pengunjung_tetap_beranda_direktori_daftar_masuk(): void
     {
-        $html = $this->get('/mobile/beranda')
+        $html = $this->get('/mobile/direktori-duta')
             ->assertOk()
             ->getContent();
 

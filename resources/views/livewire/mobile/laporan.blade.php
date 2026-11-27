@@ -12,7 +12,7 @@
         <div class="kd-section-head">
             <div>
                 <h3>Laporan APMO</h3>
-                <p>Riwayat &amp; statistik hasil Survei APMO.</p>
+                <p>Riwayat &amp; statistik hasil Survey APMO.</p>
             </div>
             <span class="kd-badge">{{ $ringkasan ? number_format($ringkasan['total']) . ' isian' : 'Wilayah' }}</span>
         </div>
@@ -92,6 +92,15 @@
                 </div>
             @endif
 
+            @if($lingkup !== 'saya')
+                <div class="kd-report-toolbar">
+                    <a href="{{ route('mobile.laporan.wilayah.pdf', ['lingkup' => $lingkup]) }}" class="kd-report-pdf" title="Unduh laporan PDF wilayah">
+                        <i data-lucide="file-down"></i>
+                        <span>Unduh PDF wilayah</span>
+                    </a>
+                </div>
+            @endif
+
             @if($tab === 'riwayat')
                 @if($daftar->isEmpty())
                     <div class="kd-empty">
@@ -99,11 +108,11 @@
                         <strong>Belum ada isian APMO</strong>
                         <p>
                             {{ $lingkup === 'saya'
-                                ? 'Isi Survei APMO untuk melihat riwayat dan statistik pribadi Anda.'
-                                : 'Belum ada warga di wilayah ini yang mengisi Survei APMO.' }}
+                                ? 'Isi Survey APMO untuk melihat riwayat dan statistik pribadi Anda.'
+                                : 'Belum ada warga di wilayah ini yang mengisi Survey APMO.' }}
                         </p>
                         @if($lingkup === 'saya')
-                            <a href="{{ route('mobile.angket') }}" wire:navigate class="kd-page-btn">Isi Survei APMO</a>
+                            <a href="{{ route('mobile.angket') }}" wire:navigate class="kd-page-btn">Isi Survey APMO</a>
                         @endif
                     </div>
                 @else
@@ -196,8 +205,8 @@
                     <div class="kd-empty">
                         <i data-lucide="chart-column"></i>
                         <strong>Belum ada statistik</strong>
-                        <p>Isi Survei APMO untuk melihat rangkuman kebiasaan olahraga Anda.</p>
-                        <a href="{{ route('mobile.angket') }}" wire:navigate class="kd-page-btn">Isi Survei APMO</a>
+                        <p>Isi Survey APMO untuk melihat rangkuman kebiasaan olahraga Anda.</p>
+                        <a href="{{ route('mobile.angket') }}" wire:navigate class="kd-page-btn">Isi Survey APMO</a>
                     </div>
                 @else
                     <div class="kd-report-metrics">
@@ -295,7 +304,7 @@
                     <div class="kd-empty">
                         <i data-lucide="chart-column"></i>
                         <strong>Belum ada data wilayah</strong>
-                        <p>Belum ada warga di {{ $namaLingkup }} yang mengisi Survei APMO.</p>
+                        <p>Belum ada warga di {{ $namaLingkup }} yang mengisi Survey APMO.</p>
                     </div>
                 @else
                     <div class="kd-report-card">
@@ -378,7 +387,7 @@
             @endif
         @endif
 
-        <p class="kd-footnote">KORMI Kabupaten Bandung · Laporan Survei APMO</p>
+        <p class="kd-footnote">KORMI Kabupaten Bandung · Laporan Survey APMO</p>
     </div>
 
     <x-mobile.tabbar aktif="laporan" />

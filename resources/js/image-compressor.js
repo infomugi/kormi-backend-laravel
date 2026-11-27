@@ -7,21 +7,107 @@
  * sehingga pemanggil dapat membandingkan referensi untuk tahu ada kompresi.
  */
 
+// HEIC/HEIF sengaja TIDAK dilewati: iPhone mengirim foto kamera sebagai HEIC
+// dan server hanya menerima JPEG/PNG/WEBP. Berkas HEIC/HEIF dikonversi ke JPEG
+// memakai heic-to (WASM, dimuat malas) sebelum dikompres. Bila konversi gagal,
+// jalur lama tetap dipakai: browser yang bisa men-dekode HEIC (Safari/iOS)
+// mengonversinya lewat kanvas; selain itu berkas asli dikembalikan dan
+// validasi formulir menampilkan pesan yang jelas.
 const TIPE_DILEWATI = new Set([
     'image/svg+xml',
     'image/gif',
     'image/x-icon',
     'image/vnd.microsoft.icon',
-    'image/heic',
-    'image/heif',
 ]);
 
-const EKSTENSI_DILEWATI = /\.(svg|gif|ico|heic|heif)$/i;
+const EKSTENSI_DILEWATI = /\.(svg|gif|ico)$/i;
+
+const TIPE_HEIC = new Set(['image/heic', 'image/heif', 'image/heic-sequence', 'image/heif-sequence']);
+
+const EKSTENSI_HEIC = /\.(heic|heif)$/i;
+
+function berkasPerluKonversi(file) {
+    return TIPE_HEIC.has((file.type || '').toLowerCase()) || EKSTENSI_HEIC.test(file.name || '');
+}
+
+// --- Konversi HEIC/HEIF -> JPEG (malas / lazy, hanya dimuat saat dibutuhkan) ---
+// Pustaka heic-to memuat dekoder WASM besar (~3 MB), sehingga diimpor dinamis
+// agar tidak membebani halaman yang tidak mengunggah HEIC. Bila gagal dimuat
+// (mis. CSP ketat), kita setel ulang cache agar percobaan berikutnya tetap bisa.
+let modulHeic = null;
+let heicTidakTersedia = false;
+
+async function muatModulHeic() {
+    if (heicTidakTersedia) {
+        return null;
+    }
+    if (! modulHeic) {
+        modulHeic = import('heic-to').catch(() => {
+            heicTidakTersedia = true;
+            modulHeic = null;
+
+            return null;
+        });
+    }
+
+    return modulHeic;
+}
+
+function namaMenjadiJpeg(nama) {
+    const dasar = (nama || 'foto').replace(/\.[^./\\]+$/, '') || 'foto';
+
+    return dasar + '.jpg';
+}
+
+/**
+ * Konversi berkas HEIC/HEIF menjadi JPEG memakai heic-to (WASM).
+ * Tidak pernah melempar error; mengembalikan File JPEG atau null bila gagal.
+ *
+ * @param {File} file
+ * @returns {Promise<File|null>}
+ */
+async function konversiHeicKeJpeg(file) {
+    try {
+        const modul = await muatModulHeic();
+        if (! modul || typeof modul.heicTo !== 'function') {
+            return null;
+        }
+
+        // Pastikan benar-benar HEIC. Bila isHeic error, tetap coba heicTo karena
+        // pustaka akan melempar sendiri untuk berkas non-HEIC.
+        let heic = true;
+        if (typeof modul.isHeic === 'function') {
+            try {
+                heic = await modul.isHeic(file);
+            } catch (e) {
+                heic = true;
+            }
+        }
+        if (! heic) {
+            return null;
+        }
+
+        const blob = await modul.heicTo({ blob: file, type: 'image/jpeg', quality: 0.92 });
+        if (! blob || ! blob.size) {
+            return null;
+        }
+
+        return new File([blob], namaMenjadiJpeg(file.name), {
+            type: 'image/jpeg',
+            lastModified: file.lastModified || Date.now(),
+        });
+    } catch (e) {
+        return null;
+    }
+}
 
 function berkasDilewati(file) {
     const tipe = (file.type || '').toLowerCase();
     const nama = (file.name || '').toLowerCase();
 
+    if (TIPE_HEIC.has(tipe) || EKSTENSI_HEIC.test(nama)) {
+        return false;
+    }
     if (! tipe.startsWith('image/')) {
         return true;
     }
@@ -161,6 +247,26 @@ export async function compressImageClientSide(file, options = {}) {
         return file;
     }
 
+    // HEIC/HEIF: coba konversi ke JPEG lebih dulu (heic-to), lalu jalankan
+    // pipeline kompresi normal pada JPEG hasilnya. Bila konversi gagal,
+    // lanjut ke jalur lama di bawah (native decode / kembalikan berkas asli).
+    if (berkasPerluKonversi(file)) {
+        let jpeg = null;
+        try {
+            jpeg = await konversiHeicKeJpeg(file);
+        } catch (e) {
+            jpeg = null;
+        }
+
+        if (jpeg) {
+            try {
+                return await compressImageClientSide(jpeg, options);
+            } catch (e) {
+                return jpeg;
+            }
+        }
+    }
+
     const maxSizeBytes = Math.max(1, maxSizeMB) * 1024 * 1024;
     const sisiMaks = Math.max(1, maxWidthOrHeight);
 
@@ -179,9 +285,11 @@ export async function compressImageClientSide(file, options = {}) {
         }
 
         const sisiTerpanjang = Math.max(lebarAsli, tinggiAsli);
+        const konversiPaksa = berkasPerluKonversi(file);
 
         // Sudah memenuhi kedua syarat: ukuran file dan dimensi.
-        if (file.size <= maxSizeBytes && sisiTerpanjang <= sisiMaks) {
+        // HEIC/HEIF tetap diproses agar hasilnya benar-benar JPEG.
+        if (! konversiPaksa && file.size <= maxSizeBytes && sisiTerpanjang <= sisiMaks) {
             return file;
         }
 

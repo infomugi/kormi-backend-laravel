@@ -380,11 +380,12 @@ class DutaPendaftaranPublikTest extends TestCase
     {
         $data = $this->dataPendaftaranValid();
 
-        $this->kirimPendaftaran($data, [
-            'foto' => UploadedFile::fake()->create('dokumen.pdf', 50, 'application/pdf'),
-        ])
+        // Sejak validasi unggah diperketat, berkas bukan gambar langsung
+        // ditolak saat dipilih (bukan baru saat submit) dan dibuang.
+        Livewire::test(DutaOlahragaDaftar::class)
+            ->set('foto', UploadedFile::fake()->create('dokumen.pdf', 50, 'application/pdf'))
             ->assertHasErrors(['foto'])
-            ->assertSet('berhasil', false);
+            ->assertSet('foto', null);
 
         $this->assertDatabaseMissing('kormi_duta_olahraga', ['email' => $data['email']]);
         $this->assertDatabaseMissing('sys_pengguna', ['email' => $data['email']]);
@@ -393,6 +394,16 @@ class DutaPendaftaranPublikTest extends TestCase
     // =====================================================================
     // 7. FOTO VALID
     // =====================================================================
+
+    public function test_foto_valid_menampilkan_pratinjau_di_langkah_tiga(): void
+    {
+        Livewire::test(DutaOlahragaDaftar::class)
+            ->set('foto', UploadedFile::fake()->image('duta.jpg', 600, 800))
+            ->set('currentStep', 3)
+            ->assertHasNoErrors()
+            ->assertSee('Ganti Foto Duta')
+            ->assertSee('<img', false);
+    }
 
     public function test_foto_valid_tersimpan_dan_pendaftaran_berhasil(): void
     {

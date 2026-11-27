@@ -611,8 +611,7 @@
                                 name="uploadFoto"
                                 input-id="uploadFotoSapras"
                                 empty-title="Unggah Foto Fasilitas"
-                                empty-subtitle="Format JPG, PNG, WEBP (Maksimal 10MB)"
-                                :max-size-m-b="10"
+                                empty-subtitle="Format JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB"
                                 aspect-ratio="h-48 sm:h-56"
                             />
                         </x-form.card>

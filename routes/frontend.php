@@ -56,6 +56,9 @@ Route::prefix('mobile')->group(function () {
     Route::get('/laporan/{isian}/pdf', \App\Http\Controllers\Mobile\LaporanApmoPdfController::class)
         ->name('mobile.laporan.pdf')
         ->middleware('auth');
+    Route::get('/laporan/wilayah/{lingkup}/pdf', \App\Http\Controllers\Mobile\LaporanWilayahPdfController::class)
+        ->name('mobile.laporan.wilayah.pdf')
+        ->middleware('auth');
     Route::get('/dashboard', \App\Livewire\Mobile\Dashboard::class)->name('mobile.dashboard')->middleware('auth');
     Route::get('/persetujuan', \App\Livewire\Mobile\Persetujuan::class)->name('mobile.persetujuan')->middleware('auth');
     Route::get('/kelola-user', \App\Livewire\Mobile\KelolaUser::class)->name('mobile.kelola-user')->middleware(['auth', 'peran:super-admin']);

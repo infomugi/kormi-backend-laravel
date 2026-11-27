@@ -32,6 +32,24 @@ class StorageServiceTest extends TestCase
         Storage::disk('minio')->assertExists($path);
     }
 
+    /** Urutan short-echo `<?=` (3 byte) di dalam data biner sah tidak boleh memicu penolakan palsu. */
+    public function test_foto_jpeg_dengan_urutan_short_echo_tetap_diterima(): void
+    {
+        $file = UploadedFile::fake()->image('selfie.jpg', 20, 20);
+
+        // `3C 3F 3D` (= `<?=`) dapat muncul acak di dalam data JPEG ber-entropi tinggi;
+        // pola short-echo yang terlalu pendek ini tidak boleh lagi menolak foto normal.
+        $byteShortEcho = "\x3C\x3F\x3D" . "\x9A\x1B\x00\xFF\x8C\x22";
+
+        file_put_contents($file->getRealPath(), file_get_contents($file->getRealPath()) . $byteShortEcho);
+
+        $path = app(StorageService::class)->uploadGambar($file, 'angket/uji');
+
+        $this->assertNotEmpty($path);
+        $this->assertStringEndsWith('.jpg', $path);
+        Storage::disk('minio')->assertExists($path);
+    }
+
     /** Gambar polyglot yang menyisipkan tag PHP tetap harus ditolak. */
     public function test_gambar_dengan_tag_php_ditolak(): void
     {

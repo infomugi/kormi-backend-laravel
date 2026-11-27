@@ -336,10 +336,16 @@
                             </div>
 
                             @if($foto)
-                                @php $ekstensiFotoMobile = strtolower($foto->getClientOriginalExtension()); @endphp
-                                @if(in_array($ekstensiFotoMobile, ['jpg', 'jpeg', 'png', 'webp']))
+                                @php
+                                    try {
+                                        $pratinjauFotoMobile = $foto->isPreviewable() ? $foto->temporaryUrl() : null;
+                                    } catch (\Throwable $e) {
+                                        $pratinjauFotoMobile = null;
+                                    }
+                                @endphp
+                                @if($pratinjauFotoMobile)
                                     <div class="kd-photo-preview">
-                                        <img src="{{ $foto->temporaryUrl() }}" alt="Pratinjau foto duta">
+                                        <img src="{{ $pratinjauFotoMobile }}" alt="Pratinjau foto duta">
                                     </div>
                                 @else
                                     <div class="kd-file-chip">
@@ -355,6 +361,13 @@
                                 <span class="kd-upload-sub">JPG, JPEG, PNG, WEBP — otomatis dikompres ≤ 1 MB</span>
                                 <input type="file" wire:model="foto" accept="image/jpeg,image/png,image/webp" class="sr-only">
                             </label>
+
+                            @if($foto)
+                                <button type="button" wire:click="$set('foto', null)" class="kd-upload-galeri" style="width: 100%; background: none; border: 0;">
+                                    <i data-lucide="trash-2"></i>
+                                    <span>Hapus foto</span>
+                                </button>
+                            @endif
 
                             <div wire:loading wire:target="foto" class="kd-upload-status">
                                 <span class="kd-spinner kd-spinner--dark"></span>

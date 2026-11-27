@@ -732,8 +732,7 @@
                                 name="uploadFotoPenerima"
                                 input-id="uploadFotoApmo"
                                 empty-title="Unggah Foto Penerima"
-                                empty-subtitle="Format JPG, PNG, WEBP (Maksimal 5MB)"
-                                :max-size-m-b="5"
+                                empty-subtitle="Format JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB"
                                 aspect-ratio="h-56 sm:h-64"
                             />
                         </x-form.card>

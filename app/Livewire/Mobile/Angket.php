@@ -216,7 +216,9 @@ class Angket extends Component
         'alasan_lainnya.required_if' => 'Sebutkan alasan Anda.',
         'alasan_lainnya.max' => 'Sebutan alasan maksimal 100 karakter.',
         'foto_bukti.required' => 'Ambil atau unggah foto selfie sebagai bukti survey.',
-        'foto_bukti.image' => 'Foto bukti survey harus berupa gambar.',
+        'foto_bukti.image' => 'Foto tidak dapat dibaca. Gunakan JPG/PNG/WEBP; foto HEIC/HEIF dikonversi otomatis — bila gagal, pilih ulang foto atau perbarui browser.',
+        'foto_bukti.mimes' => 'Foto tidak dapat dibaca. Gunakan JPG/PNG/WEBP; foto HEIC/HEIF dikonversi otomatis — bila gagal, pilih ulang foto atau perbarui browser.',
+        'foto_bukti.uploaded' => 'Foto gagal diunggah. Pastikan ukuran maksimal 10 MB lalu coba lagi.',
         'foto_bukti.max' => 'Ukuran foto bukti survey maksimal 10 MB.',
     ];
 
@@ -368,6 +370,25 @@ class Angket extends Component
         if ($this->alasan_tidak_olahraga !== 'lainnya') {
             $this->alasan_lainnya = '';
         }
+    }
+
+    /**
+     * Validasi foto segera setelah dipilih agar kesalahan format/ukuran tampil
+     * lebih awal, bukan baru saat submit. Aturan ini sengaja sama dengan
+     * aturanFotoBukti() dan whitelist di StorageService agar tidak ada berkas
+     * yang lolos validasi tetapi ditolak saat disimpan.
+     */
+    public function updatedFotoBukti(): void
+    {
+        if (! $this->foto_bukti) {
+            $this->resetValidation('foto_bukti');
+
+            return;
+        }
+
+        $this->validateOnly('foto_bukti', [
+            'foto_bukti' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:10240'],
+        ]);
     }
 
     public function kirim(): void
@@ -542,7 +563,12 @@ class Angket extends Component
                 ->whereNotNull('foto_bukti')
                 ->exists();
 
-        return [$sudahAda ? 'nullable' : 'required', 'image', 'max:10240'];
+        return [
+            $sudahAda ? 'nullable' : 'required',
+            'image',
+            'mimes:jpg,jpeg,png,webp,gif',
+            'max:10240',
+        ];
     }
 
     private function periksaDurasiOlahraga(): void

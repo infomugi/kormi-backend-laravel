@@ -41,6 +41,7 @@ class Absensi extends Component
     public function simpan(): void
     {
         $user = auth()->user();
+        $sekarang = now('Asia/Jakarta');
         $absensi = $this->absensiHariIni();
 
         if ($absensi?->sudahPulang()) {
@@ -84,7 +85,43 @@ class Absensi extends Component
         $sekarang = now('Asia/Jakarta');
         $catatan = $this->catatan !== '' ? mb_substr(strip_tags(trim($this->catatan)), 0, 500) : null;
 
-        if ($absensi) {
+        $dataMasuk = [
+            'jam_masuk' => $sekarang->format('H:i:s'),
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'akurasi_meter' => $this->akurasi_meter,
+            'alamat' => $this->alamat,
+            'foto_masuk' => $pathFoto,
+            'catatan' => $catatan,
+        ];
+
+        $absensiTerhapus = AbsensiHarian::onlyTrashed()
+            ->where('pengguna_id', $user->id)
+            ->where('tanggal', $sekarang->toDateString())
+            ->first();
+
+        if (! $absensi && $absensiTerhapus) {
+            // Baris hari ini pernah dihapus (soft delete) dan masih memegang
+            // indeks unik (pengguna_id, tanggal). Pulihkan sebagai absen masuk
+            // baru agar tidak gagal dengan duplicate entry.
+            $fotoLama = array_filter([$absensiTerhapus->foto_masuk, $absensiTerhapus->foto_pulang]);
+
+            $absensiTerhapus->restore();
+            $absensiTerhapus->update($dataMasuk + [
+                'jam_pulang' => null,
+                'latitude_pulang' => null,
+                'longitude_pulang' => null,
+                'akurasi_meter_pulang' => null,
+                'alamat_pulang' => null,
+                'foto_pulang' => null,
+            ]);
+
+            foreach ($fotoLama as $berkas) {
+                $storage->hapusFile($berkas);
+            }
+
+            $this->pesanBerhasil = 'Absensi masuk tercatat pukul ' . $sekarang->format('H:i') . ' WIB. Selamat beraktivitas!';
+        } elseif ($absensi) {
             $absensi->update([
                 'jam_pulang' => $sekarang->format('H:i:s'),
                 'latitude_pulang' => $this->latitude,
@@ -97,16 +134,9 @@ class Absensi extends Component
 
             $this->pesanBerhasil = 'Absensi pulang tercatat pukul ' . $sekarang->format('H:i') . ' WIB. Hati-hati di jalan!';
         } else {
-            AbsensiHarian::create([
+            AbsensiHarian::create($dataMasuk + [
                 'pengguna_id' => $user->id,
                 'tanggal' => $sekarang->toDateString(),
-                'jam_masuk' => $sekarang->format('H:i:s'),
-                'latitude' => $this->latitude,
-                'longitude' => $this->longitude,
-                'akurasi_meter' => $this->akurasi_meter,
-                'alamat' => $this->alamat,
-                'foto_masuk' => $pathFoto,
-                'catatan' => $catatan,
             ]);
 
             $this->pesanBerhasil = 'Absensi masuk tercatat pukul ' . $sekarang->format('H:i') . ' WIB. Selamat beraktivitas!';

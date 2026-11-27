@@ -775,8 +775,7 @@
                                 name="uploadFoto"
                                 input-id="uploadPasFotoPengurus"
                                 empty-title="Unggah Foto Pengurus"
-                                empty-subtitle="Format JPG, PNG, WEBP (Maksimal 10MB)"
-                                :max-size-m-b="10"
+                                empty-subtitle="Format JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB"
                                 aspect-ratio="h-60 sm:h-72"
                             />
                         </x-form.card>

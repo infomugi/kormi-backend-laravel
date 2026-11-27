@@ -57,7 +57,11 @@ class StorageService
         // 3. Anti-Shell / Anti-Backdoor Scanner (hanya tag eksekusi PHP yang berbahaya).
         // Pola seperti eval()/system()/<script>/<% %> sengaja tidak dipakai untuk gambar karena
         // data biner JPEG/PNG/WEBP yang terkompresi dapat memuat urutan byte acak yang menyerupai
-        // pola tersebut sehingga foto normal ikut tertolak (false positive).
+        // pola tersebut sehingga foto normal ikut tertolak (false positive). Short-echo `<?=`
+        // (3 byte) juga dibuang dengan alasan yang sama — urutan `3C 3F 3D` bisa muncul acak di
+        // data JPEG ber-entropi tinggi. Tag `<?php` dan `__halt_compiler` tetap diblokir. Objek
+        // disimpan private + nama UUID dan hanya diakses via signed URL, jadi tidak pernah
+        // dieksekusi sebagai PHP; pola yang lolos bukan risiko eksekusi.
         $content = file_get_contents($realPath);
         if ($this->containsPhpPayload($content)) {
             throw new \InvalidArgumentException('Berkas ditolak karena mengandung pola kode berbahaya / skrip tidak sah.');
@@ -128,15 +132,18 @@ class StorageService
     /**
      * Periksa apakah konten berkas mengandung tag pembuka PHP (indikator polyglot shell/backdoor).
      *
-     * Sengaja hanya memindai tag PHP, bukan nama fungsi (eval/system/exec) atau pola `<% %>`,
-     * karena berkas biner yang sah (JPEG/PNG/WEBP/PDF/ZIP) dapat memuat urutan byte acak yang
-     * menyerupai pola tersebut dan menyebabkan penolakan palsu pada berkas normal.
+     * Sengaja hanya memindai tag PHP yang praktis tidak mungkin muncul acak pada data biner sah,
+     * bukan nama fungsi (eval/system/exec) atau pola `<% %>`. Pola short-echo `<?=` (3 byte) juga
+     * dibuang karena terlalu pendek: pada JPEG/PNG ber-entropi tinggi urutan byte `3C 3F 3D` dapat
+     * muncul secara kebetulan sehingga foto normal ikut tertolak (false positive). Tag `<?php` dan
+     * `__halt_compiler` tetap diblokir. Objek disimpan private di MinIO dengan nama UUID dan hanya
+     * diakses lewat signed URL, sehingga tidak pernah dieksekusi sebagai PHP — pola yang lolos
+     * bukan risiko eksekusi.
      */
     protected function containsPhpPayload(string $content): bool
     {
         $polaTagPhp = [
             '/<\?php/i',
-            '/<\?=/i',
             '/__halt_compiler\s*\(/i',
         ];
 
@@ -213,6 +220,24 @@ class StorageService
             return false;
         }
         return Str::startsWith($path, ['http://', 'https://']);
+    }
+
+    /**
+     * Ambil isi mentah berkas dari MinIO (atau URL eksternal).
+     */
+    public function getIsiFile(?string $path): ?string
+    {
+        if (empty($path)) {
+            return null;
+        }
+
+        try {
+            return $this->isUrlEksternal($path)
+                ? @file_get_contents($path)
+                : Storage::disk($this->disk)->get($path);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     /**

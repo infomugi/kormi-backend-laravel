@@ -30,6 +30,15 @@ class MobileAngketTest extends TestCase
         return UploadedFile::fake()->image('selfie.jpg', 320, 320);
     }
 
+    /**
+     * JPEG valid (lolos aturan `image`/`mimes`) yang melaporkan ukuran > 10 MB,
+     * sehingga yang gagal murni aturan `max`.
+     */
+    private function fotoKebesaranUji(): UploadedFile
+    {
+        return UploadedFile::fake()->image('selfie-besar.jpg', 320, 320)->size(11000);
+    }
+
     private function penggunaUji(): Pengguna
     {
         return Pengguna::create([
@@ -126,7 +135,8 @@ class MobileAngketTest extends TestCase
 
     public function test_beranda_dan_layanan_menautkan_angket(): void
     {
-        $this->get('/mobile/beranda')
+        $this->actingAs($this->penggunaUji())
+            ->get('/mobile/beranda')
             ->assertOk()
             ->assertSee('Survey APMO')
             ->assertSee(route('mobile.angket'), false);
@@ -136,6 +146,30 @@ class MobileAngketTest extends TestCase
             ->assertOk()
             ->assertSee('Survei &amp; Angket', false)
             ->assertSee(route('mobile.angket'), false);
+    }
+
+    public function test_beranda_menampilkan_mini_statistik_apmo_per_kecamatan(): void
+    {
+        $desa = $this->desaUji();
+        $pengguna = $this->penggunaUji();
+        $this->catatanUji($pengguna, $desa);
+        $this->catatanUji($pengguna, $desa);
+
+        $namaKecamatan = $desa->kecamatan->nama_kecamatan;
+
+        $html = $this->actingAs($pengguna)
+            ->get('/mobile/beranda')
+            ->assertOk()
+            ->assertSee('Survey APMO per Kecamatan')
+            ->assertSee($namaKecamatan)
+            ->getContent();
+
+        $this->assertSame(Kecamatan::count(), substr_count($html, 'kd-apmo-mini-item'));
+
+        $barisKecamatan = str($html)->between('<span class="kd-apmo-mini-name">' . e($namaKecamatan) . '</span>', '</div>')->toString();
+        preg_match('/kd-apmo-mini-num">([\d.]+)</', $barisKecamatan, $cocok);
+
+        $this->assertGreaterThanOrEqual(2, (int) str_replace('.', '', $cocok[1] ?? '0'));
     }
 
     public function test_detail_belum_lengkap_tidak_tersimpan(): void
@@ -611,6 +645,76 @@ class MobileAngketTest extends TestCase
             ->assertSet('selesai', false);
 
         $this->assertSame('Ambil atau unggah foto selfie sebagai bukti survey.', $komponen->errors()->first('foto_bukti'));
+        $this->assertSame(0, AngketApmo::where('nama_lengkap', 'Responden Uji Angket')->count());
+    }
+
+    public function test_unggahan_heic_ditolak_dengan_pesan_yang_jelas(): void
+    {
+        $user = $this->penggunaUji();
+        $this->actingAs($user);
+
+        $komponen = $this->isiIdentitas(Livewire::test(Angket::class))
+            ->call('lanjut')
+            ->set('melakukan_olahraga', 'ya')
+            ->call('lanjut');
+
+        // Konversi HEIC->JPEG terjadi di klien (WASM, diuji di browser). Bila JS
+        // dilewati/berkas tetap HEIC, server harus menolaknya dengan pesan yang jelas.
+        $komponen = $this->isiDetailOlahraga($komponen)
+            ->set('foto_bukti', UploadedFile::fake()->create('selfie.heic', 200, 'image/heic'))
+            ->assertHasErrors(['foto_bukti']);
+
+        $pesan = (string) $komponen->errors()->first('foto_bukti');
+        $this->assertTrue(
+            str_contains($pesan, 'JPG') || str_contains($pesan, 'HEIC'),
+            'Pesan foto HEIC harus menyebut JPG/HEIC: ' . $pesan
+        );
+
+        $komponen->call('kirim')->assertHasErrors(['foto_bukti']);
+
+        $this->assertSame(0, AngketApmo::where('nama_lengkap', 'Responden Uji Angket')->count());
+    }
+
+    public function test_unggahan_berkas_bukan_gambar_ditolak_dengan_pesan_yang_jelas(): void
+    {
+        $user = $this->penggunaUji();
+        $this->actingAs($user);
+
+        $komponen = $this->isiIdentitas(Livewire::test(Angket::class))
+            ->call('lanjut')
+            ->set('melakukan_olahraga', 'ya')
+            ->call('lanjut');
+
+        $komponen = $this->isiDetailOlahraga($komponen)
+            ->set('foto_bukti', UploadedFile::fake()->create('dokumen.txt', 20, 'text/plain'))
+            ->assertHasErrors(['foto_bukti']);
+
+        $this->assertSame(
+            'Foto tidak dapat dibaca. Gunakan JPG/PNG/WEBP; foto HEIC/HEIF dikonversi otomatis — bila gagal, pilih ulang foto atau perbarui browser.',
+            $komponen->errors()->first('foto_bukti')
+        );
+
+        $this->assertSame(0, AngketApmo::where('nama_lengkap', 'Responden Uji Angket')->count());
+    }
+
+    public function test_unggahan_lebih_dari_10_mb_ditolak_dengan_pesan_ukuran(): void
+    {
+        $user = $this->penggunaUji();
+        $this->actingAs($user);
+
+        $komponen = $this->isiIdentitas(Livewire::test(Angket::class))
+            ->call('lanjut')
+            ->set('melakukan_olahraga', 'ya')
+            ->call('lanjut');
+
+        $komponen = $this->isiDetailOlahraga($komponen)
+            ->set('foto_bukti', $this->fotoKebesaranUji())
+            ->assertHasErrors(['foto_bukti']);
+
+        $this->assertSame('Ukuran foto bukti survey maksimal 10 MB.', $komponen->errors()->first('foto_bukti'));
+
+        $komponen->call('kirim')->assertHasErrors(['foto_bukti']);
+
         $this->assertSame(0, AngketApmo::where('nama_lengkap', 'Responden Uji Angket')->count());
     }
 

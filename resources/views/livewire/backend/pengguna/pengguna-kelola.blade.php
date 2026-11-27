@@ -681,8 +681,7 @@
                                 name="uploadFotoProfil"
                                 input-id="uploadFotoProfilPengguna"
                                 empty-title="Unggah Foto Profil"
-                                empty-subtitle="Format JPG, PNG, WEBP (Maksimal 5MB)"
-                                :max-size-m-b="5"
+                                empty-subtitle="Format JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB"
                                 aspect-ratio="h-48 sm:h-56"
                             />
                         </x-form.card>

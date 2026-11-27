@@ -650,14 +650,13 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Banner Utama -->
                         <div>
-                            <x-form.field label="Banner Utama Event (JPG/PNG/WEBP, Max 5MB)" name="uploadBanner">
+                            <x-form.field label="Banner Utama Event (JPG/PNG/WEBP, dikompres otomatis ≤ 1 MB)" name="uploadBanner">
                                 <x-form.image-upload
                                     :upload="$uploadBanner"
                                     :saved-path="$banner_url"
                                     name="uploadBanner"
                                     empty-title="Unggah Banner Utama"
-                                    empty-subtitle="Format JPG, PNG, WEBP (Maksimal 5MB)"
-                                    :max-size-m-b="5"
+                                    empty-subtitle="Format JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB"
                                     aspect-ratio="h-44 sm:h-52"
                                 />
                             </x-form.field>
@@ -665,14 +664,13 @@
 
                         <!-- Logo / Maskot -->
                         <div>
-                            <x-form.field label="Logo / Maskot Event (Max 3MB)" name="uploadLogo">
+                            <x-form.field label="Logo / Maskot Event (dikompres otomatis ≤ 1 MB)" name="uploadLogo">
                                 <x-form.image-upload
                                     :upload="$uploadLogo"
                                     :saved-path="$logo_event_url"
                                     name="uploadLogo"
                                     empty-title="Unggah Logo / Maskot"
-                                    empty-subtitle="Format JPG, PNG, WEBP (Maksimal 3MB)"
-                                    :max-size-m-b="3"
+                                    empty-subtitle="Format JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB"
                                     aspect-ratio="h-44 sm:h-52"
                                 />
                             </x-form.field>

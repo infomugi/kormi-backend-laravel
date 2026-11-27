@@ -490,7 +490,7 @@
                                             :upload="$foto_kegiatan" 
                                             name="foto_kegiatan" 
                                             emptyTitle="Pilih Foto Keramaian / Warga" 
-                                            emptySubtitle="Format JPG, PNG, WEBP maks 10MB" 
+                                            emptySubtitle="Format JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB"
                                             aspectRatio="h-36 sm:h-40"
                                         />
                                     </x-form.field>
@@ -503,7 +503,7 @@
                                             :upload="$foto_daftar_hadir" 
                                             name="foto_daftar_hadir" 
                                             emptyTitle="Pilih Foto Daftar Hadir / Banner" 
-                                            emptySubtitle="Format JPG, PNG, WEBP maks 10MB" 
+                                            emptySubtitle="Format JPG, PNG, WEBP — otomatis dikompres ≤ 1 MB"
                                             aspectRatio="h-36 sm:h-40"
                                         />
                                     </x-form.field>

@@ -108,6 +108,22 @@ class MobileProfilTest extends TestCase
         $this->assertNull($user->fresh()->foto_profil);
     }
 
+    public function test_unggah_foto_profil_lebih_dari_5_mb_ditolak(): void
+    {
+        Storage::fake('minio');
+
+        $user = $this->penggunaUji();
+        $this->actingAs($user);
+
+        $komponen = Livewire::test(Profil::class)
+            ->set('foto_profil_baru', UploadedFile::fake()->image('foto-besar.jpg', 320, 320)->size(6000))
+            ->call('simpanDataAkun')
+            ->assertHasErrors(['foto_profil_baru' => 'max']);
+
+        $this->assertSame('Ukuran foto maksimal 5 MB.', $komponen->errors()->first('foto_profil_baru'));
+        $this->assertNull($user->fresh()->foto_profil);
+    }
+
     public function test_ganti_kata_sandi_memerlukan_sandi_lama_yang_benar(): void
     {
         $user = $this->penggunaUji();
