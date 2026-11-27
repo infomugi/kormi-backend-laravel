@@ -92,6 +92,9 @@ class Angket extends Component
     public string $namaTersimpan = '';
     public string $waktuTersimpan = '';
 
+    /** Apakah pengiriman terakhir menyertakan foto bukti (untuk ringkasan selesai). */
+    public bool $fotoDilampirkan = false;
+
     /** Foto selfie bukti survey yang baru diunggah. */
     public $foto_bukti = null;
 
@@ -215,7 +218,6 @@ class Angket extends Component
         'alasan_tidak_olahraga.required' => 'Pilih alasan tidak berolahraga.',
         'alasan_lainnya.required_if' => 'Sebutkan alasan Anda.',
         'alasan_lainnya.max' => 'Sebutan alasan maksimal 100 karakter.',
-        'foto_bukti.required' => 'Ambil atau unggah foto selfie sebagai bukti survey.',
         'foto_bukti.image' => 'Foto tidak dapat dibaca. Gunakan JPG/PNG/WEBP; foto HEIC/HEIF dikonversi otomatis — bila gagal, pilih ulang foto atau perbarui browser.',
         'foto_bukti.mimes' => 'Foto tidak dapat dibaca. Gunakan JPG/PNG/WEBP; foto HEIC/HEIF dikonversi otomatis — bila gagal, pilih ulang foto atau perbarui browser.',
         'foto_bukti.uploaded' => 'Foto gagal diunggah. Pastikan ukuran maksimal 10 MB lalu coba lagi.',
@@ -445,6 +447,7 @@ class Angket extends Component
 
         AngketApmo::create($data);
 
+        $this->fotoDilampirkan = $fotoBaru !== null;
         $this->reset('foto_bukti');
         $this->namaTersimpan = trim(strip_tags($this->nama_lengkap));
         $this->waktuTersimpan = now('Asia/Jakarta')->locale('id')->translatedFormat('d M Y H:i');
@@ -481,6 +484,7 @@ class Angket extends Component
     {
         $this->reset();
         $this->mount();
+        $this->fotoDilampirkan = false;
     }
 
     private function aturanIdentitas(): array
@@ -552,19 +556,14 @@ class Angket extends Component
     }
 
     /**
-     * Foto bukti wajib saat pengisian baru. Pada mode ubah, foto lama boleh
-     * dipertahankan sehingga unggahan baru bersifat opsional.
+     * Foto bukti bersifat opsional, baik saat pengisian baru maupun saat
+     * mengubah isian. Bila ada unggahan, format dan ukurannya tetap divalidasi
+     * ketat mengikuti whitelist StorageService.
      */
     private function aturanFotoBukti(): array
     {
-        $sudahAda = $this->isianId !== null
-            && AngketApmo::where('pengguna_id', auth()->id())
-                ->whereKey($this->isianId)
-                ->whereNotNull('foto_bukti')
-                ->exists();
-
         return [
-            $sudahAda ? 'nullable' : 'required',
+            'nullable',
             'image',
             'mimes:jpg,jpeg,png,webp,gif',
             'max:10240',

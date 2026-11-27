@@ -1,21 +1,20 @@
 {{-- Langkah 3 (penutup): foto selfie sebagai lampiran bukti survey --}}
 @php
     $fotoTersimpan = $modeUbah ? $isianDiubah?->foto_bukti_url : null;
-    $fotoOpsional = $fotoTersimpan !== null;
 @endphp
 
 <div class="kd-subhead" style="margin-top: 20px;">
     <h4>Foto Bukti Survey</h4>
-    <span class="kd-chip">{{ $fotoOpsional ? 'Opsional' : 'Wajib' }}</span>
+    <span class="kd-chip">Opsional</span>
 </div>
 
 <div class="kd-group">
     <div class="kd-label-row" style="align-items: flex-start;">
         <span class="kd-label" style="line-height: 1.45;">
-            @if($fotoOpsional)
+            @if($fotoTersimpan)
                 Foto selfie saat ini sudah tersimpan. Unggah foto baru bila ingin menggantinya, atau biarkan kosong untuk tetap memakai foto lama.
             @else
-                Unggah foto selfie Anda sebagai lampiran bukti bahwa survey ini diisi langsung oleh responden. <span class="kd-req">*</span>
+                Unggah foto selfie sebagai lampiran bukti bahwa survey ini diisi langsung oleh responden. Sifatnya opsional — survey tetap bisa dikirim tanpa foto.
             @endif
         </span>
     </div>

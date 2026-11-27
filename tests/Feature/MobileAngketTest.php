@@ -631,9 +631,9 @@ class MobileAngketTest extends TestCase
         $this->assertNotNull($catatan->foto_bukti);
     }
 
-    public function test_foto_bukti_wajib_diisi(): void
+    public function test_kirim_tanpa_foto_bukti_tetap_tersimpan(): void
     {
-        $komponen = $this->isiIdentitas(Livewire::test(Angket::class))
+        $this->isiIdentitas(Livewire::test(Angket::class))
             ->call('lanjut')
             ->set('melakukan_olahraga', 'tidak')
             ->call('lanjut')
@@ -641,11 +641,14 @@ class MobileAngketTest extends TestCase
             ->set('alasan_tidak_olahraga', 'tidak_ada_waktu')
             ->set('fasilitas_olahraga', 'kurang')
             ->call('kirim')
-            ->assertHasErrors(['foto_bukti'])
-            ->assertSet('selesai', false);
+            ->assertHasNoErrors()
+            ->assertSet('selesai', true)
+            ->assertSee('tidak dilampirkan');
 
-        $this->assertSame('Ambil atau unggah foto selfie sebagai bukti survey.', $komponen->errors()->first('foto_bukti'));
-        $this->assertSame(0, AngketApmo::where('nama_lengkap', 'Responden Uji Angket')->count());
+        $angket = AngketApmo::where('nama_lengkap', 'Responden Uji Angket')->first();
+
+        $this->assertNotNull($angket);
+        $this->assertNull($angket->foto_bukti);
     }
 
     public function test_unggahan_heic_ditolak_dengan_pesan_yang_jelas(): void
@@ -718,7 +721,7 @@ class MobileAngketTest extends TestCase
         $this->assertSame(0, AngketApmo::where('nama_lengkap', 'Responden Uji Angket')->count());
     }
 
-    public function test_ubah_isian_tanpa_foto_lama_mewajibkan_unggahan_foto(): void
+    public function test_ubah_isian_tanpa_foto_tetap_boleh_disimpan(): void
     {
         $user = $this->penggunaUji();
         $this->actingAs($user);
@@ -745,7 +748,8 @@ class MobileAngketTest extends TestCase
             ->call('lanjut')
             ->assertHasNoErrors()
             ->call('kirim')
-            ->assertHasErrors(['foto_bukti']);
+            ->assertHasNoErrors()
+            ->assertRedirect(route('mobile.laporan'));
 
         $this->assertNull($catatan->fresh()->foto_bukti);
     }
@@ -824,7 +828,7 @@ class MobileAngketTest extends TestCase
             ->set('alasan_tidak_olahraga', 'tidak_ada_waktu')
             ->set('fasilitas_olahraga', 'kurang')
             ->call('kirim')
-            ->assertHasErrors(['nama_lengkap', 'usia', 'kecamatan_id', 'desa_kelurahan_id', 'pekerjaan', 'foto_bukti'])
+            ->assertHasErrors(['nama_lengkap', 'usia', 'kecamatan_id', 'desa_kelurahan_id', 'pekerjaan'])
             ->assertSet('langkah', 1)
             ->assertSet('selesai', false);
 

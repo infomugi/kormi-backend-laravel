@@ -20,7 +20,7 @@
         </div>
         <div class="kd-success-row">
             <i data-lucide="camera"></i>
-            <p>Foto bukti: <strong>terlampir</strong></p>
+            <p>Foto bukti: <strong>{{ $fotoDilampirkan ? 'terlampir' : 'tidak dilampirkan' }}</strong></p>
         </div>
         <div class="kd-success-row">
             <i data-lucide="database"></i>
